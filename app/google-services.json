@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "683864342995",
+    "project_id": "keepfit-94172",
+    "storage_bucket": "keepfit-94172.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:683864342995:android:edd2d1759963bfa62b6f26",
+        "android_client_info": {
+          "package_name": "com.jackz314.keepfit"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "683864342995-3c5hac6364a16iufj6iqqfg35rftbuqb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jackz314.keepfit",
+            "certificate_hash": "7fb46c37b8504bf01e936b5563621c5aa50d39ea"
+          }
+        },
+        {
+          "client_id": "683864342995-1ber4fluga8248p9ri0mkupuiohtkjir.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQ__KPuLdFIIAyEEqT3U3QsIS6VgiU2Ec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "683864342995-1ber4fluga8248p9ri0mkupuiohtkjir.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

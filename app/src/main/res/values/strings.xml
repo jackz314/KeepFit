@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">KeepFit</string>
+    <string name="title_feed">Feed</string>
+    <string name="title_me">Me</string>
+    <string name="title_notifications">Notifications</string>
+    <string name="toast_play_service_required">"Google Play Service is required to use this app, please install it and try again!"</string>
+    <string name="sign_out_confirm_msg">Are you sure you want to sign out of KeepFit?</string>
+    <string name="delete_account_confirm_msg">Are you sure you want to delete your account from KeepFit? This action will permanently remove all your data on KeepFit and cannot be reversed!</string>
+
+    <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
+    <string name="facebook_application_id" translatable="false">3367689143342688</string>
+    <string name="facebook_login_protocol_scheme" translatable="false">fb3367689143342688</string>
+    <!-- Twitter consumer key and secret -->
+    <string name="twitter_consumer_key" translatable="false">XEE9mBBuucUUdgHAwhw5RK0sT</string>
+    <string name="twitter_consumer_secret" translatable="false">I1jKuDhU9IsqabLjZeYfJNeg3UEEcWZbyOdoN254WdGWxhVg27</string>
+</resources>
