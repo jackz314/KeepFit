@@ -1,10 +1,15 @@
 package com.jackz314.keepfit;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -25,7 +30,8 @@ import java.util.Objects;
 import static com.jackz314.keepfit.GlobalConstants.RC_REAUTH_DELETE;
 import static com.jackz314.keepfit.GlobalConstants.RC_SIGN_IN;
 
-public class MainActivity extends AppCompatActivity {
+public
+class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
@@ -45,19 +51,39 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupAfterSignIn() {
         Log.d(TAG, "setupAfterSignIn: signed in, setting up other stuff");
-        if (findViewById(R.id.container) == null) { // first time
-            setContentView(R.layout.activity_main);
-            //nav view
-            BottomNavigationView navView = findViewById(R.id.nav_view);
-            // Passing each menu ID as a set of Ids because each
-            // menu should be considered as top level destinations.
-            AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                    R.id.navigation_me, R.id.navigation_feed)
-                    .build();
-            NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-            NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-            NavigationUI.setupWithNavController(navView, navController);
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if(user.getMetadata().getCreationTimestamp() == user.getMetadata().getLastSignInTimestamp()){
+            //new user, show additional setup stuff
+            ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(
+                    new ActivityResultContracts.StartActivityForResult(), result -> {
+                        if (result.getResultCode() == Activity.RESULT_OK) {
+                            // There are no request codes
+                            Intent data = result.getData();
+                            //do stuff
+                            initMainViews();
+                        }
+                    });
+
+            Intent intent = new Intent(this, NewUserActivity.class);
+            resultLauncher.launch(intent);
+
+        }else if (findViewById(R.id.container) == null) { // first time login
+            initMainViews();
         } // otherwise it's user change, will be handled by AuthStateListener
+    }
+
+    private void initMainViews() {
+        setContentView(R.layout.activity_main);
+        //nav view
+        BottomNavigationView navView = findViewById(R.id.nav_view);
+        // Passing each menu ID as a set of Ids because each
+        // menu should be considered as top level destinations.
+        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.navigation_me, R.id.navigation_feed)
+                .build();
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        NavigationUI.setupWithNavController(navView, navController);
     }
 
     private void checkAndRequireGooglePlayService() {
