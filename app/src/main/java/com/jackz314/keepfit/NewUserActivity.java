@@ -2,7 +2,10 @@ package com.jackz314.keepfit;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Toast;
 
 import com.jackz314.keepfit.databinding.ActivityNewUserBinding;
 import com.jackz314.keepfit.databinding.FragmentMeBinding;
@@ -15,9 +18,13 @@ public class NewUserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_user);
-        b.finishNewUserBtn.setOnClickListener(view -> {
-
+        b = ActivityNewUserBinding.inflate(getLayoutInflater());
+        View rootView = b.getRoot();
+        setContentView(rootView);
+        b.finishNewUserBtn.setOnClickListener(v -> {
+            setResult(Activity.RESULT_OK);
+            Toast.makeText(this, "DONE", Toast.LENGTH_SHORT).show();
+            finish();
         });
     }
 }

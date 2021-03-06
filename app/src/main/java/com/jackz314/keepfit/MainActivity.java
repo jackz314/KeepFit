@@ -35,6 +35,15 @@ class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    private ActivityResultLauncher<Intent> newUserResultLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    // There are no request codes
+                    Intent data = result.getData();
+                    //do stuff
+                    initMainViews();
+                }
+            });
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,23 +58,16 @@ class MainActivity extends AppCompatActivity {
         }
     }
 
+
+
     private void setupAfterSignIn() {
         Log.d(TAG, "setupAfterSignIn: signed in, setting up other stuff");
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if(user.getMetadata().getCreationTimestamp() == user.getMetadata().getLastSignInTimestamp()){
             //new user, show additional setup stuff
-            ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(
-                    new ActivityResultContracts.StartActivityForResult(), result -> {
-                        if (result.getResultCode() == Activity.RESULT_OK) {
-                            // There are no request codes
-                            Intent data = result.getData();
-                            //do stuff
-                            initMainViews();
-                        }
-                    });
 
             Intent intent = new Intent(this, NewUserActivity.class);
-            resultLauncher.launch(intent);
+            newUserResultLauncher.launch(intent);
 
         }else if (findViewById(R.id.container) == null) { // first time login
             initMainViews();
