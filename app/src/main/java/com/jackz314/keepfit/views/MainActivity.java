@@ -1,4 +1,4 @@
-package com.jackz314.keepfit;
+package com.jackz314.keepfit.views;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,8 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +22,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.Utils;
 
 import java.util.Objects;
 
@@ -35,7 +35,7 @@ class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
-    private ActivityResultLauncher<Intent> newUserResultLauncher = registerForActivityResult(
+    private final ActivityResultLauncher<Intent> newUserResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     // There are no request codes
@@ -44,6 +44,7 @@ class MainActivity extends AppCompatActivity {
                     initMainViews();
                 }
             });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

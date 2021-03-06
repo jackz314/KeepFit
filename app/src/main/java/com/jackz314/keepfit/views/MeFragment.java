@@ -1,4 +1,4 @@
-package com.jackz314.keepfit.ui.me;
+package com.jackz314.keepfit.views;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
@@ -16,11 +16,12 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
+import com.google.firebase.auth.FirebaseUser;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.databinding.FragmentMeBinding;
@@ -37,8 +38,9 @@ public class MeFragment extends Fragment {
 
     private static final String TAG = "MeFragment";
 
-    private MeViewModel meViewModel;
     private FragmentMeBinding b;
+
+    private FirebaseAuth.AuthStateListener authStateListener;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -48,12 +50,13 @@ public class MeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        meViewModel = new ViewModelProvider(this).get(MeViewModel.class);
-//        View root = inflater.inflate(R.layout.fragment_me, container, false);
+        //        View root = inflater.inflate(R.layout.fragment_me, container, false);
         // view binding ftw!
         b = FragmentMeBinding.inflate(inflater, container, false);
         View root = b.getRoot();
-        meViewModel.getUser().observe(getViewLifecycleOwner(), user -> {
+
+        authStateListener = auth -> {
+            FirebaseUser user = auth.getCurrentUser();
             if (user != null) {
                 b.userNameText.setText(getGreetingMsg() + user.getDisplayName());
                 b.userEmailText.setText(user.getEmail());
@@ -63,7 +66,9 @@ public class MeFragment extends Fragment {
                         .placeholder(R.drawable.ic_outline_account_circle_24)
                         .into(b.userProfilePicture);
             }
-        });
+        };
+        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+
         return root;
     }
 

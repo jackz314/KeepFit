@@ -7,13 +7,13 @@
 
     <fragment
         android:id="@+id/navigation_me"
-        android:name="com.jackz314.keepfit.ui.me.MeFragment"
+        android:name="com.jackz314.keepfit.views.MeFragment"
         android:label="@string/title_me"
         tools:layout="@layout/fragment_me" />
 
     <fragment
         android:id="@+id/navigation_feed"
-        android:name="com.jackz314.keepfit.ui.feed.FeedFragment"
+        android:name="com.jackz314.keepfit.views.FeedFragment"
         android:label="@string/title_feed"
         tools:layout="@layout/fragment_feed" />
 

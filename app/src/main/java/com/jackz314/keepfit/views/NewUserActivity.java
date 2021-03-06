@@ -1,4 +1,4 @@
-package com.jackz314.keepfit;
+package com.jackz314.keepfit.views;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -13,7 +13,6 @@ import com.jackz314.keepfit.databinding.FragmentMeBinding;
 public class NewUserActivity extends AppCompatActivity {
 
     private ActivityNewUserBinding b;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
