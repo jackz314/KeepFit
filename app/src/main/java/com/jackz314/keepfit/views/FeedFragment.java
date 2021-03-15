@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
 
@@ -51,7 +52,24 @@ public class FeedFragment extends Fragment {
         feedRecyclerAdapter = new FeedRecyclerAdapter(getContext(), mediaList);
         feedRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
+            // Andrew Edited this : clicking image feed links to sample video
+
+            String ResourceIdAsString = view.getResources().getResourceName(view.getId());
+
+            if(view.getId() == R.id.constraintLayout) {
+
+                Intent intent = new Intent(requireActivity(), VideoActivity.class);
+                String videoPath = "https://firebasestorage.googleapis.com/v0/b/keepfit-94172.appspot.com/o/sample.mp4?alt=media&token=8c64be5f-2393-427e-89d6-ef7ec4913b35";
+                //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
+                intent.putExtra("uri", videoPath);
+                startActivity(intent);
+            }
+
+            else{
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
+            }
+
+            //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
         });
         b.feedRecycler.setAdapter(feedRecyclerAdapter);
 
