@@ -4,13 +4,18 @@
     android:layout_height="match_parent"
     android:id="@+id/relative_parent"
     android:background="#000000">
+
     <VideoView
+        android:id="@+id/video_view"
+        android:layout_width="wrap_content"
+        android:layout_height="313dp"
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="56dp"
+        android:layout_marginRight="49dp"
+        android:layout_marginBottom="0dp"
         android:focusable="false"
-        android:focusableInTouchMode="false"
-        android:id="@+id/video_view" />
+        android:focusableInTouchMode="false" />
 </RelativeLayout>

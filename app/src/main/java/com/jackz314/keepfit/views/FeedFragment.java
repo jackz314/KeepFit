@@ -59,7 +59,8 @@ public class FeedFragment extends Fragment {
             if(view.getId() == R.id.constraintLayout) {
 
                 Intent intent = new Intent(requireActivity(), VideoActivity.class);
-                String videoPath = "https://firebasestorage.googleapis.com/v0/b/keepfit-94172.appspot.com/o/sample.mp4?alt=media&token=8c64be5f-2393-427e-89d6-ef7ec4913b35";
+
+                String videoPath = mediaList.get(position).getLink();
                 //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
                 intent.putExtra("uri", videoPath);
                 startActivity(intent);
