@@ -37,18 +37,16 @@ public class FeedFragment extends Fragment {
     private FirebaseFirestore db;
     private FeedRecyclerAdapter feedRecyclerAdapter;
 
-    private List<Media> mediaList = new ArrayList<>();
+    private final List<Media> mediaList = new ArrayList<>();
 
-    private Executor procES = Executors.newSingleThreadExecutor();
+    private final Executor procES = Executors.newSingleThreadExecutor();
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-        b = FragmentFeedBinding.inflate(inflater, container, false);
-        View root = b.getRoot();
+        Log.d(TAG, "onCreate: called");
 
-        b.emptyFeedText.setText("Hello! Empty feed.");
-        b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
         feedRecyclerAdapter = new FeedRecyclerAdapter(getContext(), mediaList);
         feedRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
@@ -72,7 +70,6 @@ public class FeedFragment extends Fragment {
 
             //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
         });
-        b.feedRecycler.setAdapter(feedRecyclerAdapter);
 
         db = FirebaseFirestore.getInstance();
         db.collection("media")
@@ -88,12 +85,46 @@ public class FeedFragment extends Fragment {
                         for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
                             mediaList.add(new Media(queryDocumentSnapshot));
                         }
+
                         // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
-                        requireActivity().runOnUiThread(() -> feedRecyclerAdapter.notifyDataSetChanged());
+                        requireActivity().runOnUiThread(() -> {
+
+                            if (b != null) {
+                                if (!mediaList.isEmpty()){
+                                    b.emptyFeedText.setVisibility(View.GONE);
+                                } else {
+                                    b.emptyFeedText.setVisibility(View.VISIBLE);
+                                    b.emptyFeedText.setText("Hello! Empty feed.");
+                                }
+                            }
+
+                            feedRecyclerAdapter.notifyDataSetChanged();
+                        });
                         Log.d(TAG, "media collection update: " + mediaList);
                     });
                 });
+    }
 
-        return root;
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        if (b == null){ // only inflate for the first time being created
+            b = FragmentFeedBinding.inflate(inflater, container, false);
+
+            if (!mediaList.isEmpty() && b.emptyFeedText.getVisibility() == View.VISIBLE) {
+                b.emptyFeedText.setVisibility(View.GONE);
+            }
+
+            b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+            b.feedRecycler.setAdapter(feedRecyclerAdapter);
+        }
+
+        return b.getRoot();
+    }
+
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "onDestroy: called");
+        super.onDestroy();
     }
 }

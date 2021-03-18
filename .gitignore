@@ -13,3 +13,5 @@
 .externalNativeBuild
 .cxx
 local.properties
+zoom-mobilertc/build
+zoom-commonlib/build
