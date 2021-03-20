@@ -61,14 +61,6 @@ public class NewUserActivity extends AppCompatActivity {
                 return;
             }
 
-            class User {
-
-                public String date_of_birth;
-                public String full_name;
-                public String nickname;
-
-            }
-
             String userName = mUsernameEditText.getText().toString();
             mBiographyEditText = (EditText) findViewById(R.id.editTextTextBio);
             mEmailEditText = (EditText) findViewById(R.id.editTextEmailAddress);
