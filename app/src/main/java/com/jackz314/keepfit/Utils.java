@@ -140,7 +140,10 @@ public class Utils {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             String savedToken = prefs.getString(GlobalConstants.ZOOM_JWT_TOKEN_KEY, "");
             Date expirationDate = getJWTExpirationDate(savedToken);
-            if(expirationDate == null) emitter.onSuccess("");
+            if(expirationDate == null) {
+                emitter.onSuccess("");
+                return;
+            }
             else expirationDate = new Date(expirationDate.getTime() - 10 * DateUtils.MINUTE_IN_MILLIS); // assume expiration 10 min before actual exp
             if(new Date().after(expirationDate)){ // invalid, get a new one
                 emitter.onSuccess("");
