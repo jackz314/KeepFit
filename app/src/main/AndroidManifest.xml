@@ -21,8 +21,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".views.VideoActivity"
+        <activity android:name=".views.VideoActivity">
             android:configChanges="orientation|screenSize"></activity>
+        <activity android:name=".views.SearchActivity"></activity>
     </application>
 
 </manifest>
