@@ -202,7 +202,8 @@ class MainActivity extends AppCompatActivity {
 
         navController.setGraph(R.navigation.mobile_navigation);
 
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        //no need to change action bar titles
+//        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
     }
 
