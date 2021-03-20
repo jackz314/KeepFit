@@ -14,9 +14,9 @@ public class User {
     private String name;
     private String profilePic;
     private Date birthday;
-    private Long height;
-    private Long weight;
-    private Boolean sex;
+    private int height; // cm
+    private int weight; // kg
+    private boolean sex;
 
     public User(){
         name = "";
@@ -30,12 +30,18 @@ public class User {
         name = doc.getString("name");
         profilePic = doc.getString("profile_pic");
         birthday = doc.getDate("birthday");
-        height = doc.getLong("height");
-        weight = doc.getLong("weight");
-        sex = doc.getBoolean("sex");
+        Long height = doc.getLong("height");
+        if(height == null) height = 0L;
+        this.height = height.intValue();
+        Long weight = doc.getLong("weight");
+        if(weight == null) weight = 0L;
+        this.weight = weight.intValue();
+        Boolean sex = doc.getBoolean("sex");
+        if(sex == null) sex = true;
+        this.sex = sex;
     }
 
-    public User(String uid, String biography, String email, String name, String profilePic, Date birthday, Long height, Long weight, Boolean sex) {
+    public User(String uid, String biography, String email, String name, String profilePic, Date birthday, int height, int weight, boolean sex) {
         this.uid = uid;
         this.biography = biography;
         this.email = email;
@@ -95,27 +101,27 @@ public class User {
         this.birthday = birthday;
     }
 
-    public Long getHeight() {
+    public int getHeight() {
         return height;
     }
 
-    public void setHeight(Long height) {
+    public void setHeight(int height) {
         this.height = height;
     }
 
-    public Long getWeight() {
+    public int getWeight() {
         return weight;
     }
 
-    public void setWeight(Long weight) {
+    public void setWeight(int weight) {
         this.weight = weight;
     }
 
-    public Boolean getSex() {
+    public boolean getSex() {
         return sex;
     }
 
-    public void setSex(Boolean sex) {
+    public void setSex(boolean sex) {
         this.sex = sex;
     }
 

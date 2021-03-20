@@ -3,6 +3,7 @@ package com.jackz314.keepfit.views;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.DrawableRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -29,10 +31,14 @@ import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.databinding.ActivityMainBinding;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Objects;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import uk.co.markormesher.android_fab.SpeedDialMenuAdapter;
+import uk.co.markormesher.android_fab.SpeedDialMenuItem;
 import us.zoom.sdk.ZoomError;
 import us.zoom.sdk.ZoomSDK;
 import us.zoom.sdk.ZoomSDKInitParams;
@@ -118,6 +124,53 @@ class MainActivity extends AppCompatActivity {
         meCompositeDisposable.add(disposable);
     }
 
+    private SpeedDialMenuAdapter speedDialMenuAdapter = new SpeedDialMenuAdapter() {
+        @Override
+        public int getCount() {
+            return 3;
+        }
+
+        @NotNull
+        @Override
+        public SpeedDialMenuItem getMenuItem(@NotNull Context context, int pos) {
+            @DrawableRes int icon;
+            String label;
+            if (pos == 0) {
+                icon = R.drawable.ic_baseline_directions_run_24;
+                label = "Track exercise";
+            } else if (pos == 1) {
+                icon = R.drawable.ic_baseline_go_live_24;
+                label = "Go live";
+            } else { // 2
+                icon = R.drawable.ic_baseline_cloud_upload_24;
+                label = "Upload a video";
+            }
+            return new SpeedDialMenuItem(context, icon, label);
+        }
+
+        @Override
+        public boolean onMenuItemClick(int pos) {
+            if (pos == 0) { // exercise
+                Intent intent = new Intent(MainActivity.this, ExerciseActivity.class);
+                intent.putExtra(GlobalConstants.EXERCISE_TYPE, "Running");
+                startActivity(intent);
+            } else if (pos == 1) { // livestream
+                Intent intent = new Intent(MainActivity.this, StartLivestreamActivity.class);
+                intent.putExtra(GlobalConstants.MEDIA_TITLE, "Testing title");
+                startActivity(intent);
+            } else { // video upload
+                // TODO: 3/20/21 upload video
+                Toast.makeText(MainActivity.this, "Upload video", Toast.LENGTH_SHORT).show();
+            }
+            return true;
+        }
+
+        @Override
+        public float fabRotationDegrees() {
+            return 135F;
+        }
+    };
+
     private void initMainViews() {
         b = ActivityMainBinding.inflate(getLayoutInflater());
         View rootView = b.getRoot();
@@ -125,11 +178,14 @@ class MainActivity extends AppCompatActivity {
 
         initializeZoomSdk(this);
 
-        b.mainActionBtn.setOnClickListener(v -> {
-            Intent intent = new Intent(this, StartLivestreamActivity.class);
-            intent.putExtra(GlobalConstants.LIVESTREAM_TITLE, "Testing title");
-            startActivity(intent);
-        });
+        b.mainActionBtn.setSpeedDialMenuAdapter(speedDialMenuAdapter);
+
+        int dark = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (dark == Configuration.UI_MODE_NIGHT_YES) { // night mode
+            b.mainActionBtn.setContentCoverColour(0xcc000000); // faint black
+        } else if (dark == Configuration.UI_MODE_NIGHT_NO) { // light mode
+            b.mainActionBtn.setContentCoverColour(0xccffffff); // faint white
+        }
 
         //nav view
         BottomNavigationView navView = findViewById(R.id.nav_view);

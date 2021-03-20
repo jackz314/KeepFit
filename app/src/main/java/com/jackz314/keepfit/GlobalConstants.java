@@ -16,5 +16,6 @@ public interface GlobalConstants {
     String ZOOM_PASSWORD_KEY = "zoom_pwd";
 
     // intent stuff
-    String LIVESTREAM_TITLE = "live_title";
+    String MEDIA_TITLE = "media_title";
+    String EXERCISE_TYPE = "exercise_type";
 }
