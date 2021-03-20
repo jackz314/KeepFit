@@ -1,15 +1,22 @@
 package com.jackz314.keepfit.views;
 
+import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -41,11 +48,13 @@ public class FeedFragment extends Fragment {
 
     private final Executor procES = Executors.newSingleThreadExecutor();
 
+    private Context context;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(TAG, "onCreate: called");
+        context = getContext();
 
         feedRecyclerAdapter = new FeedRecyclerAdapter(getContext(), mediaList);
         feedRecyclerAdapter.setClickListener((view, position) -> {
@@ -108,6 +117,7 @@ public class FeedFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
+        setHasOptionsMenu(true);
         if (b == null){ // only inflate for the first time being created
             b = FragmentFeedBinding.inflate(inflater, container, false);
 
@@ -122,9 +132,28 @@ public class FeedFragment extends Fragment {
         return b.getRoot();
     }
 
+
+    // Steven: Added menu option for search activity
+    @SuppressLint("RestrictedApi")
     @Override
-    public void onDestroy() {
-        Log.d(TAG, "onDestroy: called");
-        super.onDestroy();
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.feed_search, menu);
+        if (menu instanceof MenuBuilder) {
+            ((MenuBuilder) menu).setOptionalIconsVisible(true);
+        }
+        super.onCreateOptionsMenu(menu, inflater);
     }
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        if (item.getItemId() == R.id.app_bar_search) {
+                Intent intent = new Intent(context, SearchActivity.class);
+                context.startActivity(intent);
+        }else{
+                return super.onOptionsItemSelected(item);
+        }
+
+        return true;
+    }
+
+
 }
