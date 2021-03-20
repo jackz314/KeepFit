@@ -124,7 +124,7 @@ class MainActivity extends AppCompatActivity {
         meCompositeDisposable.add(disposable);
     }
 
-    private SpeedDialMenuAdapter speedDialMenuAdapter = new SpeedDialMenuAdapter() {
+    private final SpeedDialMenuAdapter speedDialMenuAdapter = new SpeedDialMenuAdapter() {
         @Override
         public int getCount() {
             return 3;
