@@ -23,6 +23,7 @@ import us.zoom.sdk.MeetingServiceListener;
 import us.zoom.sdk.MeetingStatus;
 import us.zoom.sdk.MeetingViewsOptions;
 import us.zoom.sdk.StartMeetingOptions;
+import us.zoom.sdk.ZoomApiError;
 import us.zoom.sdk.ZoomSDK;
 
 public class LivestreamController implements MeetingServiceListener {
@@ -57,7 +58,11 @@ public class LivestreamController implements MeetingServiceListener {
             return;
         }
         meetingService.addListener(this);
-        meetingService.joinMeetingWithParams(context, params, opts);
+        int result = meetingService.joinMeetingWithParams(context, params, opts);
+        if (result != ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
+            Log.e(TAG, "joinLivestream: Failed to join meeting, error: " + result);
+            Toast.makeText(context, "Failed to join livestream, try again later", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public static JoinMeetingParams parseMeetingParamsFromLink(String link){
