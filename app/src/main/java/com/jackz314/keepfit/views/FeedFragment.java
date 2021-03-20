@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
 
@@ -36,6 +37,9 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import us.zoom.sdk.JoinMeetingOptions;
+import us.zoom.sdk.JoinMeetingParams;
+
 public class FeedFragment extends Fragment {
 
     private static final String TAG = "FeedFragment";
@@ -43,6 +47,8 @@ public class FeedFragment extends Fragment {
     private FragmentFeedBinding b;
     private FirebaseFirestore db;
     private FeedRecyclerAdapter feedRecyclerAdapter;
+
+    private LivestreamController livestreamController;
 
     private final List<Media> mediaList = new ArrayList<>();
 
@@ -53,28 +59,25 @@ public class FeedFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         context = getContext();
-
+        livestreamController = new LivestreamController(getContext());
         feedRecyclerAdapter = new FeedRecyclerAdapter(getContext(), mediaList);
         feedRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
-            // Andrew Edited this : clicking image feed links to sample video
 
-            String ResourceIdAsString = view.getResources().getResourceName(view.getId());
-
-            if(view.getId() == R.id.constraintLayout) {
-
-                Intent intent = new Intent(requireActivity(), VideoActivity.class);
-
-                String videoPath = mediaList.get(position).getLink();
-                //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
-                intent.putExtra("uri", videoPath);
-                startActivity(intent);
+            Media media = mediaList.get(position);
+            if(media.isLivestream()) {
+                livestreamController.setLivestream(media);
+                livestreamController.joinLivestream();
             }
 
             else{
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
+                Intent intent = new Intent(requireActivity(), VideoActivity.class);
+
+                String videoPath = media.getLink();
+                //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
+                intent.putExtra("uri", videoPath);
+                startActivity(intent);
             }
 
             //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));

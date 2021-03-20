@@ -32,6 +32,9 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.util.Objects;
 
+import us.zoom.sdk.AccountService;
+import us.zoom.sdk.ZoomSDK;
+
 import static com.jackz314.keepfit.GlobalConstants.RC_REAUTH_DELETE;
 
 public class MeFragment extends Fragment {
@@ -51,25 +54,33 @@ public class MeFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //        View root = inflater.inflate(R.layout.fragment_me, container, false);
-        // view binding ftw!
-        b = FragmentMeBinding.inflate(inflater, container, false);
-        View root = b.getRoot();
+        if (b == null){
+            // view binding ftw!
+            b = FragmentMeBinding.inflate(inflater, container, false);
 
-        authStateListener = auth -> {
-            FirebaseUser user = auth.getCurrentUser();
-            if (user != null) {
-                b.userNameText.setText(getGreetingMsg() + user.getDisplayName());
-                b.userEmailText.setText(user.getEmail());
-                Glide.with(root)
-                        .load(Utils.getHighResProfilePicUrl(user))
-                        .fitCenter()
-                        .placeholder(R.drawable.ic_outline_account_circle_24)
-                        .into(b.userProfilePicture);
-            }
-        };
-        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+            authStateListener = auth -> {
+                FirebaseUser user = auth.getCurrentUser();
+                if (user != null) {
+                    b.userNameText.setText(getGreetingMsg() + user.getDisplayName());
+                    b.userEmailText.setText(user.getEmail());
+                    Glide.with(b.getRoot())
+                            .load(Utils.getHighResProfilePicUrl())
+                            .fitCenter()
+                            .placeholder(R.drawable.ic_outline_account_circle_24)
+                            .into(b.userProfilePicture);
+                }
+            };
+            FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
+        }
 
-        return root;
+
+        return b.getRoot();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (authStateListener != null) FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+        super.onDestroy();
     }
 
     @NotNull
@@ -107,6 +118,13 @@ public class MeFragment extends Fragment {
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> signOut())
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
+        } else if (item.getItemId() == R.id.sign_out_zoom_btn) {
+            ZoomSDK sdk = ZoomSDK.getInstance();
+            AccountService accountService = sdk.getAccountService();
+            String userEmail = "";
+            if (accountService != null) userEmail = accountService.getAccountEmail();
+            sdk.logoutZoom();
+            Toast.makeText(getContext(), "Signed " + userEmail + " out of Zoom", Toast.LENGTH_SHORT).show();
         } else if (item.getItemId() == R.id.delete_account_btn) {
             //delete account
             new AlertDialog.Builder(requireContext())

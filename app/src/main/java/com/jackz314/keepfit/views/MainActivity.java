@@ -1,10 +1,8 @@
 package com.jackz314.keepfit.views;
 
 import android.app.Activity;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,9 +11,6 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.browser.customtabs.CustomTabsClient;
-import androidx.browser.customtabs.CustomTabsIntent;
-import androidx.browser.customtabs.CustomTabsServiceConnection;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -33,12 +28,12 @@ import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.databinding.ActivityMainBinding;
-import com.jackz314.keepfit.databinding.ActivityNewUserBinding;
 
 import java.util.Objects;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
+import us.zoom.sdk.ZoomError;
 import us.zoom.sdk.ZoomSDK;
 import us.zoom.sdk.ZoomSDKInitParams;
 import us.zoom.sdk.ZoomSDKInitializeListener;
@@ -106,7 +101,14 @@ class MainActivity extends AppCompatActivity {
                  * @param errorCode {@link us.zoom.sdk.ZoomError#ZOOM_ERROR_SUCCESS} if the SDK has been initialized successfully.
                  */
                 @Override
-                public void onZoomSDKInitializeResult(int errorCode, int internalErrorCode) { }
+                public void onZoomSDKInitializeResult(int errorCode, int internalErrorCode) {
+                    if (errorCode != ZoomError.ZOOM_ERROR_SUCCESS) {
+                        Log.e(TAG, "onZoomSDKInitializeResult: zoom sdk initialization failed! Error: " + errorCode + " Internal error code: " + internalErrorCode);
+                        Toast.makeText(context, "Failed to initialize Zoom SDK (" + errorCode + "), you might encounter problems with live streams", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Log.d(TAG, "onZoomSDKInitializeResult: zoom sdk initialized");
+                    }
+                }
 
                 @Override
                 public void onZoomAuthIdentityExpired() { }
@@ -124,7 +126,9 @@ class MainActivity extends AppCompatActivity {
         initializeZoomSdk(this);
 
         b.mainActionBtn.setOnClickListener(v -> {
-           startActivity(new Intent(this, ZoomLoginActivity.class));
+            Intent intent = new Intent(this, StartLivestreamActivity.class);
+            intent.putExtra(GlobalConstants.LIVESTREAM_TITLE, "Testing title");
+            startActivity(intent);
         });
 
         //nav view

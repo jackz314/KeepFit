@@ -34,7 +34,7 @@ exports.getZoomJWTToken = functions.https.onCall((data, context) => {
     // Throwing an HttpsError so that the client gets the error details.
     throw new functions.https.HttpsError("failed-precondition", "User is not authenticated.");
   }
-  const expTime = Math.floor(Date.now() / 1000) + 2 * (60 * 60); // 2 hr expiration
+  const expTime = Math.floor(Date.now() / 1000) + 24 * (60 * 60); // 24 hrs expiration
   const token = jwt.sign({
     appKey: zoomSdkKey,
     exp: expTime, // iat is included automatically

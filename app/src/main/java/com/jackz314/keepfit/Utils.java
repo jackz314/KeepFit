@@ -3,9 +3,13 @@ package com.jackz314.keepfit;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.content.res.Resources;
+import androidx.preference.PreferenceManager;
+
+import android.text.format.DateUtils;
 import android.util.Base64;
 import android.util.Log;
+import android.util.Patterns;
 
 import com.facebook.AccessToken;
 import com.firebase.ui.auth.AuthUI;
@@ -18,16 +22,25 @@ import com.google.firebase.functions.HttpsCallableResult;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
+import javax.security.auth.login.LoginException;
+
+import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.core.SingleEmitter;
+import us.zoom.sdk.ZoomAuthenticationError;
+import us.zoom.sdk.ZoomSDK;
+import us.zoom.sdk.ZoomSDKAuthenticationListener;
 
 import static com.jackz314.keepfit.GlobalConstants.PRIVACY_POLICY_URL;
 import static com.jackz314.keepfit.GlobalConstants.RC_SIGN_IN;
@@ -103,7 +116,8 @@ public class Utils {
         return "firebase";
     }
 
-    public static String getHighResProfilePicUrl(FirebaseUser user) {
+    public static String getHighResProfilePicUrl() {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         String originalUrl = "";
         if (user.getPhotoUrl() != null) {
             originalUrl = user.getPhotoUrl().toString();
@@ -126,7 +140,9 @@ public class Utils {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             String savedToken = prefs.getString(GlobalConstants.ZOOM_JWT_TOKEN_KEY, "");
             Date expirationDate = getJWTExpirationDate(savedToken);
-            if(expirationDate == null || new Date().after(expirationDate)){ // invalid, get a new one
+            if(expirationDate == null) emitter.onSuccess("");
+            else expirationDate = new Date(expirationDate.getTime() - 10 * DateUtils.MINUTE_IN_MILLIS); // assume expiration 10 min before actual exp
+            if(new Date().after(expirationDate)){ // invalid, get a new one
                 emitter.onSuccess("");
             }else {
                 emitter.onSuccess(savedToken);
@@ -194,4 +210,23 @@ public class Utils {
         return new String(decodedBytes, StandardCharsets.UTF_8);
     }
 
+    public static boolean isValidEmail(CharSequence charSequence){
+        return Patterns.EMAIL_ADDRESS.matcher(charSequence).matches();
+    }
+
+    // from https://stackoverflow.com/a/21333739/8170714
+    public static String getMD5(String str) {
+        if (str == null) return "";
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] array = md.digest(str.getBytes(StandardCharsets.UTF_8));
+            StringBuilder sb = new StringBuilder();
+            for (byte b : array) {
+                sb.append(Integer.toHexString((b & 0xFF) | 0x100).substring(1, 3));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException ignored) {
+        }
+        return ""; // should never happen
+    }
 }

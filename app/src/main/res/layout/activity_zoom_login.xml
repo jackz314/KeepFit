@@ -4,6 +4,134 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".views.ZoomLoginActivity">
+    tools:context=".views.StartLivestreamActivity">
+
+
+    <TextView
+        android:id="@+id/zoom_sign_in_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Sign in with Zoom"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="To start livestreams"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/zoom_sign_in_label" />
+
+    <ProgressBar
+        android:id="@+id/zoom_login_progress"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/zoom_login_container"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/zoom_login_container" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/zoom_login_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView7"
+        app:layout_constraintVertical_bias="0.0">
+
+        <Button
+            android:id="@+id/zoom_sso_login_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SSO Login"
+            app:layout_constraintBottom_toBottomOf="@+id/zoom_sso_domain_input"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/zoom_sso_domain_input"
+            app:layout_constraintTop_toTopOf="@+id/zoom_sso_domain_input" />
+
+        <EditText
+            android:id="@+id/zoom_sso_domain_input"
+            style="@style/Widget.AppCompat.EditText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:hint="Company/school domain"
+            android:singleLine="true"
+            android:text="usc"
+            app:layout_constraintEnd_toStartOf="@+id/zoom_sso_login_btn"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+        <TextView
+            android:id="@+id/textView9"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="SSO"
+            app:layout_constraintEnd_toEndOf="@+id/zoom_sso_login_btn"
+            app:layout_constraintStart_toStartOf="@+id/zoom_sso_domain_input"
+            app:layout_constraintTop_toBottomOf="@+id/zoom_email_login_btn" />
+
+        <Button
+            android:id="@+id/zoom_email_login_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Sign In"
+            app:layout_constraintEnd_toEndOf="@+id/zoom_password_input"
+            app:layout_constraintStart_toStartOf="@+id/zoom_password_input"
+            app:layout_constraintTop_toBottomOf="@+id/zoom_password_input" />
+
+        <EditText
+            android:id="@+id/zoom_password_input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:ems="10"
+            android:hint="Password"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/zoom_email_input" />
+
+        <EditText
+            android:id="@+id/zoom_email_input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:ems="10"
+            android:hint="Email address"
+            android:inputType="textEmailAddress"
+            android:singleLine="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+        <TextView
+            android:id="@+id/textView8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Email and password"
+            app:layout_constraintEnd_toEndOf="@+id/zoom_email_input"
+            app:layout_constraintStart_toStartOf="@+id/zoom_email_input"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

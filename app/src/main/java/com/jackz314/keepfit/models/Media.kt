@@ -19,7 +19,7 @@ class Media(doc: DocumentSnapshot) {
 
     @DocumentId
     var uid: String? = null
-    var creator = MutableLiveData<User>(User())
+    var creator = MutableLiveData(User())
     var creatorRef: DocumentReference?
 
     @PropertyName("is_livestream")
@@ -32,7 +32,7 @@ class Media(doc: DocumentSnapshot) {
     var thumbnail: String? = null
     var title: String? = null
 
-    //    @PropertyName("view_count")
+    @PropertyName("view_count")
     var viewCount: Int = 0
 
     init {

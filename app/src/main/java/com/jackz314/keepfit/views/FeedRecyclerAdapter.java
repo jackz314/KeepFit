@@ -2,6 +2,7 @@ package com.jackz314.keepfit.views;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -32,6 +34,8 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     private List<Media> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+
+    private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
 
 
     // data is passed into the constructor
