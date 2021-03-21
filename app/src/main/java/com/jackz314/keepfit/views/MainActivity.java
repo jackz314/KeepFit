@@ -29,7 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
-import com.jackz314.keepfit.controllers.UserController;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivityMainBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -83,7 +83,7 @@ class MainActivity extends AppCompatActivity {
 
     private void setupAfterSignIn() {
         Log.d(TAG, "setupAfterSignIn: signed in, setting up other stuff");
-        Disposable disposable = UserController.getCurrentUser().subscribe(user -> {
+        Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {
             if (findViewById(R.id.container) == null) initMainViews();
             // otherwise it's user change, will be handled by AuthStateListener
         }, throwable -> { // unable to get user from firestore, start new user

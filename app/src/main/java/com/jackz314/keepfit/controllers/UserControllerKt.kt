@@ -10,7 +10,7 @@ import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.core.SingleEmitter
 import java.util.*
 
-object UserController {
+object UserControllerKt {
     @JvmStatic
     val currentUser: Single<User?>
         get() = Single.create { emitter: SingleEmitter<User?> ->

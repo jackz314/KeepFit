@@ -1,12 +1,9 @@
 package com.jackz314.keepfit.views;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -67,9 +64,9 @@ public class FollowActivity extends AppCompatActivity {
             public void onClick(View view) {
                 UserController ucontrol = new UserController();
                 if (following) {
-                    ucontrol.Unfollow(other_user);
+                    ucontrol.unfollow(other_user);
                 } else {
-                    ucontrol.Follow(other_user);
+                    ucontrol.follow(other_user);
                 }
             }
         });

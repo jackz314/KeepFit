@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -15,7 +14,7 @@ import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.ExerciseController;
-import com.jackz314.keepfit.controllers.UserController;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivityExerciseBinding;
 import com.jackz314.keepfit.models.User;
 
@@ -63,7 +62,7 @@ public class ExerciseActivity extends AppCompatActivity {
         else intensityStr = "Vigorous";
         b.exerciseIntensity.setText("Intensity: " + intensityStr);
 
-        Disposable disposable = UserController.getCurrentUser().subscribe(user -> {
+        Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {
             this.user = user;
             exerciseController = new ExerciseController(user, met);
         }, e -> {

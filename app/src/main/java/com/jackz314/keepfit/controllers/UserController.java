@@ -12,7 +12,7 @@ public class UserController {
     FirebaseUser curruser = FirebaseAuth.getInstance().getCurrentUser();
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    public void Follow(User other_user) {
+    public void follow(User other_user) {
         //add other user to following list
         db.collection("users").document(curruser.getUid()).collection("following").add(db.collection("users").document(other_user.getUid()));
         //add curruser to other user's followers list
@@ -20,7 +20,7 @@ public class UserController {
 
     }
 
-    public void Unfollow(User other_user) {
+    public void unfollow(User other_user) {
         DocumentReference doc = db.collection("users").document(curruser.getUid()).collection("following").document(other_user.getUid());
         //remove other user from following list
         doc.delete();
