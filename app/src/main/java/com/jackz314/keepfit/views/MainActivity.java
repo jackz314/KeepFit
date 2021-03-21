@@ -160,7 +160,9 @@ class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             } else { // video upload
                 // TODO: 3/20/21 upload video
-                Toast.makeText(MainActivity.this, "Upload video", Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, UploadVideoActivity.class);
+                intent.putExtra(GlobalConstants.MEDIA_TITLE, "Upload Video");
+                startActivity(intent);
             }
             return true;
         }
