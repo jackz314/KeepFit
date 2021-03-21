@@ -44,6 +44,30 @@ import static com.google.firebase.Timestamp.now;
 
 public class UploadVideoActivity extends AppCompatActivity {
 
+    public class putVideo {
+        public String title;
+        public String url;
+
+        public putVideo(){}
+
+        public putVideo(String name, String url){
+            this.title = name;
+            this.url = url;
+        }
+        public String getTitle() {
+            return title;
+        }
+        public void setTitle(String title){
+            this.title = title;
+        }
+        public String getUrl() {
+            return url;
+        }
+        public void setUrl(String url) {
+            this.url = url;
+        }
+    }
+
     private static final String TAG = "UploadVideoActivity";
 
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -140,8 +164,8 @@ public class UploadVideoActivity extends AppCompatActivity {
                 while (!uriTask.isComplete());
                 Uri uri = uriTask.getResult();
 
-                VideoController videoController = new VideoController(editText.getText().toString(), uri.toString());
-                databaseReference.child(databaseReference.push().getKey()).setValue(videoController);
+                putVideo putvideo = new putVideo(editText.getText().toString(), uri.toString());
+                databaseReference.child(databaseReference.push().getKey()).setValue(putvideo);
                 Toast.makeText(UploadVideoActivity.this,"File Uploaded", Toast.LENGTH_LONG).show();
                 progressDialog.dismiss();
 
