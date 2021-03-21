@@ -1,10 +1,15 @@
 package com.jackz314.keepfit.views;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.loader.content.CursorLoader;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,10 +41,13 @@ import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.graphics.Bitmap.Config.ALPHA_8;
 import static com.google.firebase.Timestamp.now;
 
 
@@ -76,7 +85,6 @@ public class UploadVideoActivity extends AppCompatActivity {
     Button btn;
 
     StorageReference storageReference;
-    DatabaseReference databaseReference;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
@@ -89,7 +97,6 @@ public class UploadVideoActivity extends AppCompatActivity {
         btn = findViewById(R.id.btn_video_upload);
 
         storageReference = FirebaseStorage.getInstance().getReference();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
 
         btn.setEnabled(false);
         editText.setOnClickListener(new View.OnClickListener(){
@@ -118,8 +125,6 @@ public class UploadVideoActivity extends AppCompatActivity {
             String path = data.getDataString();
             String filename = path.substring(path.lastIndexOf("/")+1);
             editText.setText(filename);
-
-            //editText.setText(data.getDataString().);
             btn.setOnClickListener(new View.OnClickListener(){
                 @Override
                 public void onClick(View view){
@@ -130,21 +135,16 @@ public class UploadVideoActivity extends AppCompatActivity {
                     returnCursor.moveToFirst();
                     long sizeIndex = returnCursor.getLong(returnCursor.getColumnIndex(OpenableColumns.SIZE));
 
-                    if(sizeIndex < 5 * 1024 * 1024){
-                       // Log.e(TAG, "FileSIZEEEEE: " + sizeIndex);
+                    if(sizeIndex < 10 * 1024 * 1024){
                         Toast.makeText(UploadVideoActivity.this,"File size okay", Toast.LENGTH_LONG).show();
-                        //uploadVideoFirebase(data.getData());
+                        uploadVideoFirebase(data.getData());
 
                     }
                     else{
-
                         Toast.makeText(UploadVideoActivity.this,"File size should be less than 5MB", Toast.LENGTH_LONG).show();
                     }
-
                 }
-
             });
-            ;
         }
     }
 
@@ -155,6 +155,39 @@ public class UploadVideoActivity extends AppCompatActivity {
         progressDialog.show();
 
         StorageReference reference = storageReference.child("upload"+System.currentTimeMillis()+".mp4");
+        StorageReference reference2 = storageReference.child("upload"+System.currentTimeMillis()+".mp4");
+
+        String filePath = data.getPath();
+        File file = new File(filePath);
+        //String filePath = getImagePath(data);
+
+
+        ThumbnailUtils thumbnailUtils = new ThumbnailUtils();
+        Log.i("AAAAAAAAAA", filePath);
+        Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video.Thumbnails.MINI_KIND);
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] thumbData = baos.toByteArray();
+
+        UploadTask.TaskSnapshot taskSnapshot;
+
+
+        Log.i("BBBBBBBBB", filePath);
+        final String[] thumbLink = {""};
+
+        reference2.putBytes(thumbData).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                while (!uriTask.isComplete());
+                Uri uri = uriTask.getResult();
+
+                thumbLink[0] = uri.toString();
+            }
+        });
+
 
         reference.putFile(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -165,7 +198,6 @@ public class UploadVideoActivity extends AppCompatActivity {
                 Uri uri = uriTask.getResult();
 
                 putVideo putvideo = new putVideo(editText.getText().toString(), uri.toString());
-                databaseReference.child(databaseReference.push().getKey()).setValue(putvideo);
                 Toast.makeText(UploadVideoActivity.this,"File Uploaded", Toast.LENGTH_LONG).show();
                 progressDialog.dismiss();
 
@@ -182,7 +214,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                 media.put("is_livestream", false);
                 media.put("link", link);
                 media.put("start_time", timestamp);
-                media.put("thumbnail", "");
+                media.put("thumbnail", thumbLink[0]);
                 media.put("title", titleText.getText().toString());
                 media.put("view_count", 0);
 
@@ -197,6 +229,6 @@ public class UploadVideoActivity extends AppCompatActivity {
                 progressDialog.setMessage("File Uploading.." +(int) progress + "%");
             }
         });
-    }
 
+    }
 }
