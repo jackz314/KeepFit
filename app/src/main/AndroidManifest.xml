@@ -51,8 +51,10 @@
         <activity
             android:name=".views.SearchActivity"
             android:windowSoftInputMode="adjustNothing" />
-        <activity android:name=".views.UploadVideoActivity" />
-        android:usesCleartextTraffic="true"
+        <activity android:name=".views.UploadVideoActivity"
+        android:usesCleartextTraffic="true"/>
+        <activity android:name=".views.FollowActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
 </manifest>

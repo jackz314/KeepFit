@@ -5,9 +5,10 @@ import com.google.firebase.firestore.PropertyName;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class User {
+public class User implements Serializable {
 
     private String uid;
     private String biography;

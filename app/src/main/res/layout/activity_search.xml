@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     tools:context=".views.SearchActivity">
 
     <SearchView
@@ -13,35 +12,23 @@
         android:layout_height="48dp"
         android:iconifiedByDefault="false"
         android:queryHint="Search for exercise"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.476"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023" />
-
-    <!--    <androidx.recyclerview.widget.RecyclerView-->
-<!--        android:id="@+id/search_profiles"-->
-<!--        android:layout_width="392dp"-->
-<!--        android:layout_height="69dp"-->
-<!--        android:layout_marginTop="80dp"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintHorizontal_bias="0.526"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/search"-->
-<!--        tools:listitem="@layout/profile_item" />-->
+/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_recycler"
-        android:layout_width="399dp"
-        android:layout_height="605dp"
+        android:layout_width="411dp"
+        android:layout_height="559dp"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/search"
-        app:layout_constraintVertical_bias="0.935"
-        tools:listitem="@layout/feed_item" />
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/empty_results_text"

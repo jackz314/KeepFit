@@ -53,10 +53,15 @@
             android:id="@+id/followButton"
             android:layout_width="250px"
             android:layout_height="100px"
+            android:layout_marginTop="10dp"
             android:checkable="false"
             android:text="Follow"
-            tools:layout_editor_absoluteX="207dp"
-            tools:layout_editor_absoluteY="176dp" />
+            app:layout_constraintBottom_toTopOf="@+id/today_text"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.125"
+            app:layout_constraintStart_toEndOf="@+id/user_name_text"
+            app:layout_constraintTop_toBottomOf="@+id/user_profile_picture"
+            app:layout_constraintVertical_bias="0.0" />
 
         <TextView
             android:id="@+id/me_exercise_time_text"
