@@ -3,7 +3,6 @@ package com.jackz314.keepfit.views
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
-import android.text.InputType
 import android.text.TextWatcher
 import android.view.View
 import android.view.ViewGroup
@@ -14,10 +13,8 @@ import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.marginTop
 import com.jackz314.keepfit.GlobalConstants
 import com.jackz314.keepfit.R
-import com.jackz314.keepfit.controllers.ExerciseController
 import com.jackz314.keepfit.databinding.ActivityPromptBinding
 
 class PromptActivity : AppCompatActivity() {
@@ -106,7 +103,7 @@ class PromptActivity : AppCompatActivity() {
     private fun start() {
         if (isLivestream){
             val intent = Intent(this, StartLivestreamActivity::class.java)
-            intent.putExtra(GlobalConstants.LIVESTREAM_TITLE, b.promptTitle.text.toString())
+            intent.putExtra(GlobalConstants.MEDIA_TITLE, b.promptTitle.text.toString())
             intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.text.toString())
             startActivity(intent)
         } else {
