@@ -98,7 +98,7 @@ public class NewUserActivity extends AppCompatActivity {
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("users")
-                    .document(String.valueOf(mFirebaseUser.getIdToken(false)))
+                    .document(mFirebaseUser.getUid())
                     .set(user)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
