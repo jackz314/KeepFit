@@ -56,12 +56,16 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     // Firebase stuff
-    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
-
     implementation platform('com.google.firebase:firebase-bom:26.6.0')
+    implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-firestore'
-    implementation 'com.firebase:firebase-client-android:2.5.0'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.google.firebase:firebase-functions'
+    implementation 'com.google.firebase:firebase-database:19.7.0'
+    implementation 'com.google.firebase:firebase-storage:19.2.1'
+    implementation 'com.google.firebase:firebase-core:16.0.1'
 
     // Facebook login support
     // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
