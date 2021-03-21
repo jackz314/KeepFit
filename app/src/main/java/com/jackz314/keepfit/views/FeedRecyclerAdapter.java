@@ -63,7 +63,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         }
 
         Glide.with(holder.image)
-                .load(media.getThumbnail())
+                .load(media.getLink())
                 .fitCenter()
                 .placeholder(R.drawable.ic_thumb_placeholder)
                 .into(holder.image);

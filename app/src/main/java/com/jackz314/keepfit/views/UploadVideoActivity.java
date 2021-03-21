@@ -180,40 +180,6 @@ public class UploadVideoActivity extends AppCompatActivity {
         String userID = segments[segments.length -1];
 
         StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + userID+".mp4");
-        StorageReference reference2 = storageReference.child(titleText.getText().toString() + "@" +  userID+".jpeg");
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-        RequestOptions requestOptions = new RequestOptions();
-        requestOptions.signature(new ObjectKey(System.currentTimeMillis()));
-
-        Glide.with(this).asBitmap().load(new File(data.getPath())).override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).into(new CustomTarget<Bitmap>() {
-            @Override
-            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
-                resource.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            }
-
-            @Override
-            public void onLoadCleared(@Nullable Drawable placeholder) {
-
-            }
-        });
-
-        byte[] thumbData = baos.toByteArray();
-
-        final String[] thumbLink = {""};
-
-        reference2.putBytes(thumbData).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                while (!uriTask.isComplete());
-                Uri uri = uriTask.getResult();
-
-                thumbLink[0] = uri.toString();
-            }
-        });
 
 
         reference.putFile(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -238,7 +204,6 @@ public class UploadVideoActivity extends AppCompatActivity {
                 media.put("is_livestream", false);
                 media.put("link", link);
                 media.put("start_time", timestamp);
-                media.put("thumbnail", thumbLink[0]);
                 media.put("title", titleText.getText().toString());
                 media.put("view_count", 0);
 
