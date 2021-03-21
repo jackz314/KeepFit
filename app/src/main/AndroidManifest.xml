@@ -45,6 +45,7 @@
             android:name=".views.VideoActivity"
             android:configChanges="orientation|screenSize" />
         <activity android:name=".views.SearchActivity" />
+        <activity android:name=".views.UploadVideoActivity" />
     </application>
 
 </manifest>
