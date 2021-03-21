@@ -10,9 +10,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KeepFit">
+        <activity android:name=".views.ViewExerciseActivity"
+            android:label="Exercise"/>
         <activity
             android:name=".views.PromptActivity"
-            android:label="@string/title_activity_prompt" />
+            android:label="@string/title_activity_prompt"
+            android:theme="@style/Theme.KeepFit.NoBar" />
         <activity
             android:name=".views.ExerciseActivity"
             android:label="@string/title_activity_exercise"
@@ -44,8 +47,9 @@
         <activity
             android:name=".views.VideoActivity"
             android:configChanges="orientation|screenSize" />
-        <activity android:name=".views.SearchActivity"
-            android:windowSoftInputMode="adjustNothing"/>
+        <activity
+            android:name=".views.SearchActivity"
+            android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".views.UploadVideoActivity" />
     </application>
 

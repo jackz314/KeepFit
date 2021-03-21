@@ -18,6 +18,7 @@ public interface GlobalConstants {
     // intent stuff
     String MEDIA_TITLE = "media_title";
     String EXERCISE_TYPE = "exercise_type";
+    String EXERCISE_OBJ = "exercise_obj";
     String EXERCISE_INTENSITY = "exercise_intensity";
 
     String ACTION_EXERCISE = "action_exercise";

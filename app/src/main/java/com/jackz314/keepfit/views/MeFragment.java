@@ -1,7 +1,9 @@
 package com.jackz314.keepfit.views;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,20 +18,31 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
 import com.google.firebase.auth.FirebaseUser;
+import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
+import com.jackz314.keepfit.UtilsKt;
+import com.jackz314.keepfit.controllers.ExerciseController;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentMeBinding;
+import com.jackz314.keepfit.models.Exercise;
+import com.jackz314.keepfit.models.Media;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import us.zoom.sdk.AccountService;
@@ -45,10 +58,22 @@ public class MeFragment extends Fragment {
 
     private FirebaseAuth.AuthStateListener authStateListener;
 
+    private final List<Exercise> exerciseList = new ArrayList<>();
+    private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
+
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
+        exerciseRecyclerAdapter = new ExerciseRecyclerAdapter(getContext(), exerciseList);
+        exerciseRecyclerAdapter.setClickListener((view, position) -> {
+            Exercise exercise = exerciseList.get(position);
+            Intent intent = new Intent(requireActivity(), ViewExerciseActivity.class);
+            intent.putExtra(GlobalConstants.EXERCISE_OBJ, exercise);
+            startActivity(intent);
+        });
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -71,8 +96,40 @@ public class MeFragment extends Fragment {
                 }
             };
             FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
-        }
 
+            // exercise stuff
+            b.exerciseLogRecycler.setAdapter(exerciseRecyclerAdapter);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+            b.exerciseLogRecycler.setLayoutManager(layoutManager);
+            b.exerciseLogRecycler.setNestedScrollingEnabled(false);
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(b.exerciseLogRecycler.getContext(),
+                    layoutManager.getOrientation());
+            b.exerciseLogRecycler.addItemDecoration(dividerItemDecoration);
+
+            UserControllerKt.getCurrentUserDoc().collection("exercises").addSnapshotListener(((value, error) -> {
+                if (error != null || value == null) {
+                    Log.w(TAG, "Listen failed.", error);
+                    return;
+                }
+                exerciseList.clear();
+                exerciseList.addAll(value.toObjects(Exercise.class));
+                exerciseRecyclerAdapter.notifyDataSetChanged();
+
+
+                if (!exerciseList.isEmpty()){
+                    b.emptyExerciseLogText.setVisibility(View.GONE);
+                } else {
+                    b.emptyExerciseLogText.setVisibility(View.VISIBLE);
+                    b.emptyExerciseLogText.setText("Go out and exercise more? ¯\\_(ツ)_/¯");
+                }
+                // today exercise summary stuff
+                List<Exercise> todayExercises = ExerciseController.getTodayExercises(exerciseList);
+                double todayCal = ExerciseController.getTotalCalories(todayExercises);
+                long todayExTime = ExerciseController.getTotalExerciseTime(todayExercises);
+                b.meCaloriesText.setText(String.format(Locale.getDefault(), "Calories: %.3f", todayCal));
+                b.meExerciseTimeText.setText("Exercise: " + UtilsKt.formatDurationTextString(todayExTime / DateUtils.SECOND_IN_MILLIS));
+            }));
+        }
 
         return b.getRoot();
     }

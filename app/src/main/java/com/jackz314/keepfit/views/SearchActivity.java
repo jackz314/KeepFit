@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.SearchView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -57,9 +58,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         //}
         editsearch = findViewById(R.id.search);
         editsearch.setOnQueryTextListener((SearchView.OnQueryTextListener) this);
-
-
-
+        if(editsearch.requestFocus()) getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
 

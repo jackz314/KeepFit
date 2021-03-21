@@ -18,12 +18,14 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -225,6 +227,7 @@ public class Utils {
         return ""; // should never happen
     }
 
+    // from https://www.baeldung.com/java-string-title-case
     public static String toTitleCase(String str) {
         if (str == null || str.isEmpty()) {
             return str;
@@ -247,4 +250,13 @@ public class Utils {
 
         return converted.toString();
     }
+
+    // from https://stackoverflow.com/a/40487511/8170714
+    public static String toHumanReadableFormat(Duration duration) {
+        return duration.toString()
+                .substring(2)
+                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+                .toLowerCase();
+    }
+
 }

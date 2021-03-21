@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
@@ -54,12 +55,12 @@ public class FeedFragment extends Fragment {
 
     private final Executor procES = Executors.newSingleThreadExecutor();
 
-    private Context context;
+
+    private ListenerRegistration registration;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        context = getContext();
         livestreamController = new LivestreamController(getContext());
         feedRecyclerAdapter = new FeedRecyclerAdapter(getContext(), mediaList);
         feedRecyclerAdapter.setClickListener((view, position) -> {
@@ -84,7 +85,7 @@ public class FeedFragment extends Fragment {
         });
 
         db = FirebaseFirestore.getInstance();
-        db.collection("media")
+        registration = db.collection("media")
 //                .whereEqualTo("state", "CA")
                 .addSnapshotListener((value, e) -> {
                     if (e != null || value == null) {
@@ -106,7 +107,7 @@ public class FeedFragment extends Fragment {
                                     b.emptyFeedText.setVisibility(View.GONE);
                                 } else {
                                     b.emptyFeedText.setVisibility(View.VISIBLE);
-                                    b.emptyFeedText.setText("Hello! Empty feed.");
+                                    b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
                                 }
                             }
 
@@ -146,17 +147,22 @@ public class FeedFragment extends Fragment {
         }
         super.onCreateOptionsMenu(menu, inflater);
     }
+
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == R.id.app_bar_search) {
-                Intent intent = new Intent(context, SearchActivity.class);
-                context.startActivity(intent);
+            Intent intent = new Intent(getContext(), SearchActivity.class);
+            startActivity(intent);
         }else{
-                return super.onOptionsItemSelected(item);
+            return super.onOptionsItemSelected(item);
         }
 
         return true;
     }
 
-
+    @Override
+    public void onDestroy() {
+        if (registration != null) registration.remove();
+        super.onDestroy();
+    }
 }

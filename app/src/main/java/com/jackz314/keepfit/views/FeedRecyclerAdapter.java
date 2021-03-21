@@ -13,15 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.UtilsKot;
+import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 
@@ -62,7 +59,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             holder.durationText.setText("LIVE");
             holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8,0x03, 0x06)));
         }else{
-            holder.durationText.setText(UtilsKot.formatDurationString(media.getDuration()));
+            holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
         }
 
         Glide.with(holder.image)

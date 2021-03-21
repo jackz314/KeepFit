@@ -12,10 +12,11 @@ import us.zoom.sdk.ZoomSDK
 import us.zoom.sdk.ZoomSDKAuthenticationListener
 import java.time.Duration
 import javax.security.auth.login.LoginException
+import kotlin.math.min
 
-private const val TAG = "UtilsKot"
+private const val TAG = "UtilsKt"
 
-object UtilsKot {
+object UtilsKt {
     @JvmStatic
     fun formatDurationString(duration: Long?): String {
         if (duration == null) return "0:00"
@@ -27,6 +28,23 @@ object UtilsKot {
             "${hrs}:${"%02d".format(mins)}:${"%02d".format(secs)}"
         } else {
             "${mins}:${"%02d".format(secs)}"
+        }
+    }
+
+    // returns format like 1 h 24 min 3 s
+    @JvmStatic
+    fun formatDurationTextString(duration: Long): String {
+        if (duration < 60) {
+            return "$duration sec"
+        }
+        val d = Duration.ofSeconds(duration)
+        val hrs = d.toHours()
+        val mins = d.minusHours(hrs).toMinutes()
+        val secs = d.minusMinutes(mins).seconds
+        return if (hrs > 0){
+            "$hrs hr $mins min"
+        } else {
+            "$mins min $secs s"
         }
     }
 
@@ -87,6 +105,7 @@ object UtilsKot {
         }
     }
 
+    @JvmStatic
     fun createLivestream(link: String, title: String, exerciseCategories: String, thumbnail: String = "") {
         val categories = exerciseCategories.split(",").map { it.trim() }
         Log.d(TAG, "createLivestream: link: $link, categories: $categories, title: $title, thumbnail: $thumbnail")
@@ -104,6 +123,7 @@ object UtilsKot {
         db.collection("media").document(Utils.getMD5(link)).set(docData)
     }
 
+    @JvmStatic
     fun removeLivestream(link: String) {
         Log.d(TAG, "removeLivestream: link: $link")
         val db = FirebaseFirestore.getInstance()

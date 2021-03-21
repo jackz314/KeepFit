@@ -56,20 +56,19 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/me_calories_text" />
+            app:layout_constraintTop_toBottomOf="@+id/today_text" />
 
         <TextView
             android:id="@+id/me_calories_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Calories: 1000 kCal"
+            android:text="Calories: 2896"
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/today_text" />
+            app:layout_constraintTop_toBottomOf="@+id/me_exercise_time_text" />
 
         <TextView
-            tools:viewBindingIgnore="true"
             android:id="@+id/today_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -78,7 +77,8 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_email_text" />
+            app:layout_constraintTop_toBottomOf="@+id/user_email_text"
+            tools:viewBindingIgnore="true" />
 
         <TextView
             android:id="@+id/exercise_log_text"
@@ -88,7 +88,18 @@
             android:layout_marginTop="16dp"
             android:text="Exercise Log"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/me_exercise_time_text" />
+            app:layout_constraintTop_toBottomOf="@+id/me_calories_text" />
+
+        <TextView
+            android:id="@+id/empty_exercise_log_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="80dp"
+            android:text="Loading..."
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/exercise_log_text" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/exercise_log_recycler"
@@ -98,7 +109,8 @@
             android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/exercise_log_text" />
+            app:layout_constraintTop_toBottomOf="@+id/exercise_log_text"
+            tools:listitem="@layout/exercise_item" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

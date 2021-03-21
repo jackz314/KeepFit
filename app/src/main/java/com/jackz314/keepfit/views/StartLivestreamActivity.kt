@@ -10,8 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import com.jackz314.keepfit.GlobalConstants
 import com.jackz314.keepfit.Utils
-import com.jackz314.keepfit.UtilsKot
-import com.jackz314.keepfit.UtilsKot.tryLoginToZoom
+import com.jackz314.keepfit.UtilsKt
+import com.jackz314.keepfit.UtilsKt.tryLoginToZoom
 import com.jackz314.keepfit.controllers.LivestreamController
 import com.jackz314.keepfit.databinding.ActivityZoomLoginBinding
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -92,7 +92,7 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
 
     private fun startEmailLogin() {
         startLoading()
-        val disposable = UtilsKot.tryLoginToZoom(sdk, b.zoomEmailInput.text.toString(), b.zoomPasswordInput.text.toString()).subscribe({
+        val disposable = UtilsKt.tryLoginToZoom(sdk, b.zoomEmailInput.text.toString(), b.zoomPasswordInput.text.toString()).subscribe({
             showInMeetingUI()
             Toast.makeText(this@StartLivestreamActivity, "Login successfully", Toast.LENGTH_SHORT).show()
             startMeeting()
@@ -120,7 +120,7 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
             try {
                 val token = intent?.data?.getQueryParameter("token")
                 Log.d(TAG, "onNewIntent: got zoom sso token from url ${intent?.data?.toString()?.split("\\?")?.get(0)}: ${token}")
-                val disposable = UtilsKot.tryLoginToZoom(sdk, ssoToken = token).subscribe({
+                val disposable = UtilsKt.tryLoginToZoom(sdk, ssoToken = token).subscribe({
                     showInMeetingUI()
                     Toast.makeText(this@StartLivestreamActivity, "Login successfully", Toast.LENGTH_SHORT).show()
                     startMeeting()
@@ -142,7 +142,7 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
             sdk.meetingService.removeListener(this)
         }
         if (currMeetingLink.isNotEmpty()) { // just in case
-            UtilsKot.removeLivestream(currMeetingLink)
+            UtilsKt.removeLivestream(currMeetingLink)
         }
         compositeDisposable.clear()
         super.onDestroy()
@@ -153,11 +153,11 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
         if (meetingStatus == MeetingStatus.MEETING_STATUS_INMEETING && errorCode == MeetingError.MEETING_ERROR_SUCCESS){
             // user joined meeting, publish live stream
             currMeetingLink = sdk.inMeetingService.currentMeetingUrl
-            UtilsKot.createLivestream(currMeetingLink, intent.getStringExtra(GlobalConstants.MEDIA_TITLE)?:"Untitled",
+            UtilsKt.createLivestream(currMeetingLink, intent.getStringExtra(GlobalConstants.MEDIA_TITLE)?:"Untitled",
                     intent.getStringExtra(GlobalConstants.EXERCISE_TYPE)?:"", Utils.getHighResProfilePicUrl())
         } else if (meetingStatus == MeetingStatus.MEETING_STATUS_DISCONNECTING) {
             sdk.meetingService.removeListener(this)
-            UtilsKot.removeLivestream(currMeetingLink)
+            UtilsKt.removeLivestream(currMeetingLink)
             currMeetingLink = ""
             finish()
         }

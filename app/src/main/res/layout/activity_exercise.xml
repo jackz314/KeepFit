@@ -37,7 +37,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Cal"
+        android:text="Cals"
         app:layout_constraintEnd_toEndOf="@+id/exercise_calories_text"
         app:layout_constraintStart_toStartOf="@+id/exercise_calories_text"
         app:layout_constraintTop_toBottomOf="@+id/exercise_calories_text" />

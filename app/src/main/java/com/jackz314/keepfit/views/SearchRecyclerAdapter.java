@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.UtilsKot;
+import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 
@@ -59,7 +59,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter<SearchRecyclerAd
             holder.durationText.setText("LIVE");
             holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8,0x03, 0x06)));
         }else{
-            holder.durationText.setText(UtilsKot.formatDurationString(media.getDuration()));
+            holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
         }
 
         Glide.with(holder.image)

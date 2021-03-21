@@ -1,16 +1,20 @@
 package com.jackz314.keepfit.models;
 
+import com.google.firebase.firestore.DocumentId;
 import com.google.firebase.firestore.PropertyName;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class Exercise {
+public class Exercise implements Serializable {
+    @DocumentId
+    public String uid;
     private double calories;
     private String category;
-    @PropertyName("elapsed_time")
     private long elapsedTime;
-    @PropertyName("starting_time")
     private Date startingTime;
+
+    public Exercise(){}
 
     public Exercise(double calories, String category, long elapsedTime, Date startingTime) {
         this.calories = calories;
@@ -35,18 +39,22 @@ public class Exercise {
         this.category = category;
     }
 
+    @PropertyName("elapsed_time")
     public long getElapsedTime() {
         return elapsedTime;
     }
 
+    @PropertyName("elapsed_time")
     public void setElapsedTime(long elapsedTime) {
         this.elapsedTime = elapsedTime;
     }
 
+    @PropertyName("starting_time")
     public Date getStartingTime() {
         return startingTime;
     }
 
+    @PropertyName("starting_time")
     public void setStartingTime(Date startingTime) {
         this.startingTime = startingTime;
     }

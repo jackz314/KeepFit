@@ -3,6 +3,7 @@ package com.jackz314.keepfit.controllers
 import android.content.res.Resources
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jackz314.keepfit.models.User
@@ -29,4 +30,9 @@ object UserControllerKt {
                 emitter.onError(IllegalStateException("Firebase User isn't available"))
             }
         }
+
+    @JvmStatic
+    fun getCurrentUserDoc(): DocumentReference {
+        return FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().currentUser?.uid?:"non-existence-user")
+    }
 }

@@ -4,12 +4,17 @@ import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.models.Exercise;
 import com.jackz314.keepfit.models.User;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ExerciseController {
     private static final String TAG = "ExerciseController";
@@ -72,6 +77,10 @@ public class ExerciseController {
                 .add(exercise);
     }
 
+    public static void deleteExercise(String uid) {
+        UserControllerKt.getCurrentUserDoc().collection("exercises").document(uid).delete();
+    }
+
     public static float getMETofIntensity(int intensity) {
         if (intensity == 1) {
             return 5;
@@ -80,5 +89,18 @@ public class ExerciseController {
         } else {
             return 15;
         }
+    }
+
+    public static List<Exercise> getTodayExercises(List<Exercise> exercises){
+        Date todayStartTime = Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        return exercises.stream().filter(ex -> ex.getStartingTime().after(todayStartTime)).collect(Collectors.toList());
+    }
+
+    public static double getTotalCalories(List<Exercise> exercises) {
+        return exercises.stream().mapToDouble(Exercise::getCalories).sum();
+    }
+
+    public static long getTotalExerciseTime(List<Exercise> exercises) {
+        return exercises.stream().mapToLong(Exercise::getElapsedTime).sum();
     }
 }

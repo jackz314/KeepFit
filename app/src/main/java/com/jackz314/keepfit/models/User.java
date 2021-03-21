@@ -14,7 +14,6 @@ public class User {
     private String email;
     private String name;
 
-    @PropertyName("profile_pic")
     private String profilePic;
     private Date birthday;
     private int height; // cm
@@ -88,10 +87,12 @@ public class User {
         this.name = name;
     }
 
+    @PropertyName("profile_pic")
     public String getProfilePic() {
         return profilePic;
     }
 
+    @PropertyName("profile_pic")
     public void setProfilePic(String profilePic) {
         this.profilePic = profilePic;
     }
