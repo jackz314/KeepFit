@@ -3,13 +3,12 @@ package com.jackz314.keepfit;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.Resources;
-import androidx.preference.PreferenceManager;
-
 import android.text.format.DateUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
+
+import androidx.preference.PreferenceManager;
 
 import com.facebook.AccessToken;
 import com.firebase.ui.auth.AuthUI;
@@ -22,9 +21,7 @@ import com.google.firebase.functions.HttpsCallableResult;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
-import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -33,14 +30,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import javax.security.auth.login.LoginException;
-
-import io.reactivex.rxjava3.core.Completable;
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.core.SingleEmitter;
-import us.zoom.sdk.ZoomAuthenticationError;
-import us.zoom.sdk.ZoomSDK;
-import us.zoom.sdk.ZoomSDKAuthenticationListener;
 
 import static com.jackz314.keepfit.GlobalConstants.PRIVACY_POLICY_URL;
 import static com.jackz314.keepfit.GlobalConstants.RC_SIGN_IN;
