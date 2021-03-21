@@ -19,6 +19,7 @@
 package com.jackz314.keepfit.views;
 
 import android.os.Handler;
+import android.util.Log;
 import android.widget.TextView;
 
 import java.util.Locale;
@@ -39,6 +40,8 @@ import java.util.Locale;
  */
 // from https://github.com/Sabirjan/Android-Stopwatch-TextView/blob/master/StopwatchTextView.java
 public class StopwatchTextView implements Runnable {
+	private static final String TAG = "StopwatchTextView";
+
 	public enum TimerState {STOPPED, PAUSED, RUNNING};
 
 	private final TextView widget;
@@ -74,7 +77,7 @@ public class StopwatchTextView implements Runnable {
 
 		if (updateListener != null) {
 			currScale += 1;
-			if (currScale == listenerUpdateScale){
+			if (currScale >= listenerUpdateScale){
 				currScale = 0;
 				updateListener.onTimeUpdate(getElapsedTime());
 			}

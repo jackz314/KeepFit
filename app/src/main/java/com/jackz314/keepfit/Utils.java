@@ -153,6 +153,7 @@ public class Utils {
     }
 
     private static Single<String> getZoomJWTTokenFromServer() {
+        Log.d(TAG, "getZoomJWTTokenFromServer: start");
         // Create the arguments to the callable function.
         FirebaseFunctions functions = FirebaseFunctions.getInstance();
         return Single.create(emitter -> functions
