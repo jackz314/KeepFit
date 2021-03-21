@@ -19,6 +19,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.databinding.ActivityNewUserBinding;
@@ -38,10 +40,10 @@ public class NewUserActivity extends AppCompatActivity {
     private DatePickerDialog.OnDateSetListener mDateSetListener;
     private EditText mUsernameEditText;
     private EditText mBiographyEditText;
-    private EditText mEmailEditText;
     private EditText mHeightEditText;
     private EditText mWeightEditText;
     private Calendar mBirthday = Calendar.getInstance();
+    private FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,9 +51,15 @@ public class NewUserActivity extends AppCompatActivity {
         b = ActivityNewUserBinding.inflate(getLayoutInflater());
         View rootView = b.getRoot();
         setContentView(rootView);
+        mUsernameEditText = (EditText) findViewById(R.id.editTextUsername);
+        mBiographyEditText = (EditText) findViewById(R.id.editTextTextBio);
+        mHeightEditText = (EditText) findViewById(R.id.editTextHeight);
+        mWeightEditText = (EditText) findViewById(R.id.editTextWeight);;
+        mUsernameEditText.setText(mFirebaseUser.getDisplayName());
         b.finishNewUserBtn.setOnClickListener(v -> {
             setResult(Activity.RESULT_OK);
             Toast.makeText(this, "DONE", Toast.LENGTH_SHORT).show();
+
             mUsernameEditText = (EditText) findViewById(R.id.editTextUsername);
             String strUsername = mUsernameEditText.getText().toString();
             if (strUsername.matches((""))) {
@@ -59,19 +67,12 @@ public class NewUserActivity extends AppCompatActivity {
                 return;
             }
 
-            String userName = mUsernameEditText.getText().toString();
-            mBiographyEditText = (EditText) findViewById(R.id.editTextTextBio);
-            mEmailEditText = (EditText) findViewById(R.id.editTextEmailAddress);
-            mHeightEditText = (EditText) findViewById(R.id.editTextHeight);
-            mWeightEditText = (EditText) findViewById(R.id.editTextWeight);
-
             Spinner spinner = findViewById(R.id.sex);
             boolean sex = true;
             if (spinner.getSelectedItem().toString().matches("Female")) {
                 sex = false;
             }
 
-            Map<String, Object> user = new HashMap<>();
             Double height = 0.0;
             if (!mHeightEditText.getText().toString().matches("")) {
                 height = Double.parseDouble(mHeightEditText.getText().toString());
@@ -84,19 +85,20 @@ public class NewUserActivity extends AppCompatActivity {
                 weight = 0.453592 * weight;
             }
 
+            Map<String, Object> user = new HashMap<>();
             user.put( "biography", mBiographyEditText.getText().toString());
             user.put("birthday", mBirthday.getTime());
-            user.put("email", mEmailEditText.getText().toString());
+            user.put("email", mFirebaseUser.getEmail());
             user.put("height", height);
-            user.put("name", userName);
-            user.put("profile_pic", "");
+            user.put("name", mUsernameEditText.getText().toString());
+            user.put("profile_pic", mFirebaseUser.getPhotoUrl().toString());
             user.put("sex", sex);
             user.put("weight", weight);
 
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("users")
-                    .document(userName)
+                    .document(String.valueOf(mFirebaseUser.getIdToken(false)))
                     .set(user)
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
