@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
+import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.databinding.ActivityMainBinding;
 
 import org.jetbrains.annotations.NotNull;
@@ -64,7 +65,7 @@ class MainActivity extends AppCompatActivity {
                 }
             });
 
-    private final CompositeDisposable meCompositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,16 +83,15 @@ class MainActivity extends AppCompatActivity {
 
     private void setupAfterSignIn() {
         Log.d(TAG, "setupAfterSignIn: signed in, setting up other stuff");
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user.getMetadata().getCreationTimestamp() == user.getMetadata().getLastSignInTimestamp()){
-            //new user, show additional setup stuff
-
+        Disposable disposable = UserController.getCurrentUser().subscribe(user -> {
+            if (findViewById(R.id.container) == null) initMainViews();
+            // otherwise it's user change, will be handled by AuthStateListener
+        }, throwable -> { // unable to get user from firestore, start new user
+            Log.d(TAG, "setupAfterSignIn: unable to get user from firestore, start new user " + throwable.getMessage());
             Intent intent = new Intent(this, NewUserActivity.class);
             newUserResultLauncher.launch(intent);
-
-        }else if (findViewById(R.id.container) == null) { // first time login
-            initMainViews();
-        } // otherwise it's user change, will be handled by AuthStateListener
+        });
+        compositeDisposable.add(disposable);
     }
 
     public void initializeZoomSdk(Context context) {
@@ -121,7 +121,7 @@ class MainActivity extends AppCompatActivity {
             };
             sdk.initialize(context, listener, params);
         });
-        meCompositeDisposable.add(disposable);
+        compositeDisposable.add(disposable);
     }
 
     private final SpeedDialMenuAdapter speedDialMenuAdapter = new SpeedDialMenuAdapter() {
@@ -261,7 +261,7 @@ class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        meCompositeDisposable.dispose();
+        compositeDisposable.dispose();
         super.onDestroy();
     }
 }
