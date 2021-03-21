@@ -73,6 +73,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-functions'
+    implementation 'com.google.firebase:firebase-database:19.7.0'
+    implementation 'com.google.firebase:firebase-storage:19.2.1'
 
     // Facebook login support
     // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
