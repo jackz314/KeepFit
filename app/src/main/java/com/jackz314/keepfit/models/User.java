@@ -16,7 +16,7 @@ public class User {
     private Date birthday;
     private int height; // cm
     private int weight; // kg
-    private boolean sex;
+    private boolean sex; // true for men, false for women
 
     public User(){
         name = "";

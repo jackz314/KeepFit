@@ -153,8 +153,8 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
         if (meetingStatus == MeetingStatus.MEETING_STATUS_INMEETING && errorCode == MeetingError.MEETING_ERROR_SUCCESS){
             // user joined meeting, publish live stream
             currMeetingLink = sdk.inMeetingService.currentMeetingUrl
-            UtilsKot.createLivestream(currMeetingLink, intent.getStringExtra(GlobalConstants.MEDIA_TITLE)
-                    ?: "", Utils.getHighResProfilePicUrl())
+            UtilsKot.createLivestream(currMeetingLink, intent.getStringExtra(GlobalConstants.LIVESTREAM_TITLE)?:"Untitled",
+                    intent.getStringExtra(GlobalConstants.EXERCISE_TYPE)?:"", Utils.getHighResProfilePicUrl())
         } else if (meetingStatus == MeetingStatus.MEETING_STATUS_DISCONNECTING) {
             sdk.meetingService.removeListener(this)
             UtilsKot.removeLivestream(currMeetingLink)

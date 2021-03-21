@@ -4,7 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.text.format.DateUtils;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -13,10 +13,15 @@ import android.widget.Toast;
 
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.Utils;
+import com.jackz314.keepfit.controllers.ExerciseController;
 import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.databinding.ActivityExerciseBinding;
 import com.jackz314.keepfit.models.User;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -32,6 +37,7 @@ public class ExerciseActivity extends AppCompatActivity {
     private StopwatchTextView stopwatch;
 
     private User user;
+    private ExerciseController exerciseController;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
@@ -49,21 +55,38 @@ public class ExerciseActivity extends AppCompatActivity {
         w.setStatusBarColor(Color.TRANSPARENT);
         w.setNavigationBarColor(Color.TRANSPARENT);
 
-        Disposable disposable = UserController.getCurrentUser().subscribe(user -> this.user = user, e -> {
+        int intensity = getIntent().getIntExtra(GlobalConstants.EXERCISE_INTENSITY, 2);
+        float met = ExerciseController.getMETofIntensity(intensity);
+        String intensityStr;
+        if (intensity == 1) intensityStr = "Light";
+        else if (intensity == 2) intensityStr = "Moderate";
+        else intensityStr = "Vigorous";
+        b.exerciseIntensity.setText("Intensity: " + intensityStr);
+
+        Disposable disposable = UserController.getCurrentUser().subscribe(user -> {
+            this.user = user;
+            exerciseController = new ExerciseController(user, met);
+        }, e -> {
             Log.e(TAG, "onCreate: failed to get current user", e);
             Toast.makeText(this, "Failed to get your information, some data might be inaccurate", Toast.LENGTH_SHORT).show();
             user = new User(); // use defaults to estimate stuff
             user.setHeight(170);
             user.setWeight(65);
+            user.setBirthday(Date.from(LocalDate.of(2000,1,1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            user.setSex(true);
+            exerciseController = new ExerciseController(user, met);
         });
         compositeDisposable.add(disposable);
 
-        b.exerciseTitle.setText(getIntent().getStringExtra(GlobalConstants.EXERCISE_TYPE));
+        String exerciseType = getIntent().getStringExtra(GlobalConstants.EXERCISE_TYPE);
+        if (exerciseType != null) exerciseType = Utils.toTitleCase(exerciseType);
+        b.exerciseTitle.setText(exerciseType);
 
         stopwatch = new StopwatchTextView(b.exerciseTimeText, 1);
         stopwatch.setOnTimeUpdateListener(elapsedTime -> {
-            // TODO: 3/20/21 calculate calories here
-
+            if (exerciseController != null) {
+                runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
+            }
         }, 1000); // update every second
         stopwatch.start();
 
@@ -77,10 +100,11 @@ public class ExerciseActivity extends AppCompatActivity {
             }
         });
 
+        String finalExerciseType = exerciseType;
         b.exerciseStopBtn.setOnClickListener(v -> {
             long elapsedTime = stopwatch.getElapsedTime();
             stopwatch.stop();
-            // TODO: 3/20/21 save to exercises
+            exerciseController.uploadExercise(finalExerciseType, elapsedTime);
             Toast.makeText(this, "You exercised for " + String.format(Locale.getDefault(),
                     "%d minutes", TimeUnit.MILLISECONDS.toMinutes(elapsedTime)), Toast.LENGTH_SHORT).show();
             finish();

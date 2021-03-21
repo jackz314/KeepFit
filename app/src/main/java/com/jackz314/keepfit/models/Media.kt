@@ -11,11 +11,12 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.PropertyName
 import io.reactivex.rxjava3.core.Single
+import java.io.Serializable
 import java.util.*
 
 private const val TAG = "Media"
 
-class Media(doc: DocumentSnapshot) {
+class Media(doc: DocumentSnapshot): Serializable {
 
     @DocumentId
     var uid: String? = null
@@ -84,4 +85,6 @@ class Media(doc: DocumentSnapshot) {
                 ", viewCount=" + viewCount +
                 '}'
     }
+
+
 }

@@ -151,12 +151,12 @@ class MainActivity extends AppCompatActivity {
         @Override
         public boolean onMenuItemClick(int pos) {
             if (pos == 0) { // exercise
-                Intent intent = new Intent(MainActivity.this, ExerciseActivity.class);
-                intent.putExtra(GlobalConstants.EXERCISE_TYPE, "Running");
+                Intent intent = new Intent(MainActivity.this, PromptActivity.class);
+                intent.setAction(GlobalConstants.ACTION_EXERCISE);
                 startActivity(intent);
             } else if (pos == 1) { // livestream
-                Intent intent = new Intent(MainActivity.this, StartLivestreamActivity.class);
-                intent.putExtra(GlobalConstants.MEDIA_TITLE, "Testing title");
+                Intent intent = new Intent(MainActivity.this, PromptActivity.class);
+                intent.setAction(GlobalConstants.ACTION_LIVESTREAM);
                 startActivity(intent);
             } else { // video upload
                 // TODO: 3/20/21 upload video

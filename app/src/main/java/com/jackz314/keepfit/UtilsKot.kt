@@ -87,10 +87,12 @@ object UtilsKot {
         }
     }
 
-    fun createLivestream(link: String, title: String, thumbnail: String = "") {
-        Log.d(TAG, "createLivestream: link: $link, title: $title, thumbnail: $thumbnail")
+    fun createLivestream(link: String, title: String, exerciseCategories: String, thumbnail: String = "") {
+        val categories = exerciseCategories.split(",").map { it.trim() }
+        Log.d(TAG, "createLivestream: link: $link, categories: $categories, title: $title, thumbnail: $thumbnail")
         val db = FirebaseFirestore.getInstance()
         val docData = hashMapOf(
+                "categories" to categories,
                 "creator" to db.collection("users").document(FirebaseAuth.getInstance().currentUser!!.uid),
                 "is_livestream" to true,
                 "link" to link,
