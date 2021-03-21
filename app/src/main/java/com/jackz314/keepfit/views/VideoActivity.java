@@ -70,6 +70,7 @@ public class VideoActivity extends AppCompatActivity{
         mMediaController = mediaController;
         mVideoView.setMediaController(mMediaController);
         mMediaController.setAnchorView(mVideoView);
+        mVideoView.start();
 
         if(mediaController.isPressed()){
             this.getSupportActionBar().show();
