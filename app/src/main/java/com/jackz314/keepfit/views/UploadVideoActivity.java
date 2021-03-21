@@ -2,8 +2,10 @@ package com.jackz314.keepfit.views;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -98,8 +100,24 @@ public class UploadVideoActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view){
 
-                    String link = new String();
-                    uploadVideoFirebase(data.getData());
+                    Uri fileInfo = data.getData();
+                    Cursor returnCursor =
+                            getContentResolver().query(fileInfo, null, null, null, null);
+
+                    int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
+
+
+
+                    if(sizeIndex < 5 * 1024 * 1024){
+                       // Log.e(TAG, "FileSIZEEEEE: " + sizeIndex);
+                        Toast.makeText(UploadVideoActivity.this,"File size okay" + sizeIndex, Toast.LENGTH_LONG).show();
+                        //uploadVideoFirebase(data.getData());
+
+                    }
+                    else{
+
+                        Toast.makeText(UploadVideoActivity.this,"File size should be less than 5MB" + sizeIndex, Toast.LENGTH_LONG).show();
+                    }
 
                 }
 
@@ -123,8 +141,6 @@ public class UploadVideoActivity extends AppCompatActivity {
                 Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                 while (!uriTask.isComplete());
                 Uri uri = uriTask.getResult();
-
-
 
                 VideoController videoController = new VideoController(editText.getText().toString(), uri.toString());
                 databaseReference.child(databaseReference.push().getKey()).setValue(videoController);
