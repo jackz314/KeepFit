@@ -103,20 +103,18 @@ public class UploadVideoActivity extends AppCompatActivity {
                     Uri fileInfo = data.getData();
                     Cursor returnCursor =
                             getContentResolver().query(fileInfo, null, null, null, null);
-
-                    int sizeIndex = returnCursor.getColumnIndex(OpenableColumns.SIZE);
-
-
+                    returnCursor.moveToFirst();
+                    long sizeIndex = returnCursor.getLong(returnCursor.getColumnIndex(OpenableColumns.SIZE));
 
                     if(sizeIndex < 5 * 1024 * 1024){
                        // Log.e(TAG, "FileSIZEEEEE: " + sizeIndex);
-                        Toast.makeText(UploadVideoActivity.this,"File size okay" + sizeIndex, Toast.LENGTH_LONG).show();
+                        Toast.makeText(UploadVideoActivity.this,"File size okay", Toast.LENGTH_LONG).show();
                         //uploadVideoFirebase(data.getData());
 
                     }
                     else{
 
-                        Toast.makeText(UploadVideoActivity.this,"File size should be less than 5MB" + sizeIndex, Toast.LENGTH_LONG).show();
+                        Toast.makeText(UploadVideoActivity.this,"File size should be less than 5MB", Toast.LENGTH_LONG).show();
                     }
 
                 }
