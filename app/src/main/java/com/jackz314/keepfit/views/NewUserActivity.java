@@ -43,7 +43,7 @@ public class NewUserActivity extends AppCompatActivity {
     private EditText mHeightEditText;
     private EditText mWeightEditText;
     private Calendar mBirthday = Calendar.getInstance();
-    private FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    private final FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,13 +73,13 @@ public class NewUserActivity extends AppCompatActivity {
                 sex = false;
             }
 
-            Double height = 0.0;
+            double height = 0.0;
             if (!mHeightEditText.getText().toString().matches("")) {
                 height = Double.parseDouble(mHeightEditText.getText().toString());
                 height = 2.54 * height;
             }
 
-            Double weight = 0.0;
+            double weight = 0.0;
             if (!mWeightEditText.getText().toString().matches("")) {
                 weight = Double.parseDouble(mWeightEditText.getText().toString());
                 weight = 0.453592 * weight;
@@ -104,7 +104,6 @@ public class NewUserActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(Void aVoid) {
                             finish();
-                            return;
                         }
                     })
                     .addOnFailureListener(new OnFailureListener() {

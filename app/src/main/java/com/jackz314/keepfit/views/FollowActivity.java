@@ -80,9 +80,9 @@ public class FollowActivity extends AppCompatActivity {
             public void onClick(View view) {
                 UserController ucontrol = new UserController();
                 if (following) {
-                    ucontrol.Unfollow(other_user);
+                    ucontrol.unfollow(other_user);
                 } else {
-                    ucontrol.Follow(other_user);
+                    ucontrol.follow(other_user);
                 }
             }
         });

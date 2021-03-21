@@ -60,7 +60,7 @@ public class ExerciseActivity extends AppCompatActivity {
         if (intensity == 1) intensityStr = "Light";
         else if (intensity == 2) intensityStr = "Moderate";
         else intensityStr = "Vigorous";
-        b.exerciseIntensity.setText("Intensity: " + intensityStr);
+        b.exerciseIntensity.setText(intensityStr + " Intensity");
 
         Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {
             this.user = user;
@@ -81,12 +81,12 @@ public class ExerciseActivity extends AppCompatActivity {
         if (exerciseType != null) exerciseType = Utils.toTitleCase(exerciseType);
         b.exerciseTitle.setText(exerciseType);
 
-        stopwatch = new StopwatchTextView(b.exerciseTimeText, 1);
+        stopwatch = new StopwatchTextView(b.exerciseTimeText, 10);
         stopwatch.setOnTimeUpdateListener(elapsedTime -> {
             if (exerciseController != null) {
                 runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
             }
-        }, 1000); // update every second
+        }, 100); // update every second
         stopwatch.start();
 
         b.exercisePauseResumeBtn.setOnClickListener(v -> {

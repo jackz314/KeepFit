@@ -18,4 +18,36 @@ public class Exercise {
         this.elapsedTime = elapsedTime;
         this.startingTime = startingTime;
     }
+
+    public double getCalories() {
+        return calories;
+    }
+
+    public void setCalories(double calories) {
+        this.calories = calories;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public long getElapsedTime() {
+        return elapsedTime;
+    }
+
+    public void setElapsedTime(long elapsedTime) {
+        this.elapsedTime = elapsedTime;
+    }
+
+    public Date getStartingTime() {
+        return startingTime;
+    }
+
+    public void setStartingTime(Date startingTime) {
+        this.startingTime = startingTime;
+    }
 }

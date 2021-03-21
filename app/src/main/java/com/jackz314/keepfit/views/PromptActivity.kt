@@ -112,6 +112,7 @@ class PromptActivity : AppCompatActivity() {
             intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
             startActivity(intent)
         }
+        finish()
     }
 
     private fun showLoginFailed(@StringRes errorString: Int) {

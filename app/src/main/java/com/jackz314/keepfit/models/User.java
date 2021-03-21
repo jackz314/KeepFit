@@ -1,6 +1,7 @@
 package com.jackz314.keepfit.models;
 
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.PropertyName;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -12,6 +13,8 @@ public class User {
     private String biography;
     private String email;
     private String name;
+
+    @PropertyName("profile_pic")
     private String profilePic;
     private Date birthday;
     private int height; // cm
