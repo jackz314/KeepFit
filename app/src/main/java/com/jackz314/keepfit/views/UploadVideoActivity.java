@@ -135,13 +135,14 @@ public class UploadVideoActivity extends AppCompatActivity {
                 FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
                 DocumentReference uidRef = rootRef.collection("users").document(uid);
 
-                String link = reference.getDownloadUrl().toString();
+                //String link = reference.getDownloadUrl().toString();
+                String link = uri.toString();
                 Timestamp timestamp = now();
 
                 Map<String, Object> media = new HashMap<>();
                 media.put("creator", uidRef);
                 media.put("is_livestream", false);
-                media.put("link", uriTask.toString());
+                media.put("link", link);
                 media.put("start_time", timestamp);
                 media.put("thumbnail", "");
                 media.put("title", titleText.getText().toString());
