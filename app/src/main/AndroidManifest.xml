@@ -13,6 +13,11 @@
         android:theme="@style/Theme.KeepFit">
         <activity android:name=".views.NewUserActivity"></activity>
         <activity
+            android:name=".views.ProfilePageActivity"
+            android:label="Profile Page"
+            android:exported="true">
+        </activity>
+        <activity
             android:name=".views.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
