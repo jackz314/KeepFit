@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.media.MediaMetadataRetriever;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
@@ -173,6 +174,14 @@ public class UploadVideoActivity extends AppCompatActivity {
         FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
         DocumentReference uidRef = rootRef.collection("users").document(uid);
 
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(getApplicationContext(), data);
+        String result = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+        Long durationNumber = (long) (Long.parseLong(result) / 1000);
+
+
+        retriever.release();
+
         String filePath = getPathFromURI(data);
 
         String path = uidRef.toString();
@@ -194,7 +203,10 @@ public class UploadVideoActivity extends AppCompatActivity {
                 Toast.makeText(UploadVideoActivity.this,"File Uploaded", Toast.LENGTH_LONG).show();
                 progressDialog.dismiss();
 
-                //String link = reference.getDownloadUrl().toString();
+                Long durationLong = durationNumber;
+
+
+                Log.i("AAAAAAAAAAAAAAAA", durationNumber.toString());
                 String link = uri.toString();
                 Timestamp timestamp = now();
 
@@ -203,6 +215,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                 media.put("creator", uidRef);
                 media.put("is_livestream", false);
                 media.put("link", link);
+                media.put("duration", (Long) durationLong);
                 media.put("start_time", timestamp);
                 media.put("title", titleText.getText().toString());
                 media.put("view_count", 0);

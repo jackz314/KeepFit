@@ -5,11 +5,22 @@
     android:id="@+id/relative_parent"
     android:background="#000000">
     <VideoView
+<<<<<<< Updated upstream
         android:layout_alignParentLeft="true"
         android:layout_alignParentRight="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+=======
+        android:id="@+id/video_view"
+        android:layout_width="361dp"
+        android:layout_height="match_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="-2dp"
+        android:layout_marginRight="0dp"
+>>>>>>> Stashed changes
         android:focusable="false"
         android:focusableInTouchMode="false"
         android:id="@+id/video_view" />
