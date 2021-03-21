@@ -13,9 +13,9 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginLeft="56dp"
-        android:layout_marginRight="49dp"
-        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="49dp"
+        android:layout_marginRight="56dp"
+        android:layout_marginBottom="97dp"
         android:focusable="false"
         android:focusableInTouchMode="false" />
 </RelativeLayout>

@@ -160,7 +160,6 @@ class MainActivity extends AppCompatActivity {
                 intent.setAction(GlobalConstants.ACTION_LIVESTREAM);
                 startActivity(intent);
             } else { // video upload
-                // TODO: 3/20/21 upload video
                 Intent intent = new Intent(MainActivity.this, UploadVideoActivity.class);
                 intent.putExtra(GlobalConstants.MEDIA_TITLE, "Upload Video");
                 startActivity(intent);

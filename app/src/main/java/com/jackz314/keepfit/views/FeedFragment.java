@@ -18,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.firestore.EventListener;
@@ -30,6 +31,7 @@ import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
+import com.jackz314.keepfit.models.User;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,8 +78,10 @@ public class FeedFragment extends Fragment {
                 Intent intent = new Intent(requireActivity(), VideoActivity.class);
 
                 String videoPath = media.getLink();
+                String creatorInfo =  media.getCreator().toString();
                 //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
                 intent.putExtra("uri", videoPath);
+                intent.putExtra("creator", creatorInfo);
                 startActivity(intent);
             }
 

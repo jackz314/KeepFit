@@ -2,16 +2,21 @@ package com.jackz314.keepfit.views;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.CancellationSignal;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.util.Log;
+import android.util.Size;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,6 +27,13 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.loader.content.CursorLoader;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.CustomTarget;
+import com.bumptech.glide.request.target.Target;
+import com.bumptech.glide.request.transition.Transition;
+import com.bumptech.glide.signature.ObjectKey;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -43,6 +55,7 @@ import com.jackz314.keepfit.models.Media;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Time;
 import java.util.HashMap;
 import java.util.Map;
@@ -82,6 +95,7 @@ public class UploadVideoActivity extends AppCompatActivity {
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     EditText editText;
     EditText titleText;
+    EditText categoryText;
     Button btn;
 
     StorageReference storageReference;
@@ -94,6 +108,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         editText = findViewById(R.id.choose_file_to_upload);
         titleText = findViewById(R.id.video_title_input);
+        categoryText = findViewById(R.id.categories_input);
         btn = findViewById(R.id.btn_video_upload);
 
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -135,7 +150,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                     returnCursor.moveToFirst();
                     long sizeIndex = returnCursor.getLong(returnCursor.getColumnIndex(OpenableColumns.SIZE));
 
-                    if(sizeIndex < 10 * 1024 * 1024){
+                    if(sizeIndex < 5 * 1024 * 1024){
                         Toast.makeText(UploadVideoActivity.this,"File size okay", Toast.LENGTH_LONG).show();
                         uploadVideoFirebase(data.getData());
 
@@ -154,26 +169,38 @@ public class UploadVideoActivity extends AppCompatActivity {
         progressDialog.setTitle("File is loading...");
         progressDialog.show();
 
-        StorageReference reference = storageReference.child("upload"+System.currentTimeMillis()+".mp4");
-        StorageReference reference2 = storageReference.child("upload"+System.currentTimeMillis()+".mp4");
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
+        DocumentReference uidRef = rootRef.collection("users").document(uid);
 
-        String filePath = data.getPath();
-        File file = new File(filePath);
-        //String filePath = getImagePath(data);
+        String filePath = getPathFromURI(data);
 
+        String path = uidRef.toString();
+        String segments[] = path.split("@");
+        String userID = segments[segments.length -1];
 
-        ThumbnailUtils thumbnailUtils = new ThumbnailUtils();
-        Log.i("AAAAAAAAAA", filePath);
-        Bitmap thumbnail = ThumbnailUtils.createVideoThumbnail(file.getAbsolutePath(), MediaStore.Video.Thumbnails.MINI_KIND);
+        StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + userID+".mp4");
+        StorageReference reference2 = storageReference.child(titleText.getText().toString() + "@" +  userID+".jpeg");
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+
+        RequestOptions requestOptions = new RequestOptions();
+        requestOptions.signature(new ObjectKey(System.currentTimeMillis()));
+
+        Glide.with(this).asBitmap().load(new File(data.getPath())).override(Target.SIZE_ORIGINAL, Target.SIZE_ORIGINAL).into(new CustomTarget<Bitmap>() {
+            @Override
+            public void onResourceReady(@NonNull Bitmap resource, @Nullable Transition<? super Bitmap> transition) {
+                resource.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            }
+
+            @Override
+            public void onLoadCleared(@Nullable Drawable placeholder) {
+
+            }
+        });
+
         byte[] thumbData = baos.toByteArray();
 
-        UploadTask.TaskSnapshot taskSnapshot;
-
-
-        Log.i("BBBBBBBBB", filePath);
         final String[] thumbLink = {""};
 
         reference2.putBytes(thumbData).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -201,15 +228,12 @@ public class UploadVideoActivity extends AppCompatActivity {
                 Toast.makeText(UploadVideoActivity.this,"File Uploaded", Toast.LENGTH_LONG).show();
                 progressDialog.dismiss();
 
-                String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
-                DocumentReference uidRef = rootRef.collection("users").document(uid);
-
                 //String link = reference.getDownloadUrl().toString();
                 String link = uri.toString();
                 Timestamp timestamp = now();
 
                 Map<String, Object> media = new HashMap<>();
+                media.put("categories",categoryText.getText().toString());
                 media.put("creator", uidRef);
                 media.put("is_livestream", false);
                 media.put("link", link);
@@ -218,7 +242,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                 media.put("title", titleText.getText().toString());
                 media.put("view_count", 0);
 
-                db.collection("media").document("upload_test").set(media);
+                db.collection("media").document(titleText.getText().toString()).set(media);
 
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
@@ -230,5 +254,22 @@ public class UploadVideoActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public String getPathFromURI(Uri ContentUri) {
+        String res = null;
+        String[] proj = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver()
+                .query(ContentUri, proj, null, null, null);
+
+        if (cursor != null) {
+            cursor.moveToFirst();
+
+            res = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA));
+            cursor.close();
+        }
+
+
+        return res;
     }
 }

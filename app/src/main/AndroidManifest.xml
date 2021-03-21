@@ -3,6 +3,7 @@
     package="com.jackz314.keepfit">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:icon="@mipmap/ic_launcher"
@@ -51,6 +52,7 @@
             android:name=".views.SearchActivity"
             android:windowSoftInputMode="adjustNothing" />
         <activity android:name=".views.UploadVideoActivity" />
+        android:usesCleartextTraffic="true"
     </application>
 
 </manifest>
