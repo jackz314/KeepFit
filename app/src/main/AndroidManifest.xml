@@ -46,8 +46,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".views.ProfilePageActivity"
-            android:exported="true"/>
+            android:name=".views.ProfilePageActivity"/>
 
         <activity
             android:name=".views.VideoActivity"
@@ -56,6 +55,7 @@
             android:name=".views.SearchActivity"
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+
         <activity android:name=".views.UploadVideoActivity"
         android:usesCleartextTraffic="true"/>
         <activity android:name=".views.UserProfileActivity"

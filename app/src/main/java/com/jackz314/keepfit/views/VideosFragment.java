@@ -68,7 +68,6 @@ public class VideosFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-
         if (b == null){ // only inflate for the first time being created
             b = FragmentFeedBinding.inflate(inflater, container, false);
 

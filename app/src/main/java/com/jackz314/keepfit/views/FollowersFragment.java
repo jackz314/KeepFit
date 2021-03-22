@@ -21,9 +21,11 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.databinding.ActivitySearchBinding;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
@@ -32,10 +34,12 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.jackz314.keepfit.databinding.FragmentFollowingBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -64,17 +68,25 @@ public class FollowersFragment extends Fragment {
         searchRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
 
-            SearchResult searchResult = followersList.get(position);
             Intent intent = new Intent(requireActivity(), VideoActivity.class);
 
             startActivity(intent);
+        });
+    }
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        if(b == null) {
+            b = FragmentFollowersBinding.inflate(inflater, container, false);
+
+            b.searchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+            b.searchRecycler.setAdapter(searchRecyclerAdapter);
 
             ub = FirebaseAuth.getInstance().getCurrentUser();
             db = FirebaseFirestore.getInstance();
 
             db.collection("users")
                     .document(ub.getUid())
-                    .collection("following")
+                    .collection("followers")
                     .addSnapshotListener((value, e) -> {
                         if (e != null || value == null) {
                             Log.w(TAG, "Listen failed.", e);
@@ -82,24 +94,15 @@ public class FollowersFragment extends Fragment {
                         }
 
                         procES.execute(() -> {
-                            followersRefList.clear();
-                            for (QueryDocumentSnapshot document : value) {
-                                followersRefList.add((DocumentReference)document.get("ref"));
-                            }
-                            requireActivity().runOnUiThread(searchRecyclerAdapter::notifyDataSetChanged);
-                            Log.d(TAG, "followers collection update: " + followersRefList);
 
                             followersList.clear();
-                            for (DocumentReference followerUserId : followersRefList) {
-                                followerUserId
-                                        .addSnapshotListener((value1, e1) -> {
-                                            if (e != null || value == null) {
-                                                Log.w(TAG, "Listen failed.", e);
-                                                return;
-                                            }
-                                            followersList.add(new SearchResult(new User(value1)));
-                                            Log.d(TAG, "followers collection update: " + followersList);
-                                        });
+                            try {
+                                for (QueryDocumentSnapshot doc : value) {
+                                    DocumentSnapshot userDoc = Tasks.await(doc.getDocumentReference("ref").get());
+                                    followersList.add(new SearchResult(new User(userDoc)));
+                                }
+                            } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
+                                executionException.printStackTrace();
                             }
 
                             if (b != null) {
@@ -108,29 +111,15 @@ public class FollowersFragment extends Fragment {
                                         b.emptyResultsText.setVisibility(View.GONE);
                                     } else {
                                         b.emptyResultsText.setVisibility(View.VISIBLE);
-                                        b.emptyResultsText.setText("No Followers - Go Follow!");
+                                        b.emptyResultsText.setText("No Followers - Go Get Some!");
                                     }
                                     searchRecyclerAdapter.notifyDataSetChanged();
                                 });
                             }
                         });
                     });
-        });
-    }
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-
-        b = FragmentFollowersBinding.inflate(getLayoutInflater());
-        View root = b.getRoot();
-
-        if (!followersList.isEmpty() && b.emptyResultsText.getVisibility() == View.VISIBLE) {
-            b.emptyResultsText.setVisibility(View.GONE);
         }
 
-        b.searchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        b.searchRecycler.setAdapter(searchRecyclerAdapter);
-
-        return root;
+        return b.getRoot();
     }
-
 }

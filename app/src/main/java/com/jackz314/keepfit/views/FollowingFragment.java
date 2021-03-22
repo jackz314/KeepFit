@@ -21,9 +21,11 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.databinding.ActivitySearchBinding;
@@ -38,6 +40,7 @@ import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -62,14 +65,22 @@ public class FollowingFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SearchRecyclerAdapter searchRecyclerAdapter = new SearchRecyclerAdapter(getContext(), followingList);
+        searchRecyclerAdapter = new SearchRecyclerAdapter(getContext(), followingList);
         searchRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
 
-            SearchResult searchResult = followingList.get(position);
             Intent intent = new Intent(requireActivity(), VideoActivity.class);
 
             startActivity(intent);
+        });
+    }
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             ViewGroup container, Bundle savedInstanceState) {
+        if(b == null) {
+            b = FragmentFollowingBinding.inflate(inflater, container, false);
+
+            b.searchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+            b.searchRecycler.setAdapter(searchRecyclerAdapter);
 
             ub = FirebaseAuth.getInstance().getCurrentUser();
             db = FirebaseFirestore.getInstance();
@@ -84,56 +95,32 @@ public class FollowingFragment extends Fragment {
                         }
 
                         procES.execute(() -> {
-                            followingRefList.clear();
-                            for (QueryDocumentSnapshot document : value) {
-                                followingRefList.add((DocumentReference)document.get("ref"));
-                            }
-                            requireActivity().runOnUiThread(searchRecyclerAdapter::notifyDataSetChanged);
-                            Log.d(TAG, "following collection update: " + followingRefList);
 
                             followingList.clear();
-                            for (DocumentReference followingUserId : followingRefList) {
-                                followingUserId
-                                        .addSnapshotListener((value1, e1) -> {
-                                            if (e != null || value == null) {
-                                                Log.w(TAG, "Listen failed.", e);
-                                                return;
-                                            }
-                                            followingList.add(new SearchResult(new User(value1)));
-                                            Log.d(TAG, "following collection update: " + followingList);
-                                        });
+                            try {
+                                for (QueryDocumentSnapshot doc : value) {
+                                    DocumentSnapshot userDoc = Tasks.await(doc.getDocumentReference("ref").get());
+                                    followingList.add(new SearchResult(new User(userDoc)));
+                                }
+                            } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
+                                executionException.printStackTrace();
                             }
 
                             if (b != null) {
                                 getActivity().runOnUiThread(() -> {
-
                                     if (!followingList.isEmpty()) {
                                         b.emptyResultsText.setVisibility(View.GONE);
                                     } else {
                                         b.emptyResultsText.setVisibility(View.VISIBLE);
-                                        b.emptyResultsText.setText("No Following - Go Follow!");
+                                        b.emptyResultsText.setText("No Following - Go Follow Users!");
                                     }
                                     searchRecyclerAdapter.notifyDataSetChanged();
                                 });
                             }
                         });
                     });
-        });
-    }
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-
-        b = FragmentFollowingBinding.inflate(getLayoutInflater());
-        View root = b.getRoot();
-
-        if (!followingList.isEmpty() && b.emptyResultsText.getVisibility() == View.VISIBLE) {
-            b.emptyResultsText.setVisibility(View.GONE);
         }
 
-        b.searchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-        b.searchRecycler.setAdapter(searchRecyclerAdapter);
-
-        return root;
+        return b.getRoot();
     }
-
 }
