@@ -2,6 +2,7 @@ package com.jackz314.keepfit.views;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.net.Uri;
 import android.os.Bundle;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -131,7 +132,11 @@ public class UpdateProfileActivity extends AppCompatActivity {
             user.put("email", mFirebaseUser.getEmail());
             user.put("height", height);
             user.put("name", strUsername);
-            user.put("profile_pic", mFirebaseUser.getPhotoUrl().toString());
+            Uri photoUrl = mFirebaseUser.getPhotoUrl();
+            String photoStr;
+            if (photoUrl == null) photoStr = "";
+            else photoStr = photoUrl.toString();
+            user.put("profile_pic", photoStr);
             user.put("sex", sex);
             user.put("weight", weight);
 
@@ -142,19 +147,9 @@ public class UpdateProfileActivity extends AppCompatActivity {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("users")
                     .document(mFirebaseUser.getUid())
-                    .set(user)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            finish();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            Toast.makeText(UpdateProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    .update(user)
+                    .addOnSuccessListener(aVoid -> finish())
+                    .addOnFailureListener(e -> Toast.makeText(UpdateProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show());
             setResult(Activity.RESULT_OK);
         });
 
