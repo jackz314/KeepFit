@@ -146,52 +146,58 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
         Button follow_btn = findViewById(R.id.followButton);
-        db.collection("users").document(curruser.getUid()).collection("following").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                           @Override
-                                           public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                               if (task.isSuccessful()) {
-                                                   QuerySnapshot findFollowingCollection = task.getResult();
-                                                   if (findFollowingCollection.isEmpty()) {
-                                                       //if it's empty then user is not following anyone => don't want to work with null values
-                                                       follow_btn.setText(String.valueOf('+'));
-                                                       following = false;
-                                                   } else {
-                                                       db.collection("users").document(curruser.getUid()).collection("following")
-                                                               .whereEqualTo("ref", db.collection("users").document(other_user.getUid())).get()
-                                                               .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                                                   @Override
-                                                                   public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                                       if (task.isSuccessful()) {
-                                                                           QuerySnapshot isFollowing = task.getResult();
-                                                                           if (isFollowing.isEmpty()) {
-                                                                               follow_btn.setText(String.valueOf('+'));
-                                                                               following = false;
-                                                                           } else {
-                                                                               follow_btn.setText(String.valueOf('-'));
-                                                                               following = true;
-                                                                           }
-                                                                       }
-                                                                   }
-                                                               });
-                                                   }
-                                               }
-                                           }
-                                       });
-
-
+        followButtonChange(follow_btn, other_user);
         follow_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 UserController ucontrol = new UserController();
                 if (following) {
                     ucontrol.unfollow(other_user);
+                    followButtonChange(follow_btn, other_user);
                 } else {
                     ucontrol.follow(other_user);
+                    followButtonChange(follow_btn, other_user);
                 }
-                recreate();
             }
         });
+    }
+
+
+
+    public void followButtonChange(Button follow_btn, User other_user) {
+        db.collection("users").document(curruser.getUid()).collection("following").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            QuerySnapshot findFollowingCollection = task.getResult();
+                            if (findFollowingCollection.isEmpty()) {
+                                //if it's empty then user is not following anyone => don't want to work with null values
+                                follow_btn.setText(String.valueOf('+'));
+                                following = false;
+                            } else {
+                                db.collection("users").document(curruser.getUid()).collection("following")
+                                        .whereEqualTo("ref", db.collection("users").document(other_user.getUid())).get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    QuerySnapshot isFollowing = task.getResult();
+                                                    if (isFollowing.isEmpty()) {
+                                                        follow_btn.setText(String.valueOf('+'));
+                                                        following = false;
+                                                    } else {
+                                                        follow_btn.setText(String.valueOf('-'));
+                                                        following = true;
+                                                    }
+                                                }
+                                            }
+                                        });
+                            }
+                        }
+                    }
+                });
+
     }
 
     public void populateList(User other){
