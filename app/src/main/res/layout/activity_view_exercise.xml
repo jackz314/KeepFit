@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".views.ViewExerciseActivity">
+
+    <TextView
+        android:id="@+id/view_exercise_category"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:text="Running"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="32sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/view_exercise_cals_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawableStart="@drawable/ic_baseline_local_fire_department_24"
+        android:drawablePadding="3dp"
+        android:gravity="center"
+        android:text="Calories"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        app:layout_constraintStart_toStartOf="@+id/view_exercise_date"
+        app:layout_constraintTop_toBottomOf="@+id/view_exercise_duration_label" />
+
+    <TextView
+        android:id="@+id/view_exercise_cal_per_min_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawableStart="@drawable/ic_baseline_calculate_24"
+        android:drawablePadding="3dp"
+        android:gravity="center"
+        android:text="Cal/min"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        app:layout_constraintStart_toStartOf="@+id/view_exercise_date"
+        app:layout_constraintTop_toBottomOf="@+id/view_exercise_cals_label" />
+
+    <TextView
+        android:id="@+id/view_exercise_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Mar 23, 14:36"
+        app:layout_constraintStart_toStartOf="@+id/view_exercise_category"
+        app:layout_constraintTop_toBottomOf="@+id/view_exercise_category" />
+
+    <TextView
+        android:id="@+id/view_exercise_duration_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawableStart="@drawable/ic_baseline_access_time_24"
+        android:drawablePadding="3dp"
+        android:gravity="center"
+        android:text="Duration"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        app:layout_constraintStart_toStartOf="@+id/view_exercise_date"
+        app:layout_constraintTop_toBottomOf="@+id/view_exercise_date" />
+
+    <TextView
+        android:id="@+id/view_exercise_duration"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="24dp"
+        android:text="27 min 2 sec"
+        app:layout_constraintBottom_toBottomOf="@+id/view_exercise_duration_label"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/view_exercise_duration_label" />
+
+    <TextView
+        android:id="@+id/view_exercise_cal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="2596.24"
+        app:layout_constraintBottom_toBottomOf="@+id/view_exercise_cals_label"
+        app:layout_constraintEnd_toEndOf="@+id/view_exercise_duration"
+        app:layout_constraintTop_toTopOf="@+id/view_exercise_cals_label" />
+
+    <TextView
+        android:id="@+id/view_exercise_cal_per_min"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="96.19"
+        app:layout_constraintBottom_toBottomOf="@+id/view_exercise_cal_per_min_label"
+        app:layout_constraintEnd_toEndOf="@+id/view_exercise_duration"
+        app:layout_constraintTop_toTopOf="@+id/view_exercise_cal_per_min_label" />
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,2 +1,4 @@
+include ':zoom-mobilertc'
+include ':zoom-commonlib'
 include ':app'
 rootProject.name = "KeepFit"

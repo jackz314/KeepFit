@@ -2,7 +2,6 @@ plugins {
     id 'com.android.application'
     id 'com.google.gms.google-services'
     id 'kotlin-android'
-    id 'kotlin-android-extensions'
 }
 
 android {
@@ -39,33 +38,44 @@ dependencies {
 //    implementation fileTree(include: ['*.jar'], dir: 'libs')
 //    implementation files(android.sdkDirectory.path + '/platforms/android-30/android.jar')
 
+    //zoom modules
+    implementation project(':zoom-commonlib')
+    implementation project(':zoom-mobilertc')
+    implementation 'androidx.multidex:multidex:2.0.1'
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation 'com.google.android.material:material:1.3.0'
+    implementation 'androidx.preference:preference-ktx:1.1.1'
+    implementation "androidx.browser:browser:1.3.0"
+
     //kotlin stuff
     implementation 'androidx.core:core-ktx:1.3.2'
 
     implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation "androidx.activity:activity:1.2.0"
-    implementation 'androidx.fragment:fragment:1.3.0'
+    implementation "androidx.activity:activity-ktx:1.2.1"
+    implementation 'androidx.fragment:fragment-ktx:1.3.1'
     implementation 'com.google.android.material:material:1.3.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
-    implementation 'androidx.navigation:navigation-fragment:2.3.3'
-    implementation 'androidx.navigation:navigation-ui:2.3.3'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.4'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.4'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.0'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
     // Firebase stuff
-    implementation platform('com.google.firebase:firebase-bom:26.6.0')
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
+
+    implementation platform('com.google.firebase:firebase-bom:26.6.0')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-firestore'
     implementation 'com.google.firebase:firebase-database'
     implementation 'com.google.firebase:firebase-storage'
     implementation 'com.google.firebase:firebase-functions'
-    implementation 'com.google.firebase:firebase-database:19.7.0'
-    implementation 'com.google.firebase:firebase-storage:19.2.1'
-    implementation 'com.google.firebase:firebase-core:16.0.1'
+    implementation 'com.google.firebase:firebase-storage'
 
     // Facebook login support
     // Find the latest Facebook SDK releases here: https://goo.gl/Ce5L94
@@ -73,12 +83,24 @@ dependencies {
     implementation 'com.facebook.android:facebook-android-sdk:8.1.0'
 
     // third-party stuff
-    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'de.hdodenhof:circleimageview:3.1.0' // circular imageview
+    implementation 'uk.co.markormesher:android-fab:2.5.0' // advanced FAB
+    implementation 'org.apache.commons:commons-lang3:3.12.0' // StringUtils
 
-    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    implementation 'com.github.bumptech.glide:glide:4.12.0' // glide
     annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 
     //rxjava
     implementation 'io.reactivex.rxjava3:rxjava:3.0.0'
     implementation 'io.reactivex.rxjava3:rxandroid:3.0.0'
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.github.bumptech.glide:glide:4.12.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.12.0'
 }

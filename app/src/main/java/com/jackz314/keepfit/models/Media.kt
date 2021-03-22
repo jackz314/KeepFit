@@ -11,15 +11,16 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.PropertyName
 import io.reactivex.rxjava3.core.Single
+import java.io.Serializable
 import java.util.*
 
 private const val TAG = "Media"
 
-class Media(doc: DocumentSnapshot) {
+class Media(doc: DocumentSnapshot): Serializable {
 
     @DocumentId
     var uid: String? = null
-    var creator = MutableLiveData<User>(User())
+    var creator = MutableLiveData(User())
     var creatorRef: DocumentReference?
 
     @PropertyName("is_livestream")
@@ -32,7 +33,7 @@ class Media(doc: DocumentSnapshot) {
     var thumbnail: String? = null
     var title: String? = null
 
-    //    @PropertyName("view_count")
+    @PropertyName("view_count")
     var viewCount: Int = 0
 
     init {
@@ -84,4 +85,6 @@ class Media(doc: DocumentSnapshot) {
                 ", viewCount=" + viewCount +
                 '}'
     }
+
+
 }

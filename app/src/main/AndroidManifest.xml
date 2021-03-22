@@ -3,20 +3,39 @@
     package="com.jackz314.keepfit">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
-        android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KeepFit">
-        <activity android:name=".views.NewUserActivity"></activity>
+        <activity android:name=".views.ViewExerciseActivity"
+            android:label="Exercise"/>
         <activity
-            android:name=".views.ProfilePageActivity"
-            android:label="Profile Page"
-            android:exported="true">
+            android:name=".views.PromptActivity"
+            android:label="@string/title_activity_prompt"
+            android:theme="@style/Theme.KeepFit.NoBar" />
+        <activity
+            android:name=".views.ExerciseActivity"
+            android:label="@string/title_activity_exercise"
+            android:theme="@style/Theme.KeepFit.NoBar" />
+        <activity
+            android:name=".views.StartLivestreamActivity"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="*.zoom.us"
+                    android:scheme="zoomus" />
+            </intent-filter>
         </activity>
+        <activity android:name=".views.NewUserActivity" />
         <activity
             android:name=".views.MainActivity"
             android:label="@string/app_name">
@@ -26,6 +45,19 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".views.ProfilePageActivity" />
+        <activity
+            android:name=".views.VideoActivity"
+            android:configChanges="orientation|screenSize"
+            android:screenOrientation="landscape"/>
+        <activity
+            android:name=".views.SearchActivity"
+            android:windowSoftInputMode="adjustNothing" />
+        <activity android:name=".views.UploadVideoActivity"
+        android:usesCleartextTraffic="true"/>
+        <activity android:name=".views.FollowActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 
 </manifest>

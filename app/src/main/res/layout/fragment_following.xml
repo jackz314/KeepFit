@@ -1,0 +1,22 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".views.FollowingFragment" >
+
+    <TextView
+        android:id="@+id/following_header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Following"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium">
+    </TextView>
+    <ListView
+        android:id="@android:id/list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/following_header">
+    </ListView>
+
+</RelativeLayout>

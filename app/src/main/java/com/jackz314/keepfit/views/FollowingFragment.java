@@ -24,6 +24,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,6 +49,8 @@ public class FollowingFragment extends ListFragment {
     private FirebaseFirestore db;
 
     private List<String> followingList = new ArrayList<>();
+    private List<String> followingRefList = new ArrayList<>();
+
     private Executor procES = Executors.newSingleThreadExecutor();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -62,7 +65,7 @@ public class FollowingFragment extends ListFragment {
         setListAdapter(adapter);
 
         db.collection("users")
-                .document(ub.getEmail())
+                .document(ub.getUid())
                 .collection("following")
                 .addSnapshotListener((value, e) -> {
                     if (e != null || value == null) {
@@ -71,16 +74,32 @@ public class FollowingFragment extends ListFragment {
                     }
 
                     procES.execute(() -> {
-                        followingList.clear();
+                        followingRefList.clear();
                         for (QueryDocumentSnapshot document : value) {
-                            followingList.add((String) document.get("name"));
+                            followingRefList.add((String) document.get("ref"));
                         }
                         requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
-                        Log.d(TAG, "following collection update: " + followingList);
+                        Log.d(TAG, "following collection update: " + followingRefList);
+
+                        for (String followingUserId : followingRefList) {
+                            db.document(followingUserId)
+                                    .addSnapshotListener((value1, e1) -> {
+                                        if (e != null || value == null) {
+                                            Log.w(TAG, "Listen failed.", e);
+                                            return;
+                                        }
+                                        procES.execute(() -> {
+                                            followingList.clear();
+                                            followingList.add((String) value1.get("name"));
+                                            requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                                            Log.d(TAG, "videos collection update: " + followingList);
+                                        });
+                                    });
+                        }
                     });
                 });
 
-        View view = inflater.inflate(R.layout.fragment_followers, container, false);
+        View view = inflater.inflate(R.layout.fragment_following, container, false);
         return view;
     }
 

@@ -2,6 +2,7 @@ package com.jackz314.keepfit.views;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,10 +17,8 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.UtilsKot;
+import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 
@@ -32,6 +31,8 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     private List<Media> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+
+    private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
 
 
     // data is passed into the constructor
@@ -58,11 +59,11 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             holder.durationText.setText("LIVE");
             holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8,0x03, 0x06)));
         }else{
-            holder.durationText.setText(UtilsKot.formatDurationString(media.getDuration()));
+            holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
         }
 
         Glide.with(holder.image)
-                .load(media.getThumbnail())
+                .load(media.getLink())
                 .fitCenter()
                 .placeholder(R.drawable.ic_thumb_placeholder)
                 .into(holder.image);

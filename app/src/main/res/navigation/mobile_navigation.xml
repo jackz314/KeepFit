@@ -5,13 +5,13 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@+id/navigation_me">
 
-    <fragment
+    <keep_state_fragment
         android:id="@+id/navigation_me"
         android:name="com.jackz314.keepfit.views.MeFragment"
         android:label="@string/title_me"
         tools:layout="@layout/fragment_me" />
 
-    <fragment
+    <keep_state_fragment
         android:id="@+id/navigation_feed"
         android:name="com.jackz314.keepfit.views.FeedFragment"
         android:label="@string/title_feed"

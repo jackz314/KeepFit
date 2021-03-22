@@ -16,7 +16,7 @@
         <FrameLayout
             android:id="@+id/user_info_fragment"
             android:layout_width="match_parent"
-            android:layout_height="500dp"
+            android:layout_height="wrap_content"
             android:background="@color/purple_200"></FrameLayout>
 
         <LinearLayout
@@ -25,17 +25,17 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal" >
             <FrameLayout
-                android:id="@+id/followers_fragment"
+                android:id="@+id/following_fragment"
                 android:layout_width="205dp"
                 android:layout_height="100dp"
                 android:layout_below="@id/user_info_fragment"
                 android:background="@color/white"></FrameLayout>
 
             <FrameLayout
-                android:id="@+id/following_fragment"
+                android:id="@+id/followers_fragment"
                 android:layout_width="205dp"
                 android:layout_height="100dp"
-                android:layout_toRightOf="@id/followers_fragment"
+                android:layout_toRightOf="@id/following_fragment"
                 android:layout_below="@id/user_info_fragment"
                 android:background="@color/purple_500"></FrameLayout>
         </LinearLayout>

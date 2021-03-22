@@ -8,6 +8,11 @@
         app:showAsAction="ifRoom"
         android:title="Sign Out" />
     <item
+        android:id="@+id/sign_out_zoom_btn"
+        android:icon="@drawable/ic_zoom_24"
+        android:title="SIgn out of Zoom"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/delete_account_btn"
         android:icon="@drawable/ic_delete_forever_24"
         app:showAsAction="never"

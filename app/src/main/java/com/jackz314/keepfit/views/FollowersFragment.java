@@ -48,6 +48,8 @@ public class FollowersFragment extends ListFragment {
     private FirebaseFirestore db;
 
     private List<String> followersList = new ArrayList<>();
+    private List<String> followersRefList = new ArrayList<>();
+
     private Executor procES = Executors.newSingleThreadExecutor();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -62,8 +64,8 @@ public class FollowersFragment extends ListFragment {
         setListAdapter(adapter);
 
         db.collection("users")
-                .document(ub.getEmail())
-                .collection("followers")
+                .document(ub.getUid())
+                .collection("following")
                 .addSnapshotListener((value, e) -> {
                     if (e != null || value == null) {
                         Log.w(TAG, "Listen failed.", e);
@@ -71,12 +73,28 @@ public class FollowersFragment extends ListFragment {
                     }
 
                     procES.execute(() -> {
-                        followersList.clear();
+                        followersRefList.clear();
                         for (QueryDocumentSnapshot document : value) {
-                            followersList.add((String) document.get("name"));
+                            followersRefList.add((String) document.get("ref"));
                         }
                         requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
-                        Log.d(TAG, "follower collection update: " + followersList);
+                        Log.d(TAG, "following collection update: " + followersRefList);
+
+                        for (String followerUserId : followersRefList) {
+                            db.document(followerUserId)
+                                    .addSnapshotListener((value1, e1) -> {
+                                        if (e != null || value == null) {
+                                            Log.w(TAG, "Listen failed.", e);
+                                            return;
+                                        }
+                                        procES.execute(() -> {
+                                            followersList.clear();
+                                            followersList.add((String) value1.get("name"));
+                                            requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                                            Log.d(TAG, "videos collection update: " + followersList);
+                                        });
+                                    });
+                        }
                     });
                 });
 
