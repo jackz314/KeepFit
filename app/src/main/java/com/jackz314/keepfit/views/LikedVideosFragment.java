@@ -57,10 +57,9 @@ public class LikedVideosFragment extends Fragment {
             Intent intent = new Intent(requireActivity(), VideoActivity.class);
 
             String videoPath = media.getLink();
-            String creatorInfo =  media.getCreator().toString();
 
             intent.putExtra("uri", videoPath);
-            intent.putExtra("creator", creatorInfo);
+            intent.putExtra("media", media.getUid());
             startActivity(intent);
 
         });
