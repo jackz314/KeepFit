@@ -2,8 +2,10 @@ package com.jackz314.keepfit.views;
 
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.VideoView;
@@ -17,6 +19,8 @@ import com.jackz314.keepfit.controllers.BackPressingMediaController;
 import com.jackz314.keepfit.controllers.VideoController;
 
 public class VideoActivity extends AppCompatActivity{
+    private static final String TAG = "VideoActivity";
+
     private VideoView mVideoView;
     private BackPressingMediaController mMediaController;
 
@@ -55,6 +59,13 @@ public class VideoActivity extends AppCompatActivity{
         Uri uri = Uri.parse(value);
         mVideoView.setVideoURI(uri);
 
+        mVideoView.setOnErrorListener((mp, what, extra) -> {
+            Log.d(TAG, "onCreate: couldn't play video with video view, using backup");
+            Intent webIntent = new Intent(Intent.ACTION_VIEW, uri);
+            startActivity(webIntent);
+            finish();
+            return true;
+        });
 
         mMediaController = new BackPressingMediaController(this, VideoActivity.this);
         mVideoView.setMediaController(mMediaController);

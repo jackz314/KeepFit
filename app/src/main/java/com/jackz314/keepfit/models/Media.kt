@@ -36,7 +36,9 @@ class Media(doc: DocumentSnapshot): Serializable {
     var liked = false
 
     init {
-        if (!doc.exists()) throw IllegalStateException("Media doesn't exist!")
+        if (!doc.exists()){
+
+        }
         uid = doc.id
         isLivestream = doc.getBoolean("is_livestream") == true
         link = doc.getString("link")

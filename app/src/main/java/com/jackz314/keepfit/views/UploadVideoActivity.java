@@ -1,50 +1,26 @@
 package com.jackz314.keepfit.views;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.ContentProvider;
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CancellationSignal;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
-import android.util.Log;
-import android.util.Size;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.loader.content.CursorLoader;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
-import com.bumptech.glide.request.target.CustomTarget;
-import com.bumptech.glide.request.target.Target;
-import com.bumptech.glide.request.transition.Transition;
-import com.bumptech.glide.signature.ObjectKey;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -52,31 +28,24 @@ import com.google.firebase.storage.StorageReference;
 
 import com.google.firebase.storage.UploadTask;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.controllers.VideoController;
-import com.jackz314.keepfit.models.Media;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static android.graphics.Bitmap.Config.ALPHA_8;
 import static com.google.firebase.Timestamp.now;
 
 
 public class UploadVideoActivity extends AppCompatActivity {
 
-    public class putVideo {
+    public class PutVideo {
         public String title;
         public String url;
 
-        public putVideo(){}
+        public PutVideo(){}
 
-        public putVideo(String name, String url){
+        public PutVideo(String name, String url){
             this.title = name;
             this.url = url;
         }
@@ -185,56 +154,52 @@ public class UploadVideoActivity extends AppCompatActivity {
         StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + user.getUid()+".mp4");
 
 
-        reference.putFile(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+        reference.putFile(data).addOnSuccessListener(taskSnapshot -> {
 
-                Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                while (!uriTask.isComplete());
-                Uri uri = uriTask.getResult();
+            Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+            while (!uriTask.isComplete());
+            Uri uri = uriTask.getResult();
 
-                putVideo putvideo = new putVideo(editText.getText().toString(), uri.toString());
-                Toast.makeText(UploadVideoActivity.this,"File Uploaded", Toast.LENGTH_LONG).show();
-                progressDialog.dismiss();
+            PutVideo putvideo = new PutVideo(editText.getText().toString(), uri.toString());
 
-                Long durationLong = durationNumber;
-                String categoriesString = categoryText.getText().toString();
+            Long durationLong = durationNumber;
+            String categoriesString = categoryText.getText().toString();
 
-                String link = uri.toString();
-                Timestamp timestamp = now();
+            String link = uri.toString();
+            Timestamp timestamp = now();
 
-                String raw = categoryText.getText().toString();
-                String[] categoryArray = raw.split(",");
-                List<String> categoryList = new ArrayList<String>();
+            String raw = categoryText.getText().toString();
+            String[] categoryArray = raw.split(",");
+            List<String> categoryList = new ArrayList<String>();
 
-                for(int i = 0; i < categoryArray.length; ++i){
-                    categoryList.add(categoryArray[i]);
-                }
-
-                Map<String, Object> media = new HashMap<>();
-                media.put("categories", categoryList);
-                media.put("creator", uidRef);
-                media.put("is_livestream", false);
-                media.put("link", link);
-                media.put("duration", (Long) durationLong);
-                media.put("start_time", timestamp);
-                media.put("title", titleText.getText().toString());
-                media.put("view_count", 0);
-                media.put("thumbnail", "");
-
-                DocumentReference mediaRef = db.collection("media").document();
-                mediaRef.set(media);
-                Map<String, Object> refData = new HashMap<>();
-                refData.put("ref", mediaRef);
-                db.collection("users").document(user.getUid()).collection("videos").document().set(refData);
+            for(int i = 0; i < categoryArray.length; ++i){
+                categoryList.add(categoryArray[i]);
             }
-        }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-            @Override
-            public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
 
-                double progress=(100.0 * snapshot.getBytesTransferred())/snapshot.getTotalByteCount();
-                progressDialog.setMessage("File Uploading.." +(int) progress + "%");
-            }
+            Map<String, Object> media = new HashMap<>();
+            media.put("categories", categoryList);
+            media.put("creator", uidRef);
+            media.put("is_livestream", false);
+            media.put("link", link);
+            media.put("duration", (Long) durationLong);
+            media.put("start_time", timestamp);
+            media.put("title", titleText.getText().toString());
+            media.put("view_count", 0);
+            media.put("thumbnail", "");
+
+            DocumentReference mediaRef = db.collection("media").document();
+            mediaRef.set(media);
+            Map<String, Object> refData = new HashMap<>();
+            refData.put("ref", mediaRef);
+            db.collection("users").document(user.getUid()).collection("videos").document().set(refData)
+                    .addOnCompleteListener(task -> {
+                        Toast.makeText(UploadVideoActivity.this,"File Uploaded", Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
+                        finish();
+                    });
+        }).addOnProgressListener(snapshot -> {
+            double progress=(100.0 * snapshot.getBytesTransferred())/snapshot.getTotalByteCount();
+            progressDialog.setMessage("File Uploading.." +(int) progress + "%");
         });
 
     }
