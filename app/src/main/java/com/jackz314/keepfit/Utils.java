@@ -183,6 +183,53 @@ public class Utils {
         );
     }
 
+    // get the key from local cache first, if expired, get a new one from server
+    public static Single<String> getAlgoliaSearchKey(Context context){
+         return Single.create((SingleEmitter<String> emitter) -> {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            String savedToken = prefs.getString(GlobalConstants.ALGOLIA_SEARCH_KEY, "");
+            emitter.onSuccess(savedToken);
+        }).flatMap(token -> {
+            if (token.isEmpty()){
+                return getAlgoliaSearchKeyFromServer() // save token after getting it
+                        .doOnSuccess(newKey -> PreferenceManager.getDefaultSharedPreferences(context).edit()
+                                .putString(GlobalConstants.ALGOLIA_SEARCH_KEY, newKey).apply());
+            }else{
+                return Single.just(token);
+            }
+         });
+    }
+
+    private static Single<String> getAlgoliaSearchKeyFromServer() {
+        Log.d(TAG, "getAlgoliaSearchKeyFromServer: start");
+        // Create the arguments to the callable function.
+        FirebaseFunctions functions = FirebaseFunctions.getInstance();
+        return Single.create(emitter -> functions
+                .getHttpsCallable("getAlgoliaSearchKey")
+                .call()
+                .continueWith(task -> {
+                    // This continuation runs on either success or failure, but if the task
+                    // has failed then getResult() will throw an Exception which will be
+                    // propagated down.
+                    HttpsCallableResult taskResult = task.getResult();
+                    if (taskResult == null) return "";
+                    return (String) taskResult.getData();
+                }).addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()){
+                        Exception e = task.getException();
+                        if (e == null) {
+                            e = new Exception("Original exception was null");
+                        }
+                        Log.e(TAG, "getAlgoliaSearchKeyFromServer: failed to get key, error: ", e);
+                        emitter.onError(e);
+                    } else {
+                        Log.d(TAG, "getAlgoliaSearchKeyFromServer: got key: " + task.getResult());
+                        emitter.onSuccess(Objects.requireNonNull(task.getResult()));
+                    }
+                })
+        );
+    }
+
     public static Date getJWTExpirationDate(String jwtEncoded) {
         if (jwtEncoded == null || jwtEncoded.isEmpty()) {
             return null;

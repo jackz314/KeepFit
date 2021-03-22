@@ -9,11 +9,15 @@ public interface GlobalConstants {
 
     String ZOOM_SSO_AUTH_ENDPOINT = "https://%s.zoom.us/saml/login?from=mobile";
 
+    String ALGOLIA_APP_ID = "YXGIKUNME6";
+    String ALGOLIA_INDEX_NAME = "Firestore";
+
     // shared preferences stuff
     String ZOOM_JWT_TOKEN_KEY = "zoom_jwt_token";
     String ZOOM_SSO_TOKEN_KEY = "zoom_sso_token";
     String ZOOM_USERNAME_KEY = "zoom_username";
     String ZOOM_PASSWORD_KEY = "zoom_pwd";
+    String ALGOLIA_SEARCH_KEY = "algolia_search_key";
 
     // intent stuff
     String MEDIA_TITLE = "media_title";

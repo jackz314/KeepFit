@@ -6,23 +6,35 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.algolia.search.saas.AlgoliaException;
+import com.algolia.search.saas.Client;
+import com.algolia.search.saas.Index;
+import com.algolia.search.saas.Query;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivitySearchBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
@@ -34,8 +46,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private LivestreamController livestreamController;
     private FirebaseFirestore db;
     private ActivitySearchBinding b;
-    private User self;
 
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private Index index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,30 +63,22 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         livestreamController = new LivestreamController(this);
         //if (b == null){ // only inflate for the first time being created
 
-        b.searchRecycler.setLayoutManager(new LinearLayoutManager(this));
+        Disposable disposable = Utils.getAlgoliaSearchKey(this).subscribe(key -> {
+            Client client = new Client(GlobalConstants.ALGOLIA_APP_ID, key);
+            index = client.getIndex(GlobalConstants.ALGOLIA_INDEX_NAME);
+        }, throwable -> {
+            Log.e(TAG, "onCreate: couldn't get search key for algolia", throwable);
+            Toast.makeText(this, "Couldn't connect to search service, try again later.", Toast.LENGTH_SHORT).show();
+        });
+        compositeDisposable.add(disposable);
 
+        b.searchRecycler.setLayoutManager(new LinearLayoutManager(this));
 
         if (!mList.isEmpty() && b.emptyResultsText.getVisibility() == View.VISIBLE) {
             b.emptyResultsText.setVisibility(View.GONE);
             b.searchRecycler.setVisibility(View.VISIBLE);
         }
 
-        b.searchRecycler.setAdapter(searchRecyclerAdapter);
-
-
-        //}
-        editsearch = findViewById(R.id.search);
-        editsearch.setOnQueryTextListener((SearchView.OnQueryTextListener) this);
-        if(editsearch.requestFocus()) getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-    }
-
-
-    @Override
-    public boolean onQueryTextSubmit(String query) {
-
-        processSearch(query);
-        // TODO: Add search results display (Set up fragment? on same activity?
-        //feedRecyclerAdapter.notifyDataSetChanged();
         searchRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
             if (mList.get(position)instanceof Media) {
@@ -99,6 +104,20 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             }
         });
 
+        b.searchRecycler.setAdapter(searchRecyclerAdapter);
+
+        db = FirebaseFirestore.getInstance();
+
+        editsearch = findViewById(R.id.search);
+        editsearch.setOnQueryTextListener(this);
+        if(editsearch.requestFocus()) getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+    }
+
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+
+        processSearch(query);
         Log.d(TAG, query);
 
         return false;
@@ -116,7 +135,21 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private void processSearch(String query) {
 
         // TODO: 3/19/21 Insert searching capabilities on search submit query
-        db = FirebaseFirestore.getInstance();
+
+        if (index == null) {
+            Log.w(TAG, "processSearch: couldn't search because search service is unavailable");
+            Toast.makeText(this, "Couldn't search because search service is unavailable", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        index.searchAsync(new Query(query), (JSONObject content, AlgoliaException error) -> {
+            if (error != null || content == null) {
+                Log.e(TAG, "processSearch: search error: ", error);
+            } else {
+                Log.d(TAG, "processSearch: search result: " + content);
+
+            }
+        });
 
         db.collection("users")
                 .whereLessThanOrEqualTo("name",query)
@@ -192,4 +225,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 });
     }
 
+    @Override
+    protected void onDestroy() {
+        compositeDisposable.clear();
+        super.onDestroy();
+    }
 }

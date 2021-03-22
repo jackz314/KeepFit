@@ -49,7 +49,6 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     public SearchRecyclerAdapter(Context context, List<Object> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
-
     }
 
     // inflates the row layout from xml when needed
