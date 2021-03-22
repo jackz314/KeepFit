@@ -1,9 +1,7 @@
 package com.jackz314.keepfit.views;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,31 +16,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.viewpager2.widget.ViewPager2;
 
-import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
-import com.google.firebase.auth.FirebaseAuth;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
-import com.google.firebase.auth.FirebaseUser;
-import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
-import com.jackz314.keepfit.UtilsKt;
-import com.jackz314.keepfit.controllers.ExerciseController;
-import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentMeBinding;
-import com.jackz314.keepfit.models.Exercise;
-import com.jackz314.keepfit.models.Media;
 
-import org.jetbrains.annotations.NotNull;
-
-import java.time.Instant;
-import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.Objects;
 
 import us.zoom.sdk.AccountService;
@@ -56,104 +38,44 @@ public class MeFragment extends Fragment {
 
     private FragmentMeBinding b;
 
-    private FirebaseAuth.AuthStateListener authStateListener;
-
-    private final List<Exercise> exerciseList = new ArrayList<>();
-    private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
-
+    private MeCollectionAdapter meCollectionAdapter;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-
-        exerciseRecyclerAdapter = new ExerciseRecyclerAdapter(getContext(), exerciseList);
-        exerciseRecyclerAdapter.setClickListener((view, position) -> {
-            Exercise exercise = exerciseList.get(position);
-            Intent intent = new Intent(requireActivity(), ViewExerciseActivity.class);
-            intent.putExtra(GlobalConstants.EXERCISE_OBJ, exercise);
-            startActivity(intent);
-        });
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        //        View root = inflater.inflate(R.layout.fragment_me, container, false);
         if (b == null){
             // view binding ftw!
             b = FragmentMeBinding.inflate(inflater, container, false);
-
-            authStateListener = auth -> {
-                FirebaseUser user = auth.getCurrentUser();
-                if (user != null) {
-                    b.userNameText.setText(getGreetingMsg() + user.getDisplayName());
-                    b.userEmailText.setText(user.getEmail());
-
-                    Glide.with(b.getRoot())
-                            .load(Utils.getHighResProfilePicUrl())
-                            .fitCenter()
-                            .placeholder(R.drawable.ic_outline_account_circle_24)
-                            .into(b.userProfilePicture);
+            meCollectionAdapter = new MeCollectionAdapter(this);
+            b.meViewPager.setAdapter(meCollectionAdapter);
+            TabLayoutMediator mediator = new TabLayoutMediator(b.meTabLayout, b.meViewPager, ((tab, position) -> {
+                switch (position) {
+                    case 0:
+                        tab.setText("Info");
+                        break;
+                    case 1:
+                        tab.setText("My Videos");
+                        break;
+                    case 2:
+                        tab.setText("Liked Videos");
+                        break;
+                    case 3:
+                        tab.setText("Followers");
+                        break;
+                    case 4:
+                        tab.setText("Following");
+                        break;
                 }
-            };
-            FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
-
-            // exercise stuff
-            b.exerciseLogRecycler.setAdapter(exerciseRecyclerAdapter);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
-            b.exerciseLogRecycler.setLayoutManager(layoutManager);
-            b.exerciseLogRecycler.setNestedScrollingEnabled(false);
-            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(b.exerciseLogRecycler.getContext(),
-                    layoutManager.getOrientation());
-            b.exerciseLogRecycler.addItemDecoration(dividerItemDecoration);
-
-            UserControllerKt.getCurrentUserDoc().collection("exercises").addSnapshotListener(((value, error) -> {
-                if (error != null || value == null) {
-                    Log.w(TAG, "Listen failed.", error);
-                    return;
-                }
-                exerciseList.clear();
-                exerciseList.addAll(value.toObjects(Exercise.class));
-                exerciseRecyclerAdapter.notifyDataSetChanged();
-
-
-                if (!exerciseList.isEmpty()){
-                    b.emptyExerciseLogText.setVisibility(View.GONE);
-                } else {
-                    b.emptyExerciseLogText.setVisibility(View.VISIBLE);
-                    b.emptyExerciseLogText.setText("Go out and exercise more? ¯\\_(ツ)_/¯");
-                }
-                // today exercise summary stuff
-                List<Exercise> todayExercises = ExerciseController.getTodayExercises(exerciseList);
-                double todayCal = ExerciseController.getTotalCalories(todayExercises);
-                long todayExTime = ExerciseController.getTotalExerciseTime(todayExercises);
-                b.meCaloriesText.setText(String.format(Locale.getDefault(), "Calories: %.3f", todayCal));
-                b.meExerciseTimeText.setText("Exercise: " + UtilsKt.formatDurationTextString(todayExTime / DateUtils.SECOND_IN_MILLIS));
             }));
+            mediator.attach();
         }
-
         return b.getRoot();
-    }
-
-    @Override
-    public void onDestroy() {
-        if (authStateListener != null) FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
-        super.onDestroy();
-    }
-
-    @NotNull
-    private String getGreetingMsg() {
-        Instant now = Instant.now();
-        int hr = now.atZone(ZoneId.systemDefault()).getHour();
-        String timeStr;
-        if (hr >= 5 && hr < 12) {
-            timeStr = "Morning";
-        } else if (hr >= 12 && hr <= 17) {
-            timeStr = "Afternoon";
-        } else {
-            timeStr = "Evening";
-        }
-        return "Good " + timeStr + ", ";
+//        return inflater.inflate(R.layout.fragment_me, container, false);
     }
 
     @SuppressLint("RestrictedApi")

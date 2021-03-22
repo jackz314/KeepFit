@@ -53,7 +53,8 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".views.SearchActivity"
-            android:windowSoftInputMode="adjustNothing" />
+            android:windowSoftInputMode="adjustNothing"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity android:name=".views.UploadVideoActivity"
         android:usesCleartextTraffic="true"/>
         <activity android:name=".views.FollowActivity"

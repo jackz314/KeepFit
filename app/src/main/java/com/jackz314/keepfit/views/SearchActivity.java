@@ -5,16 +5,19 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Client;
 import com.algolia.search.saas.Index;
 import com.algolia.search.saas.Query;
+//import com.google.firebase.database.snapshot.Index;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
@@ -50,7 +53,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private ActivitySearchBinding b;
 
     private CompositeDisposable compositeDisposable = new CompositeDisposable();
-    private Index index;
+    private com.algolia.search.saas.Index index;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +76,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             Toast.makeText(this, "Couldn't connect to search service, try again later.", Toast.LENGTH_SHORT).show();
         });
         compositeDisposable.add(disposable);
-
-        b.searchRecycler.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        b.searchRecycler.setLayoutManager(layoutManager);
 
         if (!mList.isEmpty() && b.emptyResultsText.getVisibility() == View.VISIBLE) {
             b.emptyResultsText.setVisibility(View.GONE);
@@ -98,15 +101,18 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 } else {
                     Intent intent = new Intent(this, VideoActivity.class);
 
-                    String videoPath = media.getLink();
+
                     //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
-                    intent.putExtra("uri", videoPath);
+                    intent.putExtra("uri", media.getLink());
+                    intent.putExtra("media", media.getUid());
                     startActivity(intent);
                 }
 
             }
         });
-
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(b.searchRecycler.getContext(),
+                layoutManager.getOrientation());
+        b.searchRecycler.addItemDecoration(dividerItemDecoration);
         b.searchRecycler.setAdapter(searchRecyclerAdapter);
 
         db = FirebaseFirestore.getInstance();
@@ -129,6 +135,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
+    }
+
+    public void closeSearch(View view){
+        finish();
     }
 
 
