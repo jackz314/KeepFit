@@ -35,7 +35,7 @@ import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
-import com.jackz314.keepfit.databinding.ActivityFollowBinding;
+import com.jackz314.keepfit.databinding.ActivityUserProfileBinding;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
@@ -51,17 +51,14 @@ import de.hdodenhof.circleimageview.CircleImageView;
 public class UserProfileActivity extends AppCompatActivity {
     private static final String TAG = "Follow Activity" ;
     FirebaseUser curruser = FirebaseAuth.getInstance().getCurrentUser();
-    private ActivityFollowBinding b;
+    private ActivityUserProfileBinding b;
     private FirebaseFirestore db;
     private FollowRecyclerAdapter followerRecyclerAdapter;
-    Boolean following;
+    boolean following;
     private List<Media> mList = new ArrayList<>();
     private Executor procES = Executors.newSingleThreadExecutor();
     private ListenerRegistration registration;
     private LivestreamController livestreamController;
-
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,11 +74,13 @@ public class UserProfileActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         followerRecyclerAdapter = new FollowRecyclerAdapter(this, mList);
         livestreamController = new LivestreamController(this);
-        b = ActivityFollowBinding.inflate(getLayoutInflater());
+        b = ActivityUserProfileBinding.inflate(getLayoutInflater());
         View v =b.getRoot();
         setContentView(v);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         b.exerciseLogRecycler.setLayoutManager(layoutManager);
+
+
 
         if (!mList.isEmpty() && b.exerciseLogRecycler.getVisibility() == View.VISIBLE) {
             b.exerciseLogRecycler.setVisibility(View.GONE);
@@ -223,7 +222,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
                         // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
                         this.runOnUiThread(() -> {
-
                             if (b != null) {
                                 if (!mList.isEmpty()){
                                     b.noVideosText.setVisibility(View.GONE);
