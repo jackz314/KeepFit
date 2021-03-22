@@ -62,9 +62,6 @@ public class UserInfoFragment extends Fragment {
 
     private FirebaseAuth.AuthStateListener authStateListener;
 
-    private UserController userController;
-    private User user;
-
     private final List<Exercise> exerciseList = new ArrayList<>();
     private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
 
@@ -92,31 +89,23 @@ public class UserInfoFragment extends Fragment {
 
             authStateListener = auth -> {
                 UserControllerKt.getCurrentUser().subscribe(user -> {
-                    this.user = user;
-                    userController = new UserController();
+                    if (user != null) {
+                        b.userNameText.setText(getGreetingMsg() + user.getName());
+                        b.userEmailText.setText(user.getEmail());
+                        b.userHeightText.setText(Utils.centimeterToFeet(user.getHeight()));
+                        b.userWeightText.setText((int)(user.getWeight() *  2.205) + " lbs");
+                        b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
+                        b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), user.getBirthday().getTime(),
+                                DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
+                        b.userBiographyText.setText(user.getBiography());
+
+                        Glide.with(b.getRoot())
+                                .load(Utils.getHighResProfilePicUrl())
+                                .fitCenter()
+                                .placeholder(R.drawable.ic_outline_account_circle_24)
+                                .into(b.userProfilePicture);
+                    }
                 });
-
-                Date date = user.getBirthday();
-
-                String birthday = (String.valueOf(date.getMonth()) + "/" +
-                        String.valueOf(date.getDay()) + "/" +
-                        String.valueOf(date.getYear()));
-
-                if (user != null) {
-                    b.userNameText.setText("Name: " + user.getName());
-                    b.userEmailText.setText("Email: " + user.getEmail());
-                    b.userHeightText.setText("Height: " + String.valueOf((int) user.getHeight() / 2.54));
-                    b.userWeightText.setText("Weight: " + String.valueOf(user.getWeight()));
-                    b.userSexText.setText("Sex: " + user.getSex());
-                    b.userBirthdayText.setText("Birthday: " + birthday);
-                    b.userBiographyText.setText("Biography: " + user.getBiography());
-
-                    Glide.with(b.getRoot())
-                            .load(Utils.getHighResProfilePicUrl())
-                            .fitCenter()
-                            .placeholder(R.drawable.ic_outline_account_circle_24)
-                            .into(b.userProfilePicture);
-                }
             };
             FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 

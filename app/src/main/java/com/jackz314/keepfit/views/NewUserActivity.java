@@ -139,7 +139,7 @@ public class NewUserActivity extends AppCompatActivity {
                 String date = month + "/" + day + "/" + year;
                 mDisplayBirthday.setText(date);
                 mBirthday = Calendar.getInstance();
-                mBirthday.set(year, month, day);
+                mBirthday.set(year, month, day,0,0);
             }
         };
 

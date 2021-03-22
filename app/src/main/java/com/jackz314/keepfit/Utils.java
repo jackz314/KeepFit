@@ -3,6 +3,7 @@ package com.jackz314.keepfit;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 import android.text.format.DateUtils;
 import android.util.Base64;
 import android.util.Log;
@@ -30,6 +31,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import io.reactivex.rxjava3.core.Single;
@@ -304,6 +306,15 @@ public class Utils {
                 .substring(2)
                 .replaceAll("(\\d[HMS])(?!$)", "$1 ")
                 .toLowerCase();
+    }
+
+    public static String centimeterToFeet(double centemeter) {
+        int feetPart = 0;
+        int inchesPart = 0;
+        feetPart = (int) Math.floor((centemeter / 2.54) / 12);
+        System.out.println((centemeter / 2.54) - (feetPart * 12));
+        inchesPart = (int) Math.ceil((centemeter / 2.54) - (feetPart * 12));
+        return String.format(Locale.US, "%d' %d''", feetPart, inchesPart);
     }
 
 }

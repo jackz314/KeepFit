@@ -31,6 +31,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:drawableEnd="@drawable/ic_baseline_female_24"
             android:text="Hi! User"
             android:textAppearance="@android:style/TextAppearance.Material.Headline"
             app:layout_constraintEnd_toEndOf="parent"
@@ -53,9 +54,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:drawableStart="@drawable/ic_height"
+            android:drawablePadding="4dp"
+            android:gravity="center"
             android:text="6' 5"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/user_weight_text"
+            app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/user_email_text" />
 
@@ -63,41 +68,42 @@
             android:id="@+id/user_weight_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="164"
+            android:drawableLeft="@drawable/ic_baseline_monitor_weight_24"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:text="164 lbs"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_height_text" />
+            app:layout_constraintEnd_toStartOf="@+id/user_birthday_text"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/user_height_text"
+            app:layout_constraintTop_toTopOf="@+id/user_height_text" />
 
         <TextView
             android:id="@+id/user_birthday_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_baseline_cake_24"
+            android:drawablePadding="4dp"
+            android:gravity="center"
             android:text="1/11/1985"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_weight_text" />
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/user_weight_text"
+            app:layout_constraintTop_toTopOf="@+id/user_height_text" />
 
-        <TextView
-            android:id="@+id/user_sex_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Male"
-            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_birthday_text" />
         <TextView
             android:id="@+id/user_biography_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
             android:text="I like food"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_sex_text" />
+            app:layout_constraintTop_toBottomOf="@+id/user_height_text" />
 
         <TextView
             android:id="@+id/me_exercise_time_text"
