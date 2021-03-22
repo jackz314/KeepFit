@@ -213,8 +213,11 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 durationText.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
             }
 
+            String thumbnail;
+            if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
+            else thumbnail = media.getLink();
             Glide.with(image)
-                    .load(media.getLink())
+                    .load(thumbnail)
                     .fitCenter()
                     .placeholder(R.drawable.ic_thumb_placeholder)
                     .into(image);
