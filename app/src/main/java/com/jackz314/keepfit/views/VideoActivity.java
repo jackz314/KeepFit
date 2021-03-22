@@ -25,10 +25,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
+import com.jackz314.keepfit.controllers.VideoController;
+import com.jackz314.keepfit.models.Media;
 
 public class VideoActivity extends AppCompatActivity{
     private VideoView mVideoView;
@@ -36,6 +39,7 @@ public class VideoActivity extends AppCompatActivity{
 
     private int mVideoWidth;
     private int mVideoHeight;
+    private VideoController mVideoController;
 
     Button deleteBtn;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -46,19 +50,20 @@ public class VideoActivity extends AppCompatActivity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.video_player);
-
-
-
         Intent intent = getIntent();
         String value = intent.getStringExtra("uri");
-        String creator = intent.getStringExtra("creator");
+        String mediaID = intent.getStringExtra("media");
         VideoView videoView = findViewById(R.id.video_view);
+
+        mVideoController = new VideoController(getBaseContext(), mediaID);
 
         try{
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
         catch (NullPointerException e){}
+
+        mVideoController.updateVideoStatus();
 
         mVideoView = videoView;
         Uri uri = Uri.parse(value);
@@ -77,47 +82,6 @@ public class VideoActivity extends AppCompatActivity{
             this.getSupportActionBar().hide();
         }
 
-//        deleteBtn.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View view) {
-//                AlertDialog diaBox = AskOption();
-//                diaBox.show();
-//            }
-//        });
-    }
-
-    private AlertDialog AskOption()
-    {
-        AlertDialog myQuittingDialogBox = new AlertDialog.Builder(this)
-                // set message, title, and icon
-                .setTitle("Delete")
-                .setMessage("Do you want to DELETE this Video?")
-
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        deleteVideo();
-                        dialog.dismiss();
-                    }
-
-                })
-                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        dialog.dismiss();
-
-                    }
-                })
-                .create();
-
-        return myQuittingDialogBox;
-    }
-
-    private void deleteVideo() {
-
-
-       // StorageReference reference = storageReference
-       // db.collection("media").
     }
 
     @Override

@@ -206,7 +206,6 @@ public class UploadVideoActivity extends AppCompatActivity {
                 Long durationLong = durationNumber;
                 String categoriesString = categoryText.getText().toString();
 
-                Log.i("AAAAAAAAAAAAAAAA", durationNumber.toString());
                 String link = uri.toString();
                 Timestamp timestamp = now();
 
@@ -221,8 +220,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                 media.put("view_count", 0);
                 media.put("thumbnail", "");
 
-                db.collection("media").document(titleText.getText().toString()).set(media);
-
+                db.collection("media").document().set(media);
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override

@@ -22,6 +22,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
@@ -77,12 +78,10 @@ public class FeedFragment extends Fragment {
             else{
                 Intent intent = new Intent(requireActivity(), VideoActivity.class);
 
-                String videoPath = media.getLink();
                 //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
-                intent.putExtra("uri", videoPath);
-                int viewCount = media.getViewCount() + 1;
+                intent.putExtra("uri", media.getLink());
+                intent.putExtra("media", media.getUid());
                 startActivity(intent);
-                db.collection("media").document(media.getTitle()).update("view_count", viewCount);
             }
 
             //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
