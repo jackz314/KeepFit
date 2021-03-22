@@ -167,7 +167,6 @@ public class UploadVideoActivity extends AppCompatActivity {
     }
 
     private void uploadVideoFirebase(Uri data) {
-
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("File is loading...");
         progressDialog.show();
@@ -190,7 +189,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         String segments[] = path.split("@");
         String userID = segments[segments.length -1];
 
-        StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + userID+".mp4");
+        StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + user.getUid()+".mp4");
 
 
         reference.putFile(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {

@@ -4,6 +4,7 @@ package com.jackz314.keepfit.views;
 
 
 
+import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -11,6 +12,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
@@ -69,18 +71,21 @@ public class VideoActivity extends AppCompatActivity{
         Uri uri = Uri.parse(value);
         mVideoView.setVideoURI(uri);
 
+
+
         MediaController mediaController = new MediaController(this);
         mMediaController = mediaController;
-        mVideoView.setMediaController(mMediaController);
+        mVideoView.setMediaController(new MediaController(this){
+            public boolean dispatchKeyEvent(KeyEvent event)
+            {
+                if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
+                    ((Activity) getContext()).finish();
+
+                return super.dispatchKeyEvent(event);
+            }
+        });
         mMediaController.setAnchorView(mVideoView);
         mVideoView.start();
-
-        if(mediaController.isPressed()){
-            this.getSupportActionBar().show();
-        }
-        else{
-            this.getSupportActionBar().hide();
-        }
 
     }
 
@@ -93,5 +98,7 @@ public class VideoActivity extends AppCompatActivity{
         Intent intent = new Intent(this, VideoActivity.class);
         startActivity(intent);
     }
+
+
 
 }
