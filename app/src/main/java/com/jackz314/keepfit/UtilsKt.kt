@@ -1,9 +1,9 @@
 package com.jackz314.keepfit
 
 import android.util.Log
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.jackz314.keepfit.controllers.UserControllerKt
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.CompletableEmitter
 import us.zoom.sdk.ZoomApiError
@@ -12,7 +12,6 @@ import us.zoom.sdk.ZoomSDK
 import us.zoom.sdk.ZoomSDKAuthenticationListener
 import java.time.Duration
 import javax.security.auth.login.LoginException
-import kotlin.math.min
 
 private const val TAG = "UtilsKt"
 
@@ -112,7 +111,7 @@ object UtilsKt {
         val db = FirebaseFirestore.getInstance()
         val docData = hashMapOf(
                 "categories" to categories,
-                "creator" to db.collection("users").document(FirebaseAuth.getInstance().currentUser!!.uid),
+                "creator" to UserControllerKt.currentUserDoc,
                 "is_livestream" to true,
                 "link" to link,
                 "start_time" to FieldValue.serverTimestamp(),
@@ -120,13 +119,24 @@ object UtilsKt {
                 "title" to title,
                 "view_count" to 0
         )
-        db.collection("media").document(Utils.getMD5(link)).set(docData)
+        val livestreamDoc = db.collection("media").document(Utils.getMD5(link))
+        livestreamDoc.set(docData)
+        UserControllerKt.currentUserDoc.collection("videos").add(hashMapOf("ref" to livestreamDoc))
     }
 
     @JvmStatic
     fun removeLivestream(link: String) {
         Log.d(TAG, "removeLivestream: link: $link")
         val db = FirebaseFirestore.getInstance()
-        db.collection("media").document(Utils.getMD5(link)).delete()
+        val livestreamDoc = db.collection("media").document(Utils.getMD5(link))
+        livestreamDoc.delete()
+        UserControllerKt.currentUserDoc.collection("videos").whereEqualTo("ref", livestreamDoc)
+                .get().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        task.result?.forEach {
+                            it.reference.delete()
+                        }
+                    }
+                }
     }
 }

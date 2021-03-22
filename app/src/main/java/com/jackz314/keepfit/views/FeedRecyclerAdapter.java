@@ -60,6 +60,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8,0x03, 0x06)));
         }else{
             holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
+            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         }
 
         String thumbnail;
