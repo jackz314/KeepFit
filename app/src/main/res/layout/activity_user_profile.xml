@@ -30,7 +30,7 @@
             android:id="@+id/user_name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="52dp"
+            android:layout_marginTop="16dp"
             android:drawableEnd="@drawable/ic_baseline_female_24"
             android:drawablePadding="4dp"
             android:text="Hi! User"
@@ -54,13 +54,14 @@
 
         <Button
             android:id="@+id/followButton"
-            android:layout_width="wrap_content"
+            android:layout_width="40dp"
             android:layout_height="wrap_content"
             android:checkable="false"
             android:text="+"
+            app:layout_constraintBottom_toBottomOf="@+id/user_name_text"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_profile_picture" />
+            app:layout_constraintStart_toEndOf="@+id/user_name_text"
+            app:layout_constraintTop_toTopOf="@+id/user_name_text" />
 
         <TextView
             android:id="@+id/user_height_text"

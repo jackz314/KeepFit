@@ -27,6 +27,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
 
@@ -131,50 +132,30 @@ public class VideosFragment extends Fragment {
         return b.getRoot();
     }
 
-    protected void deleteVideo(String MediaID, String CreatorID, String StorageLink){
+    protected void deleteVideo(String mediaID, String CreatorID, String StorageLink){
 
-        db.collection("users").document(CreatorID).collection("video").document(MediaID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "DocumentSnapshot successfully deleted!");
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error deleting document", e);
-                    }
-                });;
-
-
-
-        db.collection("media").document(MediaID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "DocumentSnapshot successfully deleted!");
-            }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w(TAG, "Error deleting document", e);
-                    }});
-
-        StorageReference videoRef = fs.getReferenceFromUrl(StorageLink);
-        videoRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                // File deleted successfully
-                Log.d(TAG, "onSuccess: deleted file");
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Uh-oh, an error occurred!
-                Log.d(TAG, "onFailure: did not delete file");
-            }
-        });
-
-
+        db.collection("users").document(CreatorID).collection("videos")
+                .whereEqualTo("ref", db.collection("media").document(mediaID)).get()
+                .continueWithTask(task -> {
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot doc : task.getResult().getDocuments()) {
+                                return doc.getReference().delete();
+                            }
+                        }
+                        return null;
+                }).continueWithTask(task -> {
+                    return db.collection("media").document(mediaID).delete()
+                            .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully deleted!"))
+                            .addOnFailureListener(e -> Log.w(TAG, "Error deleting document", e));
+                }).continueWithTask(task -> {
+                    StorageReference videoRef = fs.getReferenceFromUrl(StorageLink);
+                    return videoRef.delete();
+                }).addOnSuccessListener(aVoid -> {
+                    // File deleted successfully
+                    Log.d(TAG, "onSuccess: deleted file");
+                }).addOnFailureListener(exception -> {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG, "onFailure: did not delete file");
+                });
     }
 }
