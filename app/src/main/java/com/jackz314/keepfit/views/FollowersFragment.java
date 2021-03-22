@@ -68,9 +68,11 @@ public class FollowersFragment extends Fragment {
         searchRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
 
-            Intent intent = new Intent(requireActivity(), VideoActivity.class);
-
-            startActivity(intent);
+            SearchResult searchResult = followersList.get(position);
+            User user = searchResult.getUser();
+            Intent in = new Intent(requireActivity(), UserProfileActivity.class);
+            in.putExtra("other",user);
+            startActivity(in);
         });
     }
     public View onCreateView(@NonNull LayoutInflater inflater,

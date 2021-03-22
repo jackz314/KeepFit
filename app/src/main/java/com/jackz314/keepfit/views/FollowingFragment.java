@@ -48,7 +48,7 @@ import java.util.concurrent.Executors;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FollowingFragment extends Fragment {
+public class FollowingFragment extends Fragment  {
 
     private static final String TAG = "FollowerFragment";
 
@@ -69,9 +69,11 @@ public class FollowingFragment extends Fragment {
         searchRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
 
-            Intent intent = new Intent(requireActivity(), VideoActivity.class);
-
-            startActivity(intent);
+            SearchResult searchResult = followingList.get(position);
+            User user = searchResult.getUser();
+            Intent in = new Intent(requireActivity(), UserProfileActivity.class);
+            in.putExtra("other",user);
+            startActivity(in);
         });
     }
     public View onCreateView(@NonNull LayoutInflater inflater,
