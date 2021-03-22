@@ -13,9 +13,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
@@ -23,6 +25,7 @@ import com.jackz314.keepfit.models.Media;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -36,7 +39,6 @@ public class LikedVideosFragment extends Fragment {
     private FragmentFeedBinding b;
 
     private List<Media> likedVideosList = new ArrayList<>();
-    private List<DocumentReference> likedVideoRefList = new ArrayList<>();
 
     private Executor procES = Executors.newSingleThreadExecutor();
 
@@ -70,10 +72,6 @@ public class LikedVideosFragment extends Fragment {
         if (b == null){ // only inflate for the first time being created
             b = FragmentFeedBinding.inflate(inflater, container, false);
 
-            if (!likedVideoRefList.isEmpty() && b.emptyFeedText.getVisibility() == View.VISIBLE) {
-                b.emptyFeedText.setVisibility(View.GONE);
-            }
-
             b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
             b.feedRecycler.setAdapter(feedRecyclerAdapter);
 
@@ -87,26 +85,15 @@ public class LikedVideosFragment extends Fragment {
                         }
 
                         procES.execute(() -> {
-                            likedVideoRefList.clear();
-
-                            for (QueryDocumentSnapshot document : value) {
-                                likedVideoRefList.add((DocumentReference) document.get("ref"));
-                            }
-                            Log.d(TAG, "videos collection update: " + likedVideoRefList);
-
                             likedVideosList.clear();
-                            for (DocumentReference createdVideoId : likedVideoRefList) {
-                                createdVideoId
-                                        .addSnapshotListener((value1, e1) -> {
-                                            if (e != null || value1 == null) {
-                                                Log.w(TAG, "Listen failed.", e);
-                                                return;
-                                            }
-                                            likedVideosList.add(new  Media (value1));
-                                            Log.d(TAG, "videos collection update: " + likedVideosList);
-                                        });
+                            try {
+                                for (QueryDocumentSnapshot doc : value) {
+                                    DocumentSnapshot mediaDoc = Tasks.await(db.collection("media").document(doc.getId()).get());
+                                    likedVideosList.add(new Media(mediaDoc));
+                                }
+                            } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
+                                executionException.printStackTrace();
                             }
-
                             getActivity().runOnUiThread(() -> {
                                 if (b != null) {
                                     if (!likedVideosList.isEmpty()){

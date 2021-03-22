@@ -129,6 +129,7 @@ object UtilsKt {
         Log.d(TAG, "removeLivestream: link: $link")
         val db = FirebaseFirestore.getInstance()
         val livestreamDoc = db.collection("media").document(Utils.getMD5(link))
+        UserControllerKt.currentUserDoc.collection("liked_videos").document(livestreamDoc.id).delete()
         UserControllerKt.currentUserDoc.collection("videos").whereEqualTo("ref", livestreamDoc)
                 .get().addOnCompleteListener { task ->
                     if (task.isSuccessful) {

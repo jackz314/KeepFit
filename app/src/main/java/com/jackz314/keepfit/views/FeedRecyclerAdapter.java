@@ -57,7 +57,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
 
             likedVideos.clear();
             for (QueryDocumentSnapshot doc : value) {
-                likedVideos.add(doc.getDocumentReference("ref").getId());
+                likedVideos.add(doc.getId());
             }
 
             for (Media media : mData) {

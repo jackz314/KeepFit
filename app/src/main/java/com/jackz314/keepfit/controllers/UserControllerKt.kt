@@ -42,24 +42,14 @@ object UserControllerKt {
     @JvmStatic
     fun likeVideo(uid: String) {
         val db = FirebaseFirestore.getInstance()
-        currentUserDoc.collection("liked_videos").add(hashMapOf("ref" to db.collection("media").document(uid)))
+        currentUserDoc.collection("liked_videos").document(uid).set(hashMapOf("exists" to true))
     }
 
     @JvmStatic
     fun unlikeVideo(uid: String) {
         val db = FirebaseFirestore.getInstance()
-        val videoDoc = db.collection("media").document(uid)
-        currentUserDoc.collection("liked_videos").whereEqualTo("ref", videoDoc)
-                .get().addOnCompleteListener { task ->
-                    if (task.isSuccessful) {
-                        task.result?.forEach {
-                            it.reference.delete()
-                        }
-                    }
-                }
+        currentUserDoc.collection("liked_videos").document(uid).delete()
     }
 
-    @JvmStatic
-    fun likedVideosListener(){
-    }
+
 }
