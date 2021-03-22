@@ -109,7 +109,7 @@ public class FollowingFragment extends Fragment  {
                             }
 
                             if (b != null)  {
-                                getActivity().runOnUiThread(() -> {
+                                requireActivity().runOnUiThread(() -> {
                                     if (!followingList.isEmpty()) {
                                         b.emptyResultsText.setVisibility(View.GONE);
                                     } else {

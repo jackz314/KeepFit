@@ -171,8 +171,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             Timestamp timestamp = now();
 
             String raw = categoryText.getText().toString();
-            String[] categoryArray = raw.split(",");
-            List<String> categoryList = Arrays.stream(categoryArray).map(String::trim).collect(Collectors.toList());
+            List<String> categoryList = Arrays.stream(raw.split(",")).map(String::trim).collect(Collectors.toList());
 
             Map<String, Object> media = new HashMap<>();
             media.put("categories", categoryList);

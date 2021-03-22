@@ -1,5 +1,6 @@
 package com.jackz314.keepfit.views;
 
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,6 +15,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import android.view.LayoutInflater;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -26,6 +29,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.LivestreamController;
@@ -35,6 +39,7 @@ import com.jackz314.keepfit.databinding.ActivityFollowBinding;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -83,10 +88,6 @@ public class UserProfileActivity extends AppCompatActivity {
             b.noVideosText.setVisibility(View.VISIBLE);
         }
 
-        if (other_user.getUid().equals(curruser.getUid())) {
-            b.followButton.setVisibility(View.GONE);
-        }
-
 //        if (other_user != null) {
 
         b.userNameText.setText(other_user.getName());
@@ -104,12 +105,13 @@ public class UserProfileActivity extends AppCompatActivity {
                 .fitCenter()
                 .placeholder(R.drawable.ic_account_circle_24)
                 .into(b.userProfilePicture);
-        //fix
+
         b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, other_user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
         b.userHeightText.setText(Utils.centimeterToFeet(other_user.getHeight()));
         b.userWeightText.setText((int)(other_user.getWeight() *  2.205) + " lbs");
-        b.userBirthdayText.setText(DateUtils.formatDateTime(this, other_user.getBirthday().getTime(),
+        b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), other_user.getBirthday().getTime(),
                 DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
+
 
         //Fills list with videos that belong to the user
         populateList(other_user);
@@ -142,24 +144,40 @@ public class UserProfileActivity extends AppCompatActivity {
 //        }
 
 
+
         Button follow_btn = findViewById(R.id.followButton);
-        //if following user, then button says unfollow, if not following user, button says follow
-        DocumentReference doc = db.collection("users").document(curruser.getUid()).collection("following").document(other_user.getUid());
-        doc.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        follow_btn.setText("Unfollow");
-                        following = true;
-                    } else {
-                        follow_btn.setText("Follow");
-                        following = false;
-                    }
-                }
-            }
-        });
+        db.collection("users").document(curruser.getUid()).collection("following").get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                           @Override
+                                           public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                               if (task.isSuccessful()) {
+                                                   QuerySnapshot findFollowingCollection = task.getResult();
+                                                   if (findFollowingCollection.isEmpty()) {
+                                                       //if it's empty then user is not following anyone => don't want to work with null values
+                                                       follow_btn.setText(String.valueOf('+'));
+                                                       following = false;
+                                                   } else {
+                                                       db.collection("users").document(curruser.getUid()).collection("following")
+                                                               .whereEqualTo("ref", db.collection("users").document(other_user.getUid())).get()
+                                                               .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                   @Override
+                                                                   public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                       if (task.isSuccessful()) {
+                                                                           QuerySnapshot isFollowing = task.getResult();
+                                                                           if (isFollowing.isEmpty()) {
+                                                                               follow_btn.setText(String.valueOf('+'));
+                                                                               following = false;
+                                                                           } else {
+                                                                               follow_btn.setText(String.valueOf('-'));
+                                                                               following = true;
+                                                                           }
+                                                                       }
+                                                                   }
+                                                               });
+                                                   }
+                                               }
+                                           }
+                                       });
 
 
         follow_btn.setOnClickListener(new View.OnClickListener() {
@@ -171,6 +189,7 @@ public class UserProfileActivity extends AppCompatActivity {
                 } else {
                     ucontrol.follow(other_user);
                 }
+                recreate();
             }
         });
     }
@@ -217,6 +236,10 @@ public class UserProfileActivity extends AppCompatActivity {
     }
     public void closeProfile(View view){
         finish();
+    }
+
+    public Context getContext() {
+        return getApplication().getApplicationContext();
     }
 
     @Override
