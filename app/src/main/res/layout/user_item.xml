@@ -8,10 +8,11 @@
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/search_profile_pic"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
         android:contentDescription="Profile Picture"
         app:layout_constraintBottom_toBottomOf="@+id/space"
+        app:layout_constraintEnd_toStartOf="@+id/guideline3"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_outline_account_circle_24"
@@ -19,18 +20,18 @@
 
     <TextView
         android:id="@+id/user_name_text"
-        android:layout_width="317dp"
-        android:layout_height="56dp"
-        android:layout_marginStart="14dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="Loading"
         android:textAlignment="center"
         android:textSize="25dp"
+        android:textStyle = "bold"
         app:layout_constraintBottom_toBottomOf="@+id/space"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toEndOf="@+id/search_profile_pic"
+        app:layout_constraintHorizontal_bias="0.069"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.504" />
+        app:layout_constraintVertical_bias="0.242" />
 
     <Space
         android:id="@+id/space"
@@ -40,4 +41,24 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="135dp" />
+
+    <TextView
+        android:id="@+id/biography"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Bio"
+        android:textColor="#A9A9A9"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.059"
+        app:layout_constraintStart_toStartOf="@+id/guideline3"
+        app:layout_constraintTop_toBottomOf="@+id/user_name_text"
+        app:layout_constraintVertical_bias="0.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

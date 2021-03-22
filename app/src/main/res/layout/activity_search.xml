@@ -13,9 +13,19 @@
         android:iconifiedByDefault="false"
         android:queryHint="Search for exercise"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toStartOf="@id/guideline2"
+        app:layout_constraintTop_toTopOf="parent" >
 
+
+    </SearchView>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        app:layout_constraintGuide_end="342dp" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_recycler"
         android:layout_width="match_parent"
@@ -29,14 +39,30 @@
         android:id="@+id/empty_results_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Insert Search"
+        android:text=""
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <!-- set iconified by default to false -->
+    <ImageButton
+        android:id="@+id/imageButton2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginBottom="12dp"
+        android:background="@null"
+        android:onClick="closeSearch"
+        app:layout_constraintBottom_toTopOf="@+id/search_recycler"
+        app:layout_constraintEnd_toStartOf="@+id/guideline2"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.75"
+        app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

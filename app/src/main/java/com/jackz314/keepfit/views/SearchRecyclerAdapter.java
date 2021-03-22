@@ -24,14 +24,18 @@ import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
 
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
     private static final String TAG = "SearchRecyclerAdapter";
 
+    private final List<String> greetings = Arrays.asList("Hello", "Hi!", "Let's Be Friends");
     private List<SearchResult> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
@@ -116,6 +120,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         TextView durationText;
         ImageView profilePic;
         ImageView image;
+        TextView categoryText;
         boolean isMedia = true;
         Media media = null;
 
@@ -125,6 +130,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             detailText = itemView.findViewById(R.id.feed_detail_text);
             durationText = itemView.findViewById(R.id.feed_duration_text);
             profilePic = itemView.findViewById(R.id.feed_profile_pic);
+            categoryText = itemView.findViewById(R.id.feed_category_text);
             image = itemView.findViewById(R.id.feed_image);
             itemView.setOnClickListener(this);
         }
@@ -136,6 +142,20 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
         private void populateCreatorInfo(User creator) {
             this.detailText.setText(media.getDetailString());
+            List<String> categories = media.getCategories();
+
+
+
+            String categoryTextString = "";
+            int s = categories.size();
+            for(int i = 0; i<s ; ++i){
+                categoryTextString +=categories.get(i);
+                if(i < s-1){
+                    categoryTextString += ", ";
+                }
+            }
+
+            categoryText.setText(categoryTextString);
 
             Glide.with(this.profilePic)
                     .load(creator.getProfilePic())
@@ -158,7 +178,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             }
 
             Glide.with(image)
-                    .load(media.getThumbnail())
+                    .load(media.getLink())
                     .fitCenter()
                     .placeholder(R.drawable.ic_thumb_placeholder)
                     .into(image);
@@ -185,6 +205,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     }
     public class ViewHolder2 extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView userName;
+        TextView bio;
         ImageView profilePic;
         boolean isMedia = false;
         User user = null;
@@ -193,6 +214,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             super(itemView);
             userName = itemView.findViewById(R.id.user_name_text);
             profilePic = itemView.findViewById(R.id.search_profile_pic);
+            bio = itemView.findViewById(R.id.biography);
             itemView.setOnClickListener(this);
         }
         @Override
@@ -208,6 +230,13 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                     .placeholder(R.drawable.ic_thumb_placeholder)
                     .into(profilePic);
             userName.setText(user.getName());
+            if(user.getBiography().isEmpty()){
+                Random rand = new Random();
+                String randGreeting = greetings.get(rand.nextInt(greetings.size()));
+                bio.setText(randGreeting);
+            }
+            else
+                bio.setText("About Me: "+user.getBiography());
         }
     }
 
