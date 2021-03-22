@@ -21,6 +21,7 @@
 
     <ImageView
         android:id="@+id/feed_image"
+        android:background="@color/black"
         android:layout_width="128dp"
         android:layout_height="72dp"
         android:layout_marginStart="16dp"
