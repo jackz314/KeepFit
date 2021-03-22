@@ -83,11 +83,13 @@ public class MeFragment extends Fragment {
     // setOptionalIconsVisible bug, see https://stackoverflow.com/q/41150995/8170714
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_me_fragment, menu);
-        if (menu instanceof MenuBuilder) {
-            ((MenuBuilder) menu).setOptionalIconsVisible(true);
+        if(b == null) {
+            inflater.inflate(R.menu.menu_me_fragment, menu);
+            if (menu instanceof MenuBuilder) {
+                ((MenuBuilder) menu).setOptionalIconsVisible(true);
+            }
+            super.onCreateOptionsMenu(menu, inflater);
         }
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
