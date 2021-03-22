@@ -9,8 +9,9 @@
         android:title="Sign Out" />
     <item
         android:id="@+id/edit_profile_btn"
+        android:icon="@drawable/ic_baseline_edit_24"
         android:title="Edit Profile"
-        app:showAsAction="never" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/sign_out_zoom_btn"
         android:icon="@drawable/ic_zoom_24"

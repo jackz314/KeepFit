@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.databinding.ActivityNewUserBinding;
@@ -54,9 +55,9 @@ public class NewUserActivity extends AppCompatActivity {
             setResult(Activity.RESULT_OK);
             Toast.makeText(this, "DONE", Toast.LENGTH_SHORT).show();
 
-            mUsernameEditText = (EditText) findViewById(R.id.editTextUsername);
+            mUsernameEditText = findViewById(R.id.editTextUsername);
             String strUsername = mUsernameEditText.getText().toString();
-            if (strUsername.matches((""))) {
+            if (strUsername.trim().matches((""))) {
                 Toast.makeText(this, "Please enter a valid username", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -84,28 +85,21 @@ public class NewUserActivity extends AppCompatActivity {
             user.put("birthday", mBirthday.getTime());
             user.put("email", mFirebaseUser.getEmail());
             user.put("height", height);
-            user.put("name", mUsernameEditText.getText().toString());
+            user.put("name", strUsername);
             user.put("profile_pic", mFirebaseUser.getPhotoUrl().toString());
             user.put("sex", sex);
             user.put("weight", weight);
 
+            if (!mFirebaseUser.getDisplayName().equals(strUsername)) {
+                mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(strUsername).build());
+            }
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("users")
                     .document(mFirebaseUser.getUid())
                     .set(user)
-                    .addOnSuccessListener(new OnSuccessListener<Void>() {
-                        @Override
-                        public void onSuccess(Void aVoid) {
-                            finish();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(Exception e) {
-                            Toast.makeText(NewUserActivity.this, "Error creating profile", Toast.LENGTH_SHORT).show();
-                        }
-                    });
+                    .addOnSuccessListener(aVoid -> finish())
+                    .addOnFailureListener(e -> Toast.makeText(NewUserActivity.this, "Error creating profile", Toast.LENGTH_SHORT).show());
         });
 
         Spinner spinner = findViewById(R.id.sex);
@@ -114,33 +108,27 @@ public class NewUserActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinner.setAdapter(adapter);
 
-        mDisplayBirthday = (TextView) findViewById(R.id.birthday);
-        mDisplayBirthday.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH);
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
+        mDisplayBirthday = findViewById(R.id.birthday);
+        mDisplayBirthday.setOnClickListener(view -> {
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                DatePickerDialog dialog = new DatePickerDialog(
-                        NewUserActivity.this,
-                        android.R.style.Theme_DeviceDefault_Dialog,
-                        mDateSetListener,
-                        year, month, day);
-                dialog.show();
-            }
+            DatePickerDialog dialog = new DatePickerDialog(
+                    NewUserActivity.this,
+                    android.R.style.Theme_DeviceDefault_Dialog,
+                    mDateSetListener,
+                    year, month, day);
+            dialog.show();
         });
 
-        mDateSetListener = new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int year, int month, int day) {
-                month = month + 1;
-                String date = month + "/" + day + "/" + year;
-                mDisplayBirthday.setText(date);
-                mBirthday = Calendar.getInstance();
-                mBirthday.set(year, month, day,0,0);
-            }
+        mDateSetListener = (datePicker, year, month, day) -> {
+            month = month + 1;
+            String date = month + "/" + day + "/" + year;
+            mDisplayBirthday.setText(date);
+            mBirthday = Calendar.getInstance();
+            mBirthday.set(year, month, day,0,0);
         };
 
     }
