@@ -1,5 +1,7 @@
 package com.jackz314.keepfit.controllers;
 
+import android.util.Log;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -7,10 +9,21 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.models.User;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicReference;
+
 
 public class UserController {
-    FirebaseUser curruser = FirebaseAuth.getInstance().getCurrentUser();
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseUser curruser = FirebaseAuth.getInstance().getCurrentUser();
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private String TAG = "UserController";
+    private Executor procES = Executors.newSingleThreadExecutor();
+
+    public UserController() {
+
+    }
 
     public void follow(User other_user) {
         //add other user to following list
@@ -29,8 +42,13 @@ public class UserController {
 
     }
 
-    public FirebaseUser getUser() {
-        return curruser;
+    public User getLocalUser() {
+       return null;
     }
 
+    public User getOtherUser(String UserId) {
+        DocumentSnapshot otherUserData = db.collection("users")
+                .document(UserId).get().getResult();
+        return new User(otherUserData);
+    }
 }

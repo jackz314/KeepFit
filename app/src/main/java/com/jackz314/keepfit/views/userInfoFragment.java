@@ -31,9 +31,12 @@ import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.ExerciseController;
+import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentMeBinding;
 import com.jackz314.keepfit.models.Exercise;
+import com.jackz314.keepfit.databinding.FragmentUserInfoBinding;
+import com.jackz314.keepfit.models.User;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -53,9 +56,11 @@ public class userInfoFragment extends Fragment {
 
     private static final String TAG = "userInfoFragment";
 
-    private FragmentMeBinding b;
+    private FragmentUserInfoBinding b;
 
     private FirebaseAuth.AuthStateListener authStateListener;
+
+    private UserController userController = new UserController();
 
     private final List<Exercise> exerciseList = new ArrayList<>();
     private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
@@ -80,13 +85,19 @@ public class userInfoFragment extends Fragment {
         //        View root = inflater.inflate(R.layout.fragment_me, container, false);
         if (b == null){
             // view binding ftw!
-            b = FragmentMeBinding.inflate(inflater, container, false);
+            b = FragmentUserInfoBinding.inflate(inflater, container, false);
 
             authStateListener = auth -> {
-                FirebaseUser user = auth.getCurrentUser();
+                User user = userController.getLocalUser();
+
                 if (user != null) {
-                    b.userNameText.setText("Name: " + user.getDisplayName());
+                    b.userNameText.setText("Name: " + user.getName());
                     b.userEmailText.setText("Email: " + user.getEmail());
+                    b.userHeightText.setText("Height: " + user.getHeight());
+                    b.userWeightText.setText("Weight: " + user.getWeight());
+                    b.userSexText.setText("Sex: " + user.getSex());
+                    b.userBirthdayText.setText("Birthday: " + user.getBirthday());
+                    b.userBiographyText.setText("Biography: " + user.getBiography());
 
                     Glide.with(b.getRoot())
                             .load(Utils.getHighResProfilePicUrl())
