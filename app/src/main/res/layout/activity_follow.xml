@@ -30,12 +30,13 @@
             android:id="@+id/user_name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="52dp"
             android:drawableEnd="@drawable/ic_baseline_female_24"
             android:drawablePadding="4dp"
             android:text="Hi! User"
             android:textAppearance="@android:style/TextAppearance.Material.Headline"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/user_profile_picture" />
 
@@ -50,18 +51,16 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/user_name_text" />
 
+
         <Button
             android:id="@+id/followButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:checkable="false"
-            android:text="Follow"
+            android:text="+"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.125"
-            app:layout_constraintStart_toEndOf="@+id/user_name_text"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/user_profile_picture" />
-
 
         <TextView
             android:id="@+id/user_height_text"
@@ -160,12 +159,11 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:background="@drawable/button_background"
+            android:contentDescription="Exits profile"
+            android:onClick="closeProfile"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ic_baseline_arrow_back_24"
-            android:onClick="closeProfile"
-            android:contentDescription="Exits profile"
-            />
+            app:srcCompat="@drawable/ic_baseline_arrow_back_24" />
 
         <TextView
             android:id="@+id/biography"
@@ -181,3 +179,4 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </ScrollView>
+
