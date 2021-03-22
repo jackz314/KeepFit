@@ -43,7 +43,7 @@ public class VideosFragment extends Fragment {
     private FirebaseUser ub;
     private FirebaseFirestore db;
     private FirebaseStorage fs;
-    private FeedRecyclerAdapter feedRecyclerAdapter;
+    private VideosRecyclerAdapter videoRecyclerAdapter;
     private FragmentFeedBinding b;
 
     private List<Media> videosList = new ArrayList<>();
@@ -55,21 +55,23 @@ public class VideosFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        feedRecyclerAdapter = new FeedRecyclerAdapter(getContext(), videosList);
-        feedRecyclerAdapter.setClickListener((view, position) -> {
+        videoRecyclerAdapter = new VideosRecyclerAdapter(getContext(), videosList, this);
+        videoRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
 
             Media media = videosList.get(position);
-            Intent intent = new Intent(requireActivity(), VideoActivity.class);
+            Log.d(TAG,"Uploaded Video: "+media);
+            Intent intent = new Intent(getActivity(), VideoActivity.class);
 
             String videoPath = media.getLink();
-            String creatorInfo =  media.getCreator().toString();
+            String mediaID =  media.getUid();
 
             intent.putExtra("uri", videoPath);
-            intent.putExtra("creator", creatorInfo);
+            intent.putExtra("media", mediaID);
             startActivity(intent);
 
         });
+
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -79,7 +81,7 @@ public class VideosFragment extends Fragment {
             b = FragmentFeedBinding.inflate(inflater, container, false);
 
             b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-            b.feedRecycler.setAdapter(feedRecyclerAdapter);
+            b.feedRecycler.setAdapter(videoRecyclerAdapter);
 
             ub = FirebaseAuth.getInstance().getCurrentUser();
             db = FirebaseFirestore.getInstance();
@@ -113,7 +115,7 @@ public class VideosFragment extends Fragment {
                                         b.emptyFeedText.setVisibility(View.VISIBLE);
                                         b.emptyFeedText.setText("No Created Videos ¯\\_(ツ)_/¯");
                                     }
-                                    feedRecyclerAdapter.notifyDataChanged();
+                                    videoRecyclerAdapter.notifyDataChanged();
                                 });
                             }
                         });
@@ -123,7 +125,7 @@ public class VideosFragment extends Fragment {
         return b.getRoot();
     }
 
-    private void deleteVideo(String MediaID, String CreatorID, String StorageLink){
+    protected void deleteVideo(String MediaID, String CreatorID, String StorageLink){
 
         db.collection("users").document(CreatorID).collection("video").document(MediaID).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
