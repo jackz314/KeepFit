@@ -43,6 +43,8 @@ import org.jetbrains.annotations.NotNull;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -94,13 +96,19 @@ public class UserInfoFragment extends Fragment {
                     userController = new UserController();
                 });
 
+                Date date = user.getBirthday();
+
+                String birthday = (String.valueOf(date.getMonth()) + "/" +
+                        String.valueOf(date.getDay()) + "/" +
+                        String.valueOf(date.getYear()));
+
                 if (user != null) {
                     b.userNameText.setText("Name: " + user.getName());
                     b.userEmailText.setText("Email: " + user.getEmail());
-                    b.userHeightText.setText("Height: " + user.getHeight());
-                    b.userWeightText.setText("Weight: " + user.getWeight());
+                    b.userHeightText.setText("Height: " + String.valueOf((int) user.getHeight() / 2.54));
+                    b.userWeightText.setText("Weight: " + String.valueOf(user.getWeight()));
                     b.userSexText.setText("Sex: " + user.getSex());
-                    b.userBirthdayText.setText("Birthday: " + user.getBirthday());
+                    b.userBirthdayText.setText("Birthday: " + birthday);
                     b.userBiographyText.setText("Biography: " + user.getBiography());
 
                     Glide.with(b.getRoot())
