@@ -52,7 +52,7 @@ import us.zoom.sdk.ZoomSDK;
 
 import static com.jackz314.keepfit.GlobalConstants.RC_REAUTH_DELETE;
 
-public class userInfoFragment extends Fragment {
+public class UserInfoFragment extends Fragment {
 
     private static final String TAG = "userInfoFragment";
 
