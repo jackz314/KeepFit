@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
@@ -23,7 +22,6 @@ import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder> {
@@ -122,7 +120,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                 .into(holder.profilePic);
 
         holder.profilePic.setOnClickListener(v -> {
-            Intent in = new Intent(v.getContext(), FollowActivity.class);
+            Intent in = new Intent(v.getContext(), UserProfileActivity.class);
             in.putExtra("other", creator);
             v.getContext().startActivity(in);
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
