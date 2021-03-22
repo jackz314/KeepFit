@@ -27,7 +27,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.databinding.ActivitySearchBinding;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
-
+import com.jackz314.keepfit.databinding.FragmentFollowersBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -50,7 +50,7 @@ public class FollowersFragment extends Fragment {
     private FirebaseUser ub;
     private FirebaseFirestore db;
 
-    private ActivitySearchBinding b;
+    private FragmentFollowersBinding b;
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private List<SearchResult> followersList = new ArrayList<>();
     private List<DocumentReference> followersRefList = new ArrayList<>();
@@ -60,7 +60,7 @@ public class FollowersFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SearchRecyclerAdapter searchRecyclerAdapter = new SearchRecyclerAdapter(getContext(), followersList);
+        searchRecyclerAdapter = new SearchRecyclerAdapter(getContext(), followersList);
         searchRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
 
@@ -87,8 +87,9 @@ public class FollowersFragment extends Fragment {
                                 followersRefList.add((DocumentReference)document.get("ref"));
                             }
                             requireActivity().runOnUiThread(searchRecyclerAdapter::notifyDataSetChanged);
-                            Log.d(TAG, "following collection update: " + followersRefList);
+                            Log.d(TAG, "followers collection update: " + followersRefList);
 
+                            followersList.clear();
                             for (DocumentReference followerUserId : followersRefList) {
                                 followerUserId
                                         .addSnapshotListener((value1, e1) -> {
@@ -96,13 +97,21 @@ public class FollowersFragment extends Fragment {
                                                 Log.w(TAG, "Listen failed.", e);
                                                 return;
                                             }
-                                            procES.execute(() -> {
-                                                followersList.clear();
-                                                followersList.add(new SearchResult(new User(value1)));
-                                                requireActivity().runOnUiThread(() -> searchRecyclerAdapter.notifyDataSetChanged());
-                                                Log.d(TAG, "videos collection update: " + followersList);
-                                            });
+                                            followersList.add(new SearchResult(new User(value1)));
+                                            Log.d(TAG, "followers collection update: " + followersList);
                                         });
+                            }
+
+                            if (b != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    if (!followersList.isEmpty()) {
+                                        b.emptyResultsText.setVisibility(View.GONE);
+                                    } else {
+                                        b.emptyResultsText.setVisibility(View.VISIBLE);
+                                        b.emptyResultsText.setText("No Followers - Go Follow!");
+                                    }
+                                    searchRecyclerAdapter.notifyDataSetChanged();
+                                });
                             }
                         });
                     });
@@ -111,7 +120,7 @@ public class FollowersFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        b = ActivitySearchBinding.inflate(getLayoutInflater());
+        b = FragmentFollowersBinding.inflate(getLayoutInflater());
         View root = b.getRoot();
 
         if (!followersList.isEmpty() && b.emptyResultsText.getVisibility() == View.VISIBLE) {

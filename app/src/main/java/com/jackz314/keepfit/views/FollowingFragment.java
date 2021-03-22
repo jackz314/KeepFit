@@ -33,6 +33,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.jackz314.keepfit.databinding.FragmentFollowingBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
@@ -51,7 +52,7 @@ public class FollowingFragment extends Fragment {
     private FirebaseUser ub;
     private FirebaseFirestore db;
 
-    private ActivitySearchBinding b;
+    private FragmentFollowingBinding b;
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private List<SearchResult> followingList = new ArrayList<>();
     private List<DocumentReference> followingRefList = new ArrayList<>();
@@ -90,20 +91,30 @@ public class FollowingFragment extends Fragment {
                             requireActivity().runOnUiThread(searchRecyclerAdapter::notifyDataSetChanged);
                             Log.d(TAG, "following collection update: " + followingRefList);
 
-                            for (DocumentReference followerUserId : followingRefList) {
-                                followerUserId
+                            followingList.clear();
+                            for (DocumentReference followingUserId : followingRefList) {
+                                followingUserId
                                         .addSnapshotListener((value1, e1) -> {
                                             if (e != null || value == null) {
                                                 Log.w(TAG, "Listen failed.", e);
                                                 return;
                                             }
-                                            procES.execute(() -> {
-                                                followingList.clear();
-                                                followingList.add(new SearchResult(new User(value1)));
-                                                requireActivity().runOnUiThread(() -> searchRecyclerAdapter.notifyDataSetChanged());
-                                                Log.d(TAG, "videos collection update: " + followingList);
-                                            });
+                                            followingList.add(new SearchResult(new User(value1)));
+                                            Log.d(TAG, "following collection update: " + followingList);
                                         });
+                            }
+
+                            if (b != null) {
+                                getActivity().runOnUiThread(() -> {
+
+                                    if (!followingList.isEmpty()) {
+                                        b.emptyResultsText.setVisibility(View.GONE);
+                                    } else {
+                                        b.emptyResultsText.setVisibility(View.VISIBLE);
+                                        b.emptyResultsText.setText("No Following - Go Follow!");
+                                    }
+                                    searchRecyclerAdapter.notifyDataSetChanged();
+                                });
                             }
                         });
                     });
@@ -112,7 +123,7 @@ public class FollowingFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        b = ActivitySearchBinding.inflate(getLayoutInflater());
+        b = FragmentFollowingBinding.inflate(getLayoutInflater());
         View root = b.getRoot();
 
         if (!followingList.isEmpty() && b.emptyResultsText.getVisibility() == View.VISIBLE) {
