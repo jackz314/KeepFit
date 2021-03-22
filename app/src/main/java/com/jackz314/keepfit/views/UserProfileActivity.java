@@ -69,7 +69,7 @@ public class UserProfileActivity extends AppCompatActivity {
         //Will pass other_user object with Intent
 
         Intent intent = getIntent();
-        User other_user = (User)intent.getSerializableExtra("other");
+        User otherUser = (User)intent.getSerializableExtra("other");
         //User other_user = new User();
         db = FirebaseFirestore.getInstance();
         followerRecyclerAdapter = new FollowRecyclerAdapter(this, mList);
@@ -89,31 +89,48 @@ public class UserProfileActivity extends AppCompatActivity {
 
 //        if (other_user != null) {
 
-        b.userNameText.setText(other_user.getName());
-        b.userEmailText.setText(other_user.getEmail());
-        String bio = other_user.getBiography();
+        b.userNameText.setText(otherUser.getName());
+        b.userEmailText.setText(otherUser.getEmail());
+        String bio = otherUser.getBiography();
         if(bio.isEmpty()){
             b.biography.setText("Hello!");
         }
         else {
-            b.biography.setText("Bio: "+other_user.getBiography());
+            b.biography.setText("Bio: "+otherUser.getBiography());
         }
         CircleImageView prof_img = findViewById(R.id.user_profile_picture);
         Glide.with(b.getRoot())
-                .load(other_user.getProfilePic())
+                .load(otherUser.getProfilePic())
                 .fitCenter()
                 .placeholder(R.drawable.ic_account_circle_24)
                 .into(b.userProfilePicture);
 
-        b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, other_user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
-        b.userHeightText.setText(Utils.centimeterToFeet(other_user.getHeight()));
-        b.userWeightText.setText((int)(other_user.getWeight() *  2.205) + " lbs");
-        b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), other_user.getBirthday().getTime(),
+        b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, otherUser.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
+        b.userHeightText.setText(Utils.centimeterToFeet(otherUser.getHeight()));
+        b.userWeightText.setText((int)(otherUser.getWeight() *  2.205) + " lbs");
+        b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), otherUser.getBirthday().getTime(),
                 DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
 
+        Button followBtn = findViewById(R.id.followButton);
+        if (otherUser.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
+            followBtn.setVisibility(View.GONE);
+        }
+        UserControllerKt.getCurrentUserDoc().collection("following").whereEqualTo("ref", db.collection("users").document(otherUser.getUid()))
+                .addSnapshotListener((value, e) -> {
+                    if (e != null || value == null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+                    if (value.isEmpty()) {
+                        followBtn.setText(String.valueOf('+'));
+                        following = false;
+                    } else {
+                        followBtn.setText(String.valueOf('-'));
+                        following = true;
+                    }});
 
         //Fills list with videos that belong to the user
-        populateList(other_user);
+        populateList(otherUser);
         followerRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
 
@@ -144,19 +161,13 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
 
-        Button follow_btn = findViewById(R.id.followButton);
-        followButtonChange(follow_btn, other_user);
-        follow_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                UserController ucontrol = new UserController();
-                if (following) {
-                    ucontrol.unfollow(other_user);
-                    followButtonChange(follow_btn, other_user);
-                } else {
-                    ucontrol.follow(other_user);
-                    followButtonChange(follow_btn, other_user);
-                }
+        followButtonChange(followBtn, otherUser);
+        followBtn.setOnClickListener(view -> {
+            UserController ucontrol = new UserController();
+            if (following) {
+                ucontrol.unfollow(otherUser);
+            } else {
+                ucontrol.follow(otherUser);
             }
         });
     }
@@ -164,39 +175,6 @@ public class UserProfileActivity extends AppCompatActivity {
 
 
     public void followButtonChange(Button follow_btn, User other_user) {
-        db.collection("users").document(curruser.getUid()).collection("following").get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            QuerySnapshot findFollowingCollection = task.getResult();
-                            if (findFollowingCollection.isEmpty()) {
-                                //if it's empty then user is not following anyone => don't want to work with null values
-                                follow_btn.setText(String.valueOf('+'));
-                                following = false;
-                            } else {
-                                db.collection("users").document(curruser.getUid()).collection("following")
-                                        .whereEqualTo("ref", db.collection("users").document(other_user.getUid())).get()
-                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                                            @Override
-                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                if (task.isSuccessful()) {
-                                                    QuerySnapshot isFollowing = task.getResult();
-                                                    if (isFollowing.isEmpty()) {
-                                                        follow_btn.setText(String.valueOf('+'));
-                                                        following = false;
-                                                    } else {
-                                                        follow_btn.setText(String.valueOf('-'));
-                                                        following = true;
-                                                    }
-                                                }
-                                            }
-                                        });
-                            }
-                        }
-                    }
-                });
-
     }
 
     public void populateList(User other){
