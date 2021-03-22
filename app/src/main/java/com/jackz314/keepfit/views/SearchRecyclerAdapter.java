@@ -62,8 +62,8 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewTy) {
         switch (viewTy)
         {
-            case USER:return new ViewHolder2(LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item,parent,false));
-            default:return new ViewHolder1(LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_item,parent,false));
+            case USER:return new UserViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item,parent,false));
+            default:return new MediaViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_item,parent,false));
         }
     }
 
@@ -79,9 +79,9 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     @Override
     public void onBindViewHolder(@NotNull RecyclerView.ViewHolder holder, int position) {
         if(mData.get(position).isUser())
-            ((ViewHolder2)holder).Bind(mData.get(position).getUser());
+            ((UserViewHolder)holder).Bind(mData.get(position).getUser());
         else
-            ((ViewHolder1)holder).Bind(mData.get(position).getMedia());
+            ((MediaViewHolder)holder).Bind(mData.get(position).getMedia());
 
 
 
@@ -114,7 +114,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
 
     // stores and recycles views as they are scrolled off screen
-    public class ViewHolder1 extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class MediaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView titleText;
         TextView detailText;
         TextView durationText;
@@ -124,7 +124,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         boolean isMedia = true;
         Media media = null;
 
-        ViewHolder1(View itemView) {
+        MediaViewHolder(View itemView) {
             super(itemView);
             titleText = itemView.findViewById(R.id.feed_title_text);
             detailText = itemView.findViewById(R.id.feed_detail_text);
@@ -203,16 +203,18 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         }
 
     }
-    public class ViewHolder2 extends RecyclerView.ViewHolder implements View.OnClickListener{
+    public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         TextView userName;
+        TextView userEmail;
         TextView bio;
         ImageView profilePic;
         boolean isMedia = false;
         User user = null;
 
-        ViewHolder2(View itemView){
+        UserViewHolder(View itemView){
             super(itemView);
             userName = itemView.findViewById(R.id.user_name_text);
+            userEmail = itemView.findViewById(R.id.user_email_text);
             profilePic = itemView.findViewById(R.id.search_profile_pic);
             bio = itemView.findViewById(R.id.biography);
             itemView.setOnClickListener(this);
@@ -230,6 +232,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                     .placeholder(R.drawable.ic_thumb_placeholder)
                     .into(profilePic);
             userName.setText(user.getName());
+            userEmail.setText(user.getEmail());
             if(user.getBiography().isEmpty()){
                 Random rand = new Random();
                 String randGreeting = greetings.get(rand.nextInt(greetings.size()));
