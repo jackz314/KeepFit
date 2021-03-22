@@ -3,14 +3,10 @@ package com.jackz314.keepfit.models
 import android.text.format.DateUtils
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.PropertyName
-import io.reactivex.rxjava3.core.Single
 import java.io.Serializable
 import java.util.*
 
@@ -26,7 +22,7 @@ class Media(doc: DocumentSnapshot): Serializable {
     @PropertyName("is_livestream")
     var isLivestream = false
     var link: String? = null
-    var categories: String? = null
+    var categories: List<String>? = null
 
     @PropertyName("start_time")
     var startTime: Date? = null
@@ -42,7 +38,7 @@ class Media(doc: DocumentSnapshot): Serializable {
         uid = doc.id
         isLivestream = doc.getBoolean("is_livestream") == true
         link = doc.getString("link")
-        categories = doc.getString("categories")
+        categories = doc.get("categories") as List<String>
         startTime = doc.getDate("start_time")
         if(!isLivestream) duration = doc.getLong("duration")
         thumbnail = doc.getString("thumbnail")

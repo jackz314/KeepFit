@@ -22,6 +22,7 @@ import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder> {
@@ -98,14 +99,12 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     private void populateCreatorInfo(ViewHolder holder, Media media, User creator) {
         holder.detailText.setText(media.getDetailString());
 
-        String categoriesUnrefined = media.getCategories();
-
-        String[] categories = categoriesUnrefined.split(",");
+        List<String> categories = media.getCategories();
 
         String categoryTextString = "";
-        for(int i = 0; i < categories.length ; ++i){
-            categoryTextString += categories[i];
-            if(i < categories.length-1){
+        for(int i = 0; i < categories.size() ; ++i){
+            categoryTextString += categories.get(i);
+            if(i < categories.size()-1){
                 categoryTextString += ", ";
             }
         }
