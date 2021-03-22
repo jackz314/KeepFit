@@ -7,14 +7,15 @@
 
 
     <EditText
+        android:id="@+id/choose_file_to_upload"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/choose_file_to_upload"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
+        android:layout_centerInParent="true"
+        android:clickable="true"
+        android:focusable="false"
         android:hint="Select File from Storage"
         android:textColor="#0000FF"
-        android:textStyle="bold"/>
+        android:textStyle="bold" />
 
     <Button android:id="@+id/btn_video_upload"
         android:layout_height="wrap_content"
