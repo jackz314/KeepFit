@@ -20,6 +20,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
 
@@ -75,8 +76,7 @@ public class LikedVideosFragment extends Fragment {
             b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
             b.feedRecycler.setAdapter(feedRecyclerAdapter);
 
-            db.collection("users")
-                    .document(ub.getUid())
+            UserControllerKt.getCurrentUserDoc()
                     .collection("liked_videos")
                     .addSnapshotListener((value, e) -> {
                         if (e != null || value == null) {
@@ -103,7 +103,7 @@ public class LikedVideosFragment extends Fragment {
                                         b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
                                     }
                                 }
-                                feedRecyclerAdapter.notifyDataSetChanged();
+                                feedRecyclerAdapter.notifyDataChanged();
                             });
                         });
                     });

@@ -115,7 +115,7 @@ public class FeedFragment extends Fragment {
                                 }
                             }
 
-                            feedRecyclerAdapter.notifyDataSetChanged();
+                            feedRecyclerAdapter.notifyDataChanged();
                         });
                         Log.d(TAG, "media collection update: " + mediaList);
                     });

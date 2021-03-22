@@ -60,14 +60,23 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                 likedVideos.add(doc.getId());
             }
 
-            for (Media media : mData) {
-                if (likedVideos.contains(media.getUid())) {
-                    media.setLiked(true);
-                } else {
-                    media.setLiked(false);
-                }
-            }
+            updateMediaListLikeStatus();
         }));
+    }
+
+    private void updateMediaListLikeStatus() {
+        for (Media media : mData) {
+            if (likedVideos.contains(media.getUid())) {
+                media.setLiked(true);
+            } else {
+                media.setLiked(false);
+            }
+        }
+    }
+
+    public void notifyDataChanged(){
+        updateMediaListLikeStatus();
+        super.notifyDataSetChanged();
     }
 
     // inflates the row layout from xml when needed

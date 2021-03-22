@@ -118,7 +118,7 @@ public class VideosFragment extends Fragment {
                                         b.emptyFeedText.setVisibility(View.VISIBLE);
                                         b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
                                     }
-                                    feedRecyclerAdapter.notifyDataSetChanged();
+                                    feedRecyclerAdapter.notifyDataChanged();
                                 });
                             }
                         });
