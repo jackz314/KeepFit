@@ -18,6 +18,7 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.models.Media;
@@ -31,6 +32,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+
+import co.lujun.androidtagview.TagContainerLayout;
+import co.lujun.androidtagview.TagView;
 
 public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
@@ -121,7 +126,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         TextView durationText;
         ImageView profilePic;
         ImageView image;
-        TextView categoryText;
+        TagContainerLayout categoryText;
         boolean isMedia = true;
         Media media = null;
 
@@ -143,20 +148,45 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
         private void populateCreatorInfo(User creator) {
             this.detailText.setText(media.getDetailString());
-            List<String> categories = media.getCategories();
+
+            List<String> categories = media.getCategories().stream().map(String::trim).collect(Collectors.toList());
 
 
+//            String categoryTextString = "";
+//            int s = categories.size();
+//            for(int i = 0; i<s ; ++i){
+//                categoryTextString +=categories.get(i);
+//                if(i < s-1){
+//                    categoryTextString += ", ";
+//                }
+//            }
 
-            String categoryTextString = "";
-            int s = categories.size();
-            for(int i = 0; i<s ; ++i){
-                categoryTextString +=categories.get(i);
-                if(i < s-1){
-                    categoryTextString += ", ";
+            categoryText.setTags(categories);
+
+            categoryText.setOnTagClickListener(new TagView.OnTagClickListener() {
+                @Override
+                public void onTagClick(int position, String text) {
+                    Log.d(TAG, "onTagClick: clicked");
+                    Intent intent = new Intent(mInflater.getContext(), SearchActivity.class);
+                    intent.putExtra(GlobalConstants.SEARCH_QUERY, text);
+                    mInflater.getContext().startActivity(intent);
                 }
-            }
 
-            categoryText.setText(categoryTextString);
+                @Override
+                public void onTagLongClick(int position, String text) {
+
+                }
+
+                @Override
+                public void onSelectedTagDrag(int position, String text) {
+
+                }
+
+                @Override
+                public void onTagCrossClick(int position) {
+
+                }
+            });
 
             Glide.with(this.profilePic)
                     .load(creator.getProfilePic())

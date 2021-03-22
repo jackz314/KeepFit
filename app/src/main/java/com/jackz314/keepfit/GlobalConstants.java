@@ -24,6 +24,7 @@ public interface GlobalConstants {
     String EXERCISE_TYPE = "exercise_type";
     String EXERCISE_OBJ = "exercise_obj";
     String EXERCISE_INTENSITY = "exercise_intensity";
+    String SEARCH_QUERY = "SEARCH_QUERY";
 
     String ACTION_EXERCISE = "action_exercise";
     String ACTION_LIVESTREAM = "action_live";

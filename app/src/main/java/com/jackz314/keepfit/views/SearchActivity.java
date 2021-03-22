@@ -115,7 +115,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         editsearch = findViewById(R.id.search);
         editsearch.setOnQueryTextListener(this);
-        if(editsearch.requestFocus()) getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        String searchQuery = getIntent().getStringExtra(GlobalConstants.SEARCH_QUERY);
+        if(searchQuery != null && !searchQuery.trim().isEmpty()){
+            editsearch.setQuery(searchQuery, true);
+        } else if(editsearch.requestFocus()) getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
 
@@ -137,6 +140,17 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         finish();
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        Log.d(TAG, "onNewIntent: got new intent");
+        if (editsearch != null) {
+            String searchQuery = intent.getStringExtra(GlobalConstants.SEARCH_QUERY);
+            if(searchQuery != null && !searchQuery.trim().isEmpty()){
+                editsearch.setQuery(searchQuery, true);
+            }
+        }
+    }
 
     private void processSearch(String query) {
 

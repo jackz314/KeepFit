@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.UserControllerKt;
@@ -32,6 +33,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import co.lujun.androidtagview.TagContainerLayout;
+import co.lujun.androidtagview.TagView;
 
 public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder> {
 
@@ -156,17 +161,43 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     private void populateCreatorInfo(ViewHolder holder, Media media, User creator) {
         holder.detailText.setText(media.getDetailString());
 
-        List<String> categories = media.getCategories();
+        List<String> categories = media.getCategories().stream().map(String::trim).collect(Collectors.toList());
 
-        String categoryTextString = "";
-        for(int i = 0; i < categories.size() ; ++i){
-            categoryTextString += categories.get(i);
-            if(i < categories.size()-1){
-                categoryTextString += ", ";
+//        String categoryTextString = "";
+//        for(int i = 0; i < categories.size() ; ++i){
+//            categoryTextString += categories.get(i);
+//            if(i < categories.size()-1){
+//                categoryTextString += ", ";
+//            }
+//        }
+//
+//        holder.categoryText.setText(categoryTextString);
+
+        holder.categoryText.setTags(categories);
+
+        holder.categoryText.setOnTagClickListener(new TagView.OnTagClickListener() {
+            @Override
+            public void onTagClick(int position, String text) {
+                Intent intent = new Intent(mInflater.getContext(), SearchActivity.class);
+                intent.putExtra(GlobalConstants.SEARCH_QUERY, text);
+                mInflater.getContext().startActivity(intent);
             }
-        }
 
-        holder.categoryText.setText(categoryTextString);
+            @Override
+            public void onTagLongClick(int position, String text) {
+
+            }
+
+            @Override
+            public void onSelectedTagDrag(int position, String text) {
+
+            }
+
+            @Override
+            public void onTagCrossClick(int position) {
+
+            }
+        });
 
         Glide.with(holder.profilePic)
                 .load(creator.getProfilePic())
@@ -196,7 +227,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         TextView titleText;
         TextView detailText;
         TextView durationText;
-        TextView categoryText;
+        TagContainerLayout categoryText;
         ImageView profilePic;
         ImageView image;
         LikeButton likeButton;
