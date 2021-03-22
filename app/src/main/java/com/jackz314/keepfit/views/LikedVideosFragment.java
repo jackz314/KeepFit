@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.gms.tasks.Tasks;
@@ -100,7 +101,9 @@ public class LikedVideosFragment extends Fragment {
                             } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
                                 executionException.printStackTrace();
                             }
-                            getActivity().runOnUiThread(() -> {
+                            FragmentActivity activity = getActivity();
+                            if (activity == null) return;
+                            activity.runOnUiThread(() -> {
                                 if (b != null) {
                                     if (!likedVideosList.isEmpty()){
                                         b.emptyFeedText.setVisibility(View.GONE);
