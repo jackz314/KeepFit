@@ -56,27 +56,10 @@
             android:layout_marginTop="10dp"
             android:checkable="false"
             android:text="Follow"
-            app:layout_constraintBottom_toTopOf="@+id/today_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.125"
             app:layout_constraintStart_toEndOf="@+id/user_name_text"
-            app:layout_constraintTop_toBottomOf="@+id/user_profile_picture"
-            app:layout_constraintVertical_bias="0.0" />
-
-
-        <TextView
-            tools:viewBindingIgnore="true"
-            android:id="@+id/today_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Today"
-            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/user_email_text" />
-
-
+            app:layout_constraintTop_toBottomOf="@+id/user_profile_picture" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

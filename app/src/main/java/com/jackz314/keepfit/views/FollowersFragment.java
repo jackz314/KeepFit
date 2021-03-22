@@ -77,7 +77,7 @@ public class FollowersFragment extends ListFragment {
                         for (QueryDocumentSnapshot document : value) {
                             followersRefList.add((String) document.get("ref"));
                         }
-                        requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
+                        requireActivity().runOnUiThread(adapter::notifyDataSetChanged);
                         Log.d(TAG, "following collection update: " + followersRefList);
 
                         for (String followerUserId : followersRefList) {
