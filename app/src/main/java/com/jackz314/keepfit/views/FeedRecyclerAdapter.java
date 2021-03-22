@@ -13,15 +13,24 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
+import com.like.LikeButton;
+import com.like.OnLikeListener;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapter.ViewHolder> {
@@ -31,6 +40,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     private List<Media> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private HashSet<String> likedVideos = new HashSet<>();
 
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
 
@@ -39,6 +49,25 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     public FeedRecyclerAdapter(Context context, List<Media> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        UserControllerKt.getCurrentUserDoc().collection("liked_videos").addSnapshotListener(((value, e) -> {
+            if (e != null || value == null) {
+                Log.w(TAG, "Listen failed.", e);
+                return;
+            }
+
+            likedVideos.clear();
+            for (QueryDocumentSnapshot doc : value) {
+                likedVideos.add(doc.getDocumentReference("ref").getId());
+            }
+
+            for (Media media : mData) {
+                if (likedVideos.contains(media.getUid())) {
+                    media.setLiked(true);
+                } else {
+                    media.setLiked(false);
+                }
+            }
+        }));
     }
 
     // inflates the row layout from xml when needed
@@ -89,6 +118,22 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         }else{
             populateCreatorInfo(holder, media, creator);
         }
+
+
+        holder.likeButton.setLiked(media.getLiked());
+
+
+        holder.likeButton.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                UserControllerKt.likeVideo(media.getUid());
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                UserControllerKt.unlikeVideo(media.getUid());
+            }
+        });
 
         //use ref directly, similar speed
 //        media.getCreatorRef().get().addOnSuccessListener(snapshot -> {
@@ -145,6 +190,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         TextView categoryText;
         ImageView profilePic;
         ImageView image;
+        LikeButton likeButton;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -153,6 +199,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             durationText = itemView.findViewById(R.id.feed_duration_text);
             categoryText = itemView.findViewById(R.id.feed_category_text);
             profilePic = itemView.findViewById(R.id.feed_profile_pic);
+            likeButton = itemView.findViewById(R.id.feed_like_button);
             image = itemView.findViewById(R.id.feed_image);
             itemView.setOnClickListener(this);
         }

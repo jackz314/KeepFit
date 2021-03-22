@@ -38,7 +38,7 @@ public class VideosFragment extends Fragment {
     private FragmentFeedBinding b;
 
     private List<Media> videosList = new ArrayList<>();
-    private List<DocumentReference> videoRefList = new ArrayList<>();
+    private final List<DocumentReference> videoRefList = new ArrayList<>();
 
     private Executor procES = Executors.newSingleThreadExecutor();
 
@@ -61,65 +61,11 @@ public class VideosFragment extends Fragment {
             startActivity(intent);
 
         });
-
-        ub = FirebaseAuth.getInstance().getCurrentUser();
-        db = FirebaseFirestore.getInstance();
-
-        db.collection("users")
-                .document(ub.getUid())
-                .collection("videos")
-                .addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-
-                    procES.execute(() -> {
-                        videoRefList.clear();
-
-                        for (QueryDocumentSnapshot document : value) {
-                            videoRefList.add((DocumentReference) document.get("ref"));
-                        }
-                        requireActivity().runOnUiThread(() -> feedRecyclerAdapter.notifyDataSetChanged());
-                        Log.d(TAG, "videos collection update: " + videoRefList);
-
-                        videosList.clear();
-                        for (DocumentReference createdVideoId : videoRefList) {
-                            createdVideoId
-                                    .addSnapshotListener((value1, e1) -> {
-                                        if (e != null || value1 == null) {
-                                            Log.w(TAG, "Listen failed.", e);
-                                            return;
-                                        }
-                                        videosList.add(new  Media (value1));
-                                        Log.d(TAG, "videos collection update: " + videosList);
-                                    });
-                        }
-
-                        if (b != null) {
-                            getActivity().runOnUiThread(() -> {
-                                if (!videosList.isEmpty()){
-                                    b.emptyFeedText.setVisibility(View.GONE);
-                                } else {
-                                    b.emptyFeedText.setVisibility(View.VISIBLE);
-                                    b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                                }
-                            });
-                        }
-                        feedRecyclerAdapter.notifyDataSetChanged();
-                    });
-                });
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        b = FragmentFeedBinding.inflate(inflater, container, false);
-        View root = b.getRoot();
-
-        b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        b.feedRecycler.setAdapter(feedRecyclerAdapter);
 
         if (b == null){ // only inflate for the first time being created
             b = FragmentFeedBinding.inflate(inflater, container, false);
@@ -130,8 +76,55 @@ public class VideosFragment extends Fragment {
 
             b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
             b.feedRecycler.setAdapter(feedRecyclerAdapter);
+
+            ub = FirebaseAuth.getInstance().getCurrentUser();
+            db = FirebaseFirestore.getInstance();
+
+            db.collection("users")
+                    .document(ub.getUid())
+                    .collection("videos")
+                    .addSnapshotListener((value, e) -> {
+                        if (e != null || value == null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+
+                        procES.execute(() -> {
+                            videoRefList.clear();
+
+                            for (QueryDocumentSnapshot document : value) {
+                                videoRefList.add((DocumentReference) document.get("ref"));
+                            }
+                            Log.d(TAG, "videos collection update: " + videoRefList);
+
+                            videosList.clear();
+                            for (DocumentReference createdVideoId : videoRefList) {
+                                createdVideoId
+                                        .addSnapshotListener((value1, e1) -> {
+                                            if (e != null || value1 == null) {
+                                                Log.w(TAG, "Listen failed.", e);
+                                                return;
+                                            }
+                                            videosList.add(new  Media (value1));
+                                            Log.d(TAG, "videos collection update: " + videosList);
+                                        });
+                            }
+
+                            if (b != null) {
+                                getActivity().runOnUiThread(() -> {
+                                    if (!videosList.isEmpty()){
+                                        b.emptyFeedText.setVisibility(View.GONE);
+                                    } else {
+                                        b.emptyFeedText.setVisibility(View.VISIBLE);
+                                        b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+                                    }
+                                    feedRecyclerAdapter.notifyDataSetChanged();
+                                });
+                            }
+                        });
+                    });
         }
 
-        return root;
+        return b.getRoot();
     }
 }

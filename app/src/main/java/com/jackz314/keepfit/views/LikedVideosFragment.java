@@ -62,62 +62,10 @@ public class LikedVideosFragment extends Fragment {
 
         ub = FirebaseAuth.getInstance().getCurrentUser();
         db = FirebaseFirestore.getInstance();
-
-        db.collection("users")
-                .document(ub.getUid())
-                .collection("videos")
-                .addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-
-                    procES.execute(() -> {
-                        likedVideoRefList.clear();
-
-                        for (QueryDocumentSnapshot document : value) {
-                            likedVideoRefList.add((DocumentReference) document.get("ref"));
-                        }
-                        requireActivity().runOnUiThread(() -> feedRecyclerAdapter.notifyDataSetChanged());
-                        Log.d(TAG, "videos collection update: " + likedVideoRefList);
-
-                        likedVideosList.clear();
-                        for (DocumentReference createdVideoId : likedVideoRefList) {
-                            createdVideoId
-                                    .addSnapshotListener((value1, e1) -> {
-                                        if (e != null || value1 == null) {
-                                            Log.w(TAG, "Listen failed.", e);
-                                            return;
-                                        }
-                                        procES.execute(() -> {
-                                            likedVideosList.add(new  Media (value1));
-                                            Log.d(TAG, "videos collection update: " + likedVideosList);
-                                        });
-                                    });
-                        }
-
-                        if (b != null) {
-                            if (!likedVideosList.isEmpty()){
-                                b.emptyFeedText.setVisibility(View.GONE);
-                            } else {
-                                b.emptyFeedText.setVisibility(View.VISIBLE);
-                                b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                            }
-                        }
-                        feedRecyclerAdapter.notifyDataSetChanged();
-                    });
-                });
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-
-        b = FragmentFeedBinding.inflate(inflater, container, false);
-        View root = b.getRoot();
-
-        b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-
-        b.feedRecycler.setAdapter(feedRecyclerAdapter);
 
         if (b == null){ // only inflate for the first time being created
             b = FragmentFeedBinding.inflate(inflater, container, false);
@@ -128,9 +76,53 @@ public class LikedVideosFragment extends Fragment {
 
             b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
             b.feedRecycler.setAdapter(feedRecyclerAdapter);
+
+            db.collection("users")
+                    .document(ub.getUid())
+                    .collection("liked_videos")
+                    .addSnapshotListener((value, e) -> {
+                        if (e != null || value == null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+
+                        procES.execute(() -> {
+                            likedVideoRefList.clear();
+
+                            for (QueryDocumentSnapshot document : value) {
+                                likedVideoRefList.add((DocumentReference) document.get("ref"));
+                            }
+                            Log.d(TAG, "videos collection update: " + likedVideoRefList);
+
+                            likedVideosList.clear();
+                            for (DocumentReference createdVideoId : likedVideoRefList) {
+                                createdVideoId
+                                        .addSnapshotListener((value1, e1) -> {
+                                            if (e != null || value1 == null) {
+                                                Log.w(TAG, "Listen failed.", e);
+                                                return;
+                                            }
+                                            likedVideosList.add(new  Media (value1));
+                                            Log.d(TAG, "videos collection update: " + likedVideosList);
+                                        });
+                            }
+
+                            getActivity().runOnUiThread(() -> {
+                                if (b != null) {
+                                    if (!likedVideosList.isEmpty()){
+                                        b.emptyFeedText.setVisibility(View.GONE);
+                                    } else {
+                                        b.emptyFeedText.setVisibility(View.VISIBLE);
+                                        b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+                                    }
+                                }
+                                feedRecyclerAdapter.notifyDataSetChanged();
+                            });
+                        });
+                    });
         }
 
-        return root;
+        return b.getRoot();
     }
 }
 

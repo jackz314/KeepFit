@@ -23,7 +23,8 @@ object UserControllerKt {
                             if (ds.isSuccessful && ds.result?.exists() == true) {
                                 emitter.onSuccess(User(Objects.requireNonNull(ds.result)))
                             } else {
-                                emitter.onError(ds.exception?: Resources.NotFoundException("User not found."))
+                                emitter.onError(ds.exception
+                                        ?: Resources.NotFoundException("User not found."))
                             }
                         }
             } else {
@@ -37,4 +38,28 @@ object UserControllerKt {
             return FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().currentUser?.uid
                     ?: "non-existence-user")
         }
+
+    @JvmStatic
+    fun likeVideo(uid: String) {
+        val db = FirebaseFirestore.getInstance()
+        currentUserDoc.collection("liked_videos").add(hashMapOf("ref" to db.collection("media").document(uid)))
+    }
+
+    @JvmStatic
+    fun unlikeVideo(uid: String) {
+        val db = FirebaseFirestore.getInstance()
+        val videoDoc = db.collection("media").document(uid)
+        currentUserDoc.collection("liked_videos").whereEqualTo("ref", videoDoc)
+                .get().addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        task.result?.forEach {
+                            it.reference.delete()
+                        }
+                    }
+                }
+    }
+
+    @JvmStatic
+    fun likedVideosListener(){
+    }
 }

@@ -3,10 +3,6 @@ package com.jackz314.keepfit.models
 import android.text.format.DateUtils
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import com.google.firebase.firestore.DocumentId
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.DocumentSnapshot
-import com.google.firebase.firestore.PropertyName
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.*
 import java.io.Serializable
@@ -35,6 +31,9 @@ class Media(doc: DocumentSnapshot): Serializable {
 
     @PropertyName("view_count")
     var viewCount: Int = 0
+
+    @Exclude
+    var liked = false
 
     init {
         if (!doc.exists()) throw IllegalStateException("Media doesn't exist!")
@@ -70,8 +69,9 @@ class Media(doc: DocumentSnapshot): Serializable {
 
     fun getDetailString(): String {
         val creator = creator.value ?: User()
-        if (isLivestream) return "${creator.name} · ${viewCount} watching · Started ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
-        else return "${creator.name} · ${viewCount} views · ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
+        val startTimeStr = startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }
+        if (isLivestream) return "${creator.name} · ${viewCount} watching · Started $startTimeStr"
+        else return "${creator.name} · ${viewCount} views · $startTimeStr"
     }
 
     override fun toString(): String {
