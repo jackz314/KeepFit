@@ -3,6 +3,7 @@ package com.jackz314.keepfit.views;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -82,6 +83,10 @@ public class UserProfileActivity extends AppCompatActivity {
             b.noVideosText.setVisibility(View.VISIBLE);
         }
 
+        if (other_user.getUid().equals(curruser.getUid())) {
+            b.followButton.setVisibility(View.GONE);
+        }
+
 //        if (other_user != null) {
 
         b.userNameText.setText(other_user.getName());
@@ -103,7 +108,8 @@ public class UserProfileActivity extends AppCompatActivity {
         b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, other_user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
         b.userHeightText.setText(Utils.centimeterToFeet(other_user.getHeight()));
         b.userWeightText.setText((int)(other_user.getWeight() *  2.205) + " lbs");
-
+        b.userBirthdayText.setText(DateUtils.formatDateTime(this, other_user.getBirthday().getTime(),
+                DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
 
         //Fills list with videos that belong to the user
         populateList(other_user);
