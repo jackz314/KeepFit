@@ -57,7 +57,7 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
         <activity android:name=".views.UploadVideoActivity"
         android:usesCleartextTraffic="true"/>
-        <activity android:name=".views.FollowActivity"
+        <activity android:name=".views.UserProfileActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
     </application>
 

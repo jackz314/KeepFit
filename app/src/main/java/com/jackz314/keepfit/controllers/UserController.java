@@ -54,21 +54,15 @@ public class UserController {
 
     public void unfollow(User other_user) {
         //remove from
-        db.collection("users")
-                .document(curruser.getUid())
+        UserControllerKt.getCurrentUserDoc()
                 .collection("following")
                 .whereEqualTo("ref", db.collection("users").document(other_user.getUid())).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
-                        if (task.isSuccessful()) {
-                            List<DocumentSnapshot> removeFollowingList = task.getResult().getDocuments();
-                            for (DocumentSnapshot doc: removeFollowingList) {
-                                db.collection("users")
-                                        .document(curruser.getUid())
-                                        .collection("following").document(doc.getId()).delete();
-                            }
+                .addOnCompleteListener(task -> {
+                    // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
+                    if (task.isSuccessful()) {
+                        List<DocumentSnapshot> removeFollowingList = task.getResult().getDocuments();
+                        for (DocumentSnapshot doc: removeFollowingList) {
+                            doc.getReference().delete();
                         }
                     }
                 });
@@ -76,18 +70,13 @@ public class UserController {
         db.collection("users")
                 .document(other_user.getUid())
                 .collection("followers")
-                .whereEqualTo("ref", db.collection("users").document(curruser.getUid())).get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
-                        if (task.isSuccessful()) {
-                            List<DocumentSnapshot> removeFollowerList = task.getResult().getDocuments();
-                            for (DocumentSnapshot doc: removeFollowerList) {
-                                db.collection("users")
-                                        .document(other_user.getUid())
-                                        .collection("followers").document(doc.getId()).delete();
-                            }
+                .whereEqualTo("ref", UserControllerKt.getCurrentUserDoc()).get()
+                .addOnCompleteListener(task -> {
+                    // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
+                    if (task.isSuccessful()) {
+                        List<DocumentSnapshot> removeFollowerList = task.getResult().getDocuments();
+                        for (DocumentSnapshot doc: removeFollowerList) {
+                            doc.getReference().delete();
                         }
                     }
                 });

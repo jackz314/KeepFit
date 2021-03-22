@@ -32,6 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
             android:drawableEnd="@drawable/ic_baseline_female_24"
+            android:drawablePadding="4dp"
             android:text="Hi! User"
             android:textAppearance="@android:style/TextAppearance.Material.Headline"
             app:layout_constraintEnd_toEndOf="parent"

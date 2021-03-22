@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -15,17 +14,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Client;
-import com.algolia.search.saas.Index;
 import com.algolia.search.saas.Query;
 //import com.google.firebase.database.snapshot.Index;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.controllers.SearchController;
-import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivitySearchBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
@@ -89,7 +85,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             if (searchResult.isUser()) {
                 //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
                 User user = searchResult.getUser();
-                Intent in = new Intent(this,FollowActivity.class);
+                Intent in = new Intent(this, UserProfileActivity.class);
                 in.putExtra("other",user);
                 startActivity(in);
             }
