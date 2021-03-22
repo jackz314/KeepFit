@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
@@ -77,7 +78,7 @@ public class LikedVideosFragment extends Fragment {
             b.feedRecycler.setAdapter(feedRecyclerAdapter);
 
             UserControllerKt.getCurrentUserDoc()
-                    .collection("liked_videos")
+                    .collection("liked_videos").orderBy("liked_time", Query.Direction.DESCENDING)
                     .addSnapshotListener((value, e) -> {
                         if (e != null || value == null) {
                             Log.w(TAG, "Listen failed.", e);

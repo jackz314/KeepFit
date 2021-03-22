@@ -118,12 +118,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference();
 
         btn.setEnabled(false);
-        editText.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view) {
-                selectVideo();
-            }
-        });
+        editText.setOnClickListener(view -> selectVideo());
 
     }
 
@@ -144,24 +139,21 @@ public class UploadVideoActivity extends AppCompatActivity {
             String path = data.getDataString();
             String filename = path.substring(path.lastIndexOf("/")+1);
             editText.setText(filename);
-            btn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
+            btn.setOnClickListener(view -> {
 
-                    Uri fileInfo = data.getData();
-                    Cursor returnCursor =
-                            getContentResolver().query(fileInfo, null, null, null, null);
-                    returnCursor.moveToFirst();
-                    long sizeIndex = returnCursor.getLong(returnCursor.getColumnIndex(OpenableColumns.SIZE));
+                Uri fileInfo = data.getData();
+                Cursor returnCursor =
+                        getContentResolver().query(fileInfo, null, null, null, null);
+                returnCursor.moveToFirst();
+                long sizeIndex = returnCursor.getLong(returnCursor.getColumnIndex(OpenableColumns.SIZE));
 
-                    if(sizeIndex < 5 * 1024 * 1024){
-                        Toast.makeText(UploadVideoActivity.this,"File size okay", Toast.LENGTH_LONG).show();
-                        uploadVideoFirebase(data.getData());
+                if(sizeIndex < 5 * 1024 * 1024){
+                    Toast.makeText(UploadVideoActivity.this,"File size okay", Toast.LENGTH_LONG).show();
+                    uploadVideoFirebase(data.getData());
 
-                    }
-                    else{
-                        Toast.makeText(UploadVideoActivity.this,"File size should be less than 5MB", Toast.LENGTH_LONG).show();
-                    }
+                }
+                else{
+                    Toast.makeText(UploadVideoActivity.this,"File size should be less than 5MB", Toast.LENGTH_LONG).show();
                 }
             });
         }
@@ -232,9 +224,9 @@ public class UploadVideoActivity extends AppCompatActivity {
 
                 DocumentReference mediaRef = db.collection("media").document();
                 mediaRef.set(media);
-                Map<String, Object> RefData = new HashMap<>();
-                RefData.put("ref", mediaRef);
-                db.collection("users").document(user.getUid()).collection("videos").document().set(RefData);
+                Map<String, Object> refData = new HashMap<>();
+                refData.put("ref", mediaRef);
+                db.collection("users").document(user.getUid()).collection("videos").document().set(refData);
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override

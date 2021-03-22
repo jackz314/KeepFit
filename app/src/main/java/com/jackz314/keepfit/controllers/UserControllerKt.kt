@@ -5,6 +5,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jackz314.keepfit.models.User
 import io.reactivex.rxjava3.core.Single
@@ -42,7 +43,7 @@ object UserControllerKt {
     @JvmStatic
     fun likeVideo(uid: String) {
         val db = FirebaseFirestore.getInstance()
-        currentUserDoc.collection("liked_videos").document(uid).set(hashMapOf("exists" to true))
+        currentUserDoc.collection("liked_videos").document(uid).set(hashMapOf("liked_time" to FieldValue.serverTimestamp()))
     }
 
     @JvmStatic

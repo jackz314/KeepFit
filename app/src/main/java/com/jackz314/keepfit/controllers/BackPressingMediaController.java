@@ -16,27 +16,23 @@ public class BackPressingMediaController extends MediaController {
         mParentActivity = parentActivity;
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            OnUnhandledKeyEventListener eventListener = new OnUnhandledKeyEventListener() {
-                @Override
-                public boolean onUnhandledKeyEvent(View v, KeyEvent event) {
-                    boolean fHandled = false;
+            OnUnhandledKeyEventListener eventListener = (v, event) -> {
+                boolean fHandled = false;
 
-                    if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
-                        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                            fHandled =  true;
-                        } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                            if(mParentActivity != null) {
-                                mParentActivity.onBackPressed();
-                                fHandled = true;
-                            }
+                if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+                    if (event.getAction() == KeyEvent.ACTION_DOWN) {
+                        fHandled =  true;
+                    } else if (event.getAction() == KeyEvent.ACTION_UP) {
+                        if(mParentActivity != null) {
+                            mParentActivity.onBackPressed();
+                            fHandled = true;
                         }
                     }
-                    return(fHandled);
                 }
+                return(fHandled);
             };
             addOnUnhandledKeyEventListener(eventListener);
         }
-
     }
 
     @Override

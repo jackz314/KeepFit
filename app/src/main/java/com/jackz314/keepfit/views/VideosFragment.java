@@ -14,6 +14,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.ListFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -25,6 +26,7 @@ import com.jackz314.keepfit.models.Media;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -70,10 +72,6 @@ public class VideosFragment extends Fragment {
         if (b == null){ // only inflate for the first time being created
             b = FragmentFeedBinding.inflate(inflater, container, false);
 
-            if (!videosList.isEmpty() && b.emptyFeedText.getVisibility() == View.VISIBLE) {
-                b.emptyFeedText.setVisibility(View.GONE);
-            }
-
             b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
             b.feedRecycler.setAdapter(feedRecyclerAdapter);
 
@@ -90,24 +88,15 @@ public class VideosFragment extends Fragment {
                         }
 
                         procES.execute(() -> {
-                            videoRefList.clear();
-
-                            for (QueryDocumentSnapshot document : value) {
-                                videoRefList.add((DocumentReference) document.get("ref"));
-                            }
-                            Log.d(TAG, "videos collection update: " + videoRefList);
 
                             videosList.clear();
-                            for (DocumentReference createdVideoId : videoRefList) {
-                                createdVideoId
-                                        .addSnapshotListener((value1, e1) -> {
-                                            if (e != null || value1 == null) {
-                                                Log.w(TAG, "Listen failed.", e);
-                                                return;
-                                            }
-                                            videosList.add(new  Media (value1));
-                                            Log.d(TAG, "videos collection update: " + videosList);
-                                        });
+                            try {
+                                for (QueryDocumentSnapshot doc : value) {
+                                    DocumentSnapshot mediaDoc = Tasks.await(doc.getDocumentReference("ref").get());
+                                    videosList.add(new Media(mediaDoc));
+                                }
+                            } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
+                                executionException.printStackTrace();
                             }
 
                             if (b != null) {
