@@ -161,7 +161,7 @@ class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             } else { // video upload
                 Intent intent = new Intent(MainActivity.this, UploadVideoActivity.class);
-                intent.putExtra(GlobalConstants.MEDIA_TITLE, "Upload Video");
+                intent.putExtra("UserID", "Upload Video");
                 startActivity(intent);
             }
             return true;
