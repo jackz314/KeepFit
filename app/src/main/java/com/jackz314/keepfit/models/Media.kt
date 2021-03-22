@@ -7,8 +7,11 @@ import com.google.firebase.firestore.DocumentId
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.PropertyName
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.firestore.*
 import java.io.Serializable
 import java.util.*
+import java.util.concurrent.ExecutionException
 
 private const val TAG = "Media"
 
@@ -84,5 +87,19 @@ class Media(doc: DocumentSnapshot): Serializable {
                 '}'
     }
 
+    companion object {
+        @JvmStatic
+        fun populateFromUid(uid: String?): Media? {
+            if (uid == null) return null
+            try {
+                return Media(Tasks.await(FirebaseFirestore.getInstance().collection("media").document(uid).get()))
+            } catch (e: ExecutionException) {
+                Log.e(TAG, "populateFromUid: error getting user from uid", e)
+            } catch (e: InterruptedException) {
+                Log.e(TAG, "populateFromUid: error getting user from uid", e)
+            }
+            return null
+        }
+    }
 
 }

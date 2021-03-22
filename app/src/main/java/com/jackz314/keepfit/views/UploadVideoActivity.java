@@ -58,7 +58,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static android.graphics.Bitmap.Config.ALPHA_8;
@@ -165,7 +167,6 @@ public class UploadVideoActivity extends AppCompatActivity {
     }
 
     private void uploadVideoFirebase(Uri data) {
-
         final ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("File is loading...");
         progressDialog.show();
@@ -188,7 +189,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         String segments[] = path.split("@");
         String userID = segments[segments.length -1];
 
-        StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + userID+".mp4");
+        StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + user.getUid()+".mp4");
 
 
         reference.putFile(data).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -209,8 +210,16 @@ public class UploadVideoActivity extends AppCompatActivity {
                 String link = uri.toString();
                 Timestamp timestamp = now();
 
+                String raw = categoryText.getText().toString();
+                String[] categoryArray = raw.split(",");
+                List<String> categoryList = new ArrayList<String>();
+
+                for(int i = 0; i < categoryArray.length; ++i){
+                    categoryList.add(categoryArray[i]);
+                }
+
                 Map<String, Object> media = new HashMap<>();
-                media.put("categories",categoryText.getText().toString());
+                media.put("categories", categoryList);
                 media.put("creator", uidRef);
                 media.put("is_livestream", false);
                 media.put("link", link);

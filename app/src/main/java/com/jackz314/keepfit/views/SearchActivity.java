@@ -21,9 +21,11 @@ import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.LivestreamController;
+import com.jackz314.keepfit.controllers.SearchController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivitySearchBinding;
 import com.jackz314.keepfit.models.Media;
+import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
 
 import org.json.JSONObject;
@@ -40,7 +42,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private static final String TAG = "SearchActivity";
     private SearchView editsearch;
-    private final List<Object> mList = new ArrayList<>();
+    private final List<SearchResult> mList = new ArrayList<>();
     private Executor procES = Executors.newSingleThreadExecutor();
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private LivestreamController livestreamController;
@@ -76,13 +78,20 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         if (!mList.isEmpty() && b.emptyResultsText.getVisibility() == View.VISIBLE) {
             b.emptyResultsText.setVisibility(View.GONE);
-            b.searchRecycler.setVisibility(View.VISIBLE);
         }
 
         searchRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
-            if (mList.get(position)instanceof Media) {
-                Media media = (Media) mList.get(position);
+            SearchResult searchResult = mList.get(position);
+            if (searchResult.isUser()) {
+                //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
+                User user = searchResult.getUser();
+                Intent in = new Intent(this,FollowActivity.class);
+                in.putExtra("other",user);
+                startActivity(in);
+            }
+            else{
+                Media media = searchResult.getMedia();
                 if (media.isLivestream()) {
                     livestreamController.setLivestream(media);
                     livestreamController.joinLivestream();
@@ -94,13 +103,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     intent.putExtra("uri", videoPath);
                     startActivity(intent);
                 }
-                //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
-            }
-            else{
-                User user = (User) mList.get(position);
-                Intent in = new Intent(this,FollowActivity.class);
-                in.putExtra("other",user);
-                startActivity(in);
+
             }
         });
 
@@ -125,9 +128,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if(b.searchRecycler.getVisibility() == View.VISIBLE){
-            b.searchRecycler.setVisibility(View.GONE);
-        }
         return false;
     }
 
@@ -142,87 +142,29 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             return;
         }
 
-        index.searchAsync(new Query(query), (JSONObject content, AlgoliaException error) -> {
-            if (error != null || content == null) {
-                Log.e(TAG, "processSearch: search error: ", error);
-            } else {
+        procES.execute(() -> {
+            try {
+                JSONObject content = index.search(new Query(query), null);
                 Log.d(TAG, "processSearch: search result: " + content);
-
+                List<SearchResult> searchResults = SearchController.parseResults(content);
+                this.runOnUiThread(() -> {
+                    mList.clear();
+                    mList.addAll(searchResults);
+                    if (b != null) {
+                        if (!mList.isEmpty()){
+                            b.emptyResultsText.setVisibility(View.GONE);
+                        } else {
+                            b.emptyResultsText.setVisibility(View.VISIBLE);
+                            b.emptyResultsText.setText("No Results");
+                        }
+                    }
+                    searchRecyclerAdapter.notifyDataSetChanged();
+                });
+            } catch (AlgoliaException e) {
+                Log.e(TAG, "processSearch: search error: ", e);
+                Toast.makeText(this, "Error while searching " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
-        db.collection("users")
-                .whereLessThanOrEqualTo("name",query)
-                .addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-
-                    procES.execute(() -> {
-                        mList.clear();
-
-
-                        for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                            User user = new User(queryDocumentSnapshot);
-//                            Log.d(TAG,"CurrId = "+UserControllerKt.getCurrentUserDoc().getId()+".");
-//                            Log.d(TAG,"SearchId = "+user.getUid()+".");
-                            if(!user.getUid().equals(UserControllerKt.getCurrentUserDoc().getId())){
-                                mList.add(user);
-                            }
-                        }
-
-
-
-                        // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
-                        this.runOnUiThread(() -> {
-
-                            if (b != null) {
-                                if (!mList.isEmpty()){
-                                    b.emptyResultsText.setVisibility(View.GONE);
-                                    b.searchRecycler.setVisibility(View.VISIBLE);
-                                } else {
-                                    b.emptyResultsText.setVisibility(View.VISIBLE);
-                                    b.emptyResultsText.setText("No Results");
-                                }
-                            }
-
-                            searchRecyclerAdapter.notifyDataSetChanged();
-                        });
-                        Log.d(TAG, "profile collection update: " + mList);
-                    });
-                });
-        db.collection("media")
-                .whereGreaterThanOrEqualTo("title", query)
-                .addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-
-                    procES.execute(() -> {
-                        for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                            mList.add(new Media(queryDocumentSnapshot));
-                        }
-
-                        // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
-                        this.runOnUiThread(() -> {
-
-                            if (b != null) {
-                                if (!mList.isEmpty()){
-                                    b.emptyResultsText.setVisibility(View.GONE);
-                                    b.searchRecycler.setVisibility(View.VISIBLE);
-                                } else {
-                                    b.emptyResultsText.setVisibility(View.VISIBLE);
-                                    b.emptyResultsText.setText("No Results");
-                                }
-                            }
-
-                            searchRecyclerAdapter.notifyDataSetChanged();
-                        });
-                        Log.d(TAG, "media collection update: " + mList);
-                    });
-                });
     }
 
     @Override

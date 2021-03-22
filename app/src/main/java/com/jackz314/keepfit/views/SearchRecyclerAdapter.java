@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.models.Media;
+import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
 
 import org.jetbrains.annotations.NotNull;
@@ -31,7 +32,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
     private static final String TAG = "SearchRecyclerAdapter";
 
-    private List<Object> mData;
+    private List<SearchResult> mData;
     private LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
@@ -40,13 +41,13 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
 
     ArrayList<Object> models;
-    final static int PROFILE=1;
+    final static int USER =1;
     final static int MEDIA=2;
 
 
 
     // data is passed into the constructor
-    public SearchRecyclerAdapter(Context context, List<Object> data) {
+    public SearchRecyclerAdapter(Context context, List<SearchResult> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
     }
@@ -57,16 +58,15 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewTy) {
         switch (viewTy)
         {
-            case PROFILE:return new ViewHolder2(LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_item,parent,false));
+            case USER:return new ViewHolder2(LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item,parent,false));
             default:return new ViewHolder1(LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_item,parent,false));
         }
     }
+
     @Override
     public int getItemViewType(int position) {
-        if(mData.get(position)instanceof User)
-            return PROFILE;
-        else if(mData.get(position)instanceof Media)
-            return MEDIA;
+        if(mData.get(position).isUser())
+            return USER;
         else
             return MEDIA;
     }
@@ -74,10 +74,10 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(@NotNull RecyclerView.ViewHolder holder, int position) {
-        if(mData.get(position) instanceof User)
-            ((ViewHolder2)holder).Bind((User)mData.get(position));
-        else if (mData.get(position) instanceof Media)
-            ((ViewHolder1)holder).Bind((Media) mData.get(position));
+        if(mData.get(position).isUser())
+            ((ViewHolder2)holder).Bind(mData.get(position).getUser());
+        else
+            ((ViewHolder1)holder).Bind(mData.get(position).getMedia());
 
 
 

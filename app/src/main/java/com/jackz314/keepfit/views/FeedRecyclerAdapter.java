@@ -1,6 +1,7 @@
 package com.jackz314.keepfit.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -63,8 +64,11 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
         }
 
+        String thumbnail;
+        if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
+        else thumbnail = media.getLink();
         Glide.with(holder.image)
-                .load(media.getLink())
+                .load(thumbnail)
                 .fitCenter()
                 .placeholder(R.drawable.ic_thumb_placeholder)
                 .into(holder.image);
@@ -117,7 +121,12 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                 .placeholder(R.drawable.ic_account_circle_24)
                 .into(holder.profilePic);
 
-        holder.profilePic.setOnClickListener(v -> Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show());
+        holder.profilePic.setOnClickListener(v -> {
+            Intent in = new Intent(v.getContext(), FollowActivity.class);
+            in.putExtra("other", creator);
+            v.getContext().startActivity(in);
+//            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
+        });
     }
 
 

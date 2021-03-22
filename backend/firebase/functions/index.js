@@ -48,6 +48,7 @@ const createIndexForUser = (doc, userId, index) => {
   }
   // Add an 'objectID' field which Algolia requires
   userData.objectID = userId;
+  userData.type = "user";
 
   // Write to the algolia index
   return index.partialUpdateObject(userData, {createIfNotExists: true});
@@ -76,6 +77,7 @@ const createIndexForMedia = (doc, mediaId, index) => {
   }
   // Add an 'objectID' field which Algolia requires
   mediaData.objectID = mediaId;
+  mediaData.type = "media";
 
   // Write to the algolia index
   return index.partialUpdateObject(mediaData, {createIfNotExists: true});
@@ -141,8 +143,8 @@ exports.reindexDatastore = functions.https.onRequest(async (req, res) => {
       snap.forEach((doc) => {
         createIndexForMedia(doc, doc.id, algoliaIndex);
       });
+      res.status(200).send("Indexing finished");
     });
-    res.status(200).send("Indexing finished");
   } else {
     res.status(403).send("Unauthorized");
   }
