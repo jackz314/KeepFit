@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.controllers.UserController;
+import com.jackz314.keepfit.databinding.ActivitySearchBinding;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,6 +34,7 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.models.Media;
+import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
 
 import java.util.concurrent.Executor;
@@ -42,66 +44,85 @@ import java.util.concurrent.Executors;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FollowingFragment extends ListFragment {
+public class FollowingFragment extends Fragment {
 
-    private static final String TAG = "FollowingFragment";
+    private static final String TAG = "FollowerFragment";
 
     private FirebaseUser ub;
     private FirebaseFirestore db;
 
-    private List<String> followingList = new ArrayList<>();
+    private ActivitySearchBinding b;
+    private SearchRecyclerAdapter searchRecyclerAdapter;
+    private List<SearchResult> followingList = new ArrayList<>();
     private List<DocumentReference> followingRefList = new ArrayList<>();
 
     private Executor procES = Executors.newSingleThreadExecutor();
 
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        SearchRecyclerAdapter searchRecyclerAdapter = new SearchRecyclerAdapter(getContext(), followingList);
+        searchRecyclerAdapter.setClickListener((view, position) -> {
+            // TODO: 3/6/21 replace with activity intent
+
+            SearchResult searchResult = followingList.get(position);
+            Intent intent = new Intent(requireActivity(), VideoActivity.class);
+
+            startActivity(intent);
+
+            ub = FirebaseAuth.getInstance().getCurrentUser();
+            db = FirebaseFirestore.getInstance();
+
+            db.collection("users")
+                    .document(ub.getUid())
+                    .collection("following")
+                    .addSnapshotListener((value, e) -> {
+                        if (e != null || value == null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+
+                        procES.execute(() -> {
+                            followingRefList.clear();
+                            for (QueryDocumentSnapshot document : value) {
+                                followingRefList.add((DocumentReference)document.get("ref"));
+                            }
+                            requireActivity().runOnUiThread(searchRecyclerAdapter::notifyDataSetChanged);
+                            Log.d(TAG, "following collection update: " + followingRefList);
+
+                            for (DocumentReference followerUserId : followingRefList) {
+                                followerUserId
+                                        .addSnapshotListener((value1, e1) -> {
+                                            if (e != null || value == null) {
+                                                Log.w(TAG, "Listen failed.", e);
+                                                return;
+                                            }
+                                            procES.execute(() -> {
+                                                followingList.clear();
+                                                followingList.add(new SearchResult(new User(value1)));
+                                                requireActivity().runOnUiThread(() -> searchRecyclerAdapter.notifyDataSetChanged());
+                                                Log.d(TAG, "videos collection update: " + followingList);
+                                            });
+                                        });
+                            }
+                        });
+                    });
+        });
+    }
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        ub = FirebaseAuth.getInstance().getCurrentUser();
-        db = FirebaseFirestore.getInstance();
+        b = ActivitySearchBinding.inflate(getLayoutInflater());
+        View root = b.getRoot();
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getContext(),
-                R.layout.activity_listview, followingList);
+        if (!followingList.isEmpty() && b.emptyResultsText.getVisibility() == View.VISIBLE) {
+            b.emptyResultsText.setVisibility(View.GONE);
+        }
 
-        setListAdapter(adapter);
+        b.searchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+        b.searchRecycler.setAdapter(searchRecyclerAdapter);
 
-        db.collection("users")
-                .document(ub.getUid())
-                .collection("following")
-                .addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-
-                    procES.execute(() -> {
-                        followingRefList.clear();
-                        for (QueryDocumentSnapshot document : value) {
-                            followingRefList.add((DocumentReference)document.get("ref"));
-                        }
-                        requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
-                        Log.d(TAG, "following collection update: " + followingRefList);
-
-                        for (DocumentReference followingUserId : followingRefList) {
-                                    followingUserId
-                                    .addSnapshotListener((value1, e1) -> {
-                                        if (e != null || value == null) {
-                                            Log.w(TAG, "Listen failed.", e);
-                                            return;
-                                        }
-                                        procES.execute(() -> {
-                                            followingList.clear();
-                                            followingList.add((String) value1.get("name"));
-                                            requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
-                                            Log.d(TAG, "videos collection update: " + followingList);
-                                        });
-                                    });
-                        }
-                    });
-                });
-
-        View view = inflater.inflate(R.layout.fragment_following, container, false);
-        return view;
+        return root;
     }
 
 }
