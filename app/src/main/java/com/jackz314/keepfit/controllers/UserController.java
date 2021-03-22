@@ -12,6 +12,10 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.models.User;
+import com.google.firebase.firestore.QuerySnapshot;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -29,20 +33,64 @@ public class UserController {
     public UserController() {
     }
 
-    public void follow(User other_user) {
-        //add other user to following list
-        db.collection("users").document(curruser.getUid()).collection("following").add(db.collection("users").document(other_user.getUid()));
-        //add curruser to other user's followers list
-        db.collection("users").document(other_user.getUid()).collection("followers").add(db.collection("users").document(curruser.getUid()));
+   public void follow(User other_user) {
+        //get document references for users
+        Map<String, Object> docFollowerData = new HashMap<>();
+        Map<String, Object> docFollowingData = new HashMap<>();
+        docFollowerData.put("ref", db.collection("users").document(curruser.getUid()));
+        docFollowingData.put("ref", db.collection("users").document(other_user.getUid()));
+
+        db.collection("users")
+                .document(curruser.getUid())
+                .collection("following").add(docFollowingData);
+
+
+        db.collection("users")
+                .document(other_user.getUid())
+                .collection("followers")
+                .add(docFollowerData);
 
     }
 
     public void unfollow(User other_user) {
-        DocumentReference doc = db.collection("users").document(curruser.getUid()).collection("following").document(other_user.getUid());
-        //remove other user from following list
-        doc.delete();
-        //remove curruser from other user's followers list
-        db.collection("users").document(other_user.getUid()).collection("followers").document(curruser.getUid()).delete();
+        //remove from
+        db.collection("users")
+                .document(curruser.getUid())
+                .collection("following")
+                .whereEqualTo("ref", db.collection("users").document(other_user.getUid())).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> removeFollowingList = task.getResult().getDocuments();
+                            for (DocumentSnapshot doc: removeFollowingList) {
+                                db.collection("users")
+                                        .document(curruser.getUid())
+                                        .collection("following").document(doc.getId()).delete();
+                            }
+                        }
+                    }
+                });
+
+        db.collection("users")
+                .document(other_user.getUid())
+                .collection("followers")
+                .whereEqualTo("ref", db.collection("users").document(curruser.getUid())).get()
+                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> removeFollowerList = task.getResult().getDocuments();
+                            for (DocumentSnapshot doc: removeFollowerList) {
+                                db.collection("users")
+                                        .document(other_user.getUid())
+                                        .collection("followers").document(doc.getId()).delete();
+                            }
+                        }
+                    }
+                });
 
     }
 
