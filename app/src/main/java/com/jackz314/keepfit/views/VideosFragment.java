@@ -38,7 +38,7 @@ public class VideosFragment extends Fragment {
     private FragmentFeedBinding b;
 
     private List<Media> videosList = new ArrayList<>();
-    private List<String> videoRefList = new ArrayList<>();
+    private List<DocumentReference> videoRefList = new ArrayList<>();
 
     private Executor procES = Executors.newSingleThreadExecutor();
 
@@ -78,14 +78,14 @@ public class VideosFragment extends Fragment {
                         videoRefList.clear();
 
                         for (QueryDocumentSnapshot document : value) {
-                            videoRefList.add((String) document.get("ref"));
+                            videoRefList.add((DocumentReference) document.get("ref"));
                         }
                         requireActivity().runOnUiThread(() -> feedRecyclerAdapter.notifyDataSetChanged());
                         Log.d(TAG, "videos collection update: " + videoRefList);
 
                         videosList.clear();
-                        for (String createdVideoId : videoRefList) {
-                            db.document(createdVideoId)
+                        for (DocumentReference createdVideoId : videoRefList) {
+                            createdVideoId
                                     .addSnapshotListener((value1, e1) -> {
                                         if (e != null || value1 == null) {
                                             Log.w(TAG, "Listen failed.", e);

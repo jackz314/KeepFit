@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
@@ -35,7 +36,7 @@ public class LikedVideosFragment extends Fragment {
     private FragmentFeedBinding b;
 
     private List<Media> likedVideosList = new ArrayList<>();
-    private List<String> likedVideoRefList = new ArrayList<>();
+    private List<DocumentReference> likedVideoRefList = new ArrayList<>();
 
     private Executor procES = Executors.newSingleThreadExecutor();
 
@@ -75,14 +76,14 @@ public class LikedVideosFragment extends Fragment {
                         likedVideoRefList.clear();
 
                         for (QueryDocumentSnapshot document : value) {
-                            likedVideoRefList.add((String) document.get("ref"));
+                            likedVideoRefList.add((DocumentReference) document.get("ref"));
                         }
                         requireActivity().runOnUiThread(() -> feedRecyclerAdapter.notifyDataSetChanged());
                         Log.d(TAG, "videos collection update: " + likedVideoRefList);
 
                         likedVideosList.clear();
-                        for (String createdVideoId : likedVideoRefList) {
-                            db.document(createdVideoId)
+                        for (DocumentReference createdVideoId : likedVideoRefList) {
+                            createdVideoId
                                     .addSnapshotListener((value1, e1) -> {
                                         if (e != null || value1 == null) {
                                             Log.w(TAG, "Listen failed.", e);

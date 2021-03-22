@@ -23,6 +23,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
@@ -49,7 +50,7 @@ public class FollowingFragment extends ListFragment {
     private FirebaseFirestore db;
 
     private List<String> followingList = new ArrayList<>();
-    private List<String> followingRefList = new ArrayList<>();
+    private List<DocumentReference> followingRefList = new ArrayList<>();
 
     private Executor procES = Executors.newSingleThreadExecutor();
 
@@ -76,13 +77,13 @@ public class FollowingFragment extends ListFragment {
                     procES.execute(() -> {
                         followingRefList.clear();
                         for (QueryDocumentSnapshot document : value) {
-                            followingRefList.add((String) document.get("ref"));
+                            followingRefList.add((DocumentReference)document.get("ref"));
                         }
                         requireActivity().runOnUiThread(() -> adapter.notifyDataSetChanged());
                         Log.d(TAG, "following collection update: " + followingRefList);
 
-                        for (String followingUserId : followingRefList) {
-                            db.document(followingUserId)
+                        for (DocumentReference followingUserId : followingRefList) {
+                                    followingUserId
                                     .addSnapshotListener((value1, e1) -> {
                                         if (e != null || value == null) {
                                             Log.w(TAG, "Listen failed.", e);
