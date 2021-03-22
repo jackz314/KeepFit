@@ -78,7 +78,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         if (!mList.isEmpty() && b.emptyResultsText.getVisibility() == View.VISIBLE) {
             b.emptyResultsText.setVisibility(View.GONE);
-            b.searchRecycler.setVisibility(View.VISIBLE);
         }
 
         searchRecyclerAdapter.setClickListener((view, position) -> {
@@ -129,9 +128,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        if(b.searchRecycler.getVisibility() == View.VISIBLE){
-            b.searchRecycler.setVisibility(View.GONE);
-        }
         return false;
     }
 
@@ -150,13 +146,13 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             try {
                 JSONObject content = index.search(new Query(query), null);
                 Log.d(TAG, "processSearch: search result: " + content);
-                mList.clear();
-                mList.addAll(SearchController.parseResults(content));
+                List<SearchResult> searchResults = SearchController.parseResults(content);
                 this.runOnUiThread(() -> {
+                    mList.clear();
+                    mList.addAll(searchResults);
                     if (b != null) {
                         if (!mList.isEmpty()){
                             b.emptyResultsText.setVisibility(View.GONE);
-                            b.searchRecycler.setVisibility(View.VISIBLE);
                         } else {
                             b.emptyResultsText.setVisibility(View.VISIBLE);
                             b.emptyResultsText.setText("No Results");

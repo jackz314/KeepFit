@@ -58,7 +58,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewTy) {
         switch (viewTy)
         {
-            case USER:return new ViewHolder2(LayoutInflater.from(parent.getContext()).inflate(R.layout.profile_item,parent,false));
+            case USER:return new ViewHolder2(LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item,parent,false));
             default:return new ViewHolder1(LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_item,parent,false));
         }
     }

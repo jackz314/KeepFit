@@ -143,8 +143,8 @@ exports.reindexDatastore = functions.https.onRequest(async (req, res) => {
       snap.forEach((doc) => {
         createIndexForMedia(doc, doc.id, algoliaIndex);
       });
+      res.status(200).send("Indexing finished");
     });
-    res.status(200).send("Indexing finished");
   } else {
     res.status(403).send("Unauthorized");
   }
