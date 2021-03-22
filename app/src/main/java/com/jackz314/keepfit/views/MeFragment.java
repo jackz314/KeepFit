@@ -53,6 +53,7 @@ public class MeFragment extends Fragment {
             b = FragmentMeBinding.inflate(inflater, container, false);
             meCollectionAdapter = new MeCollectionAdapter(this);
             b.meViewPager.setAdapter(meCollectionAdapter);
+            b.meViewPager.setSaveEnabled(false);
             TabLayoutMediator mediator = new TabLayoutMediator(b.meTabLayout, b.meViewPager, ((tab, position) -> {
                 switch (position) {
                     case 0:

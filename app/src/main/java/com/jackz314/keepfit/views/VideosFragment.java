@@ -91,20 +91,20 @@ public class VideosFragment extends Fragment {
                                             Log.w(TAG, "Listen failed.", e);
                                             return;
                                         }
-                                        procES.execute(() -> {
-                                            videosList.add(new  Media (value1));
-                                            Log.d(TAG, "videos collection update: " + videosList);
-                                        });
+                                        videosList.add(new  Media (value1));
+                                        Log.d(TAG, "videos collection update: " + videosList);
                                     });
                         }
 
                         if (b != null) {
-                            if (!videosList.isEmpty()){
-                                b.emptyFeedText.setVisibility(View.GONE);
-                            } else {
-                                b.emptyFeedText.setVisibility(View.VISIBLE);
-                                b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                            }
+                            getActivity().runOnUiThread(() -> {
+                                if (!videosList.isEmpty()){
+                                    b.emptyFeedText.setVisibility(View.GONE);
+                                } else {
+                                    b.emptyFeedText.setVisibility(View.VISIBLE);
+                                    b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+                                }
+                            });
                         }
                         feedRecyclerAdapter.notifyDataSetChanged();
                     });
