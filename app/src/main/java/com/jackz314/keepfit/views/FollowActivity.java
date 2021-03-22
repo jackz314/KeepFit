@@ -86,7 +86,6 @@ public class FollowActivity extends AppCompatActivity {
                                         .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                                             @Override
                                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                                // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
                                                 if (task.isSuccessful()) {
                                                     QuerySnapshot isFollowing = task.getResult();
                                                     if (isFollowing.isEmpty()) {
