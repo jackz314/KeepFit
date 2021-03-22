@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
@@ -88,7 +89,7 @@ public class FeedFragment extends Fragment {
         });
 
         db = FirebaseFirestore.getInstance();
-        registration = db.collection("media")
+        registration = db.collection("media").orderBy("start_time", Query.Direction.DESCENDING)
 //                .whereEqualTo("state", "CA")
                 .addSnapshotListener((value, e) -> {
                     if (e != null || value == null) {

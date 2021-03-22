@@ -32,7 +32,9 @@ object UserControllerKt {
         }
 
     @JvmStatic
-    fun getCurrentUserDoc(): DocumentReference {
-        return FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().currentUser?.uid?:"non-existence-user")
-    }
+    val currentUserDoc: DocumentReference
+        get() {
+            return FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().currentUser?.uid
+                    ?: "non-existence-user")
+        }
 }

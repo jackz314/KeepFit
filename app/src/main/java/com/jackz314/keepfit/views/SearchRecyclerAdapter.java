@@ -175,6 +175,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8, 0x03, 0x06)));
             } else {
                 durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
+                durationText.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
             }
 
             Glide.with(image)
