@@ -29,4 +29,8 @@ public class UserController {
 
     }
 
+    public FirebaseUser getUser() {
+        return curruser;
+    }
+
 }

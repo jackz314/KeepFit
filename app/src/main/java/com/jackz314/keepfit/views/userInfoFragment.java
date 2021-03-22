@@ -34,7 +34,6 @@ import com.jackz314.keepfit.controllers.ExerciseController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentMeBinding;
 import com.jackz314.keepfit.models.Exercise;
-import com.jackz314.keepfit.models.Media;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -50,9 +49,9 @@ import us.zoom.sdk.ZoomSDK;
 
 import static com.jackz314.keepfit.GlobalConstants.RC_REAUTH_DELETE;
 
-public class MeFragment extends Fragment {
+public class userInfoFragment extends Fragment {
 
-    private static final String TAG = "MeFragment";
+    private static final String TAG = "userInfoFragment";
 
     private FragmentMeBinding b;
 
@@ -86,8 +85,8 @@ public class MeFragment extends Fragment {
             authStateListener = auth -> {
                 FirebaseUser user = auth.getCurrentUser();
                 if (user != null) {
-                    b.userNameText.setText(getGreetingMsg() + user.getDisplayName());
-                    b.userEmailText.setText(user.getEmail());
+                    b.userNameText.setText("Name: " + user.getDisplayName());
+                    b.userEmailText.setText("Email: " + user.getEmail());
 
                     Glide.with(b.getRoot())
                             .load(Utils.getHighResProfilePicUrl())
