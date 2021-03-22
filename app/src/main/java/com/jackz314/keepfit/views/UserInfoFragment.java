@@ -187,6 +187,8 @@ public class UserInfoFragment extends Fragment {
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> signOut())
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
+        } else if (item.getItemId() == R.id.edit_profile_btn) {
+            editProfile();
         } else if (item.getItemId() == R.id.sign_out_zoom_btn) {
             ZoomSDK sdk = ZoomSDK.getInstance();
             AccountService accountService = sdk.getAccountService();
@@ -203,6 +205,11 @@ public class UserInfoFragment extends Fragment {
                     .show();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void editProfile() {
+        Intent activity2Intent = new Intent(getActivity(), UpdateProfileActivity.class);
+        startActivity(activity2Intent);
     }
 
     private void signOut() {
