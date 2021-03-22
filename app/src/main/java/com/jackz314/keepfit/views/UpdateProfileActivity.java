@@ -28,6 +28,7 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.R;
@@ -59,10 +60,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_profile);
-//        Toolbar toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-
-
 
         mUsernameEditText = (EditText) findViewById(R.id.editTextUsername);
         mBiographyEditText = (EditText) findViewById(R.id.editTextTextBio);
@@ -72,96 +69,93 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
         Button finishEdit = findViewById(R.id.finish_new_user_btn);
 
-        finishEdit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        finishEdit.setOnClickListener(view -> {
 
-                //get current user data
-                db.collection("users").document(mFirebaseUser.getUid()).get()
-                        .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                DocumentSnapshot dataResult = task.getResult();
-                                originalName = (String) dataResult.get("name");
-                                originalBio =(String) dataResult.get("biography");
-                                originalWeight = (double) dataResult.get("weight");
-                                originalHeight = (double) dataResult.get("height");
-                            }
-                        });
+            //get current user data
+            db.collection("users").document(mFirebaseUser.getUid()).get()
+                    .addOnCompleteListener(task -> {
+                        DocumentSnapshot dataResult = task.getResult();
+                        originalName = (String) dataResult.get("name");
+                        originalBio =(String) dataResult.get("biography");
+                        originalWeight = (double) dataResult.get("weight");
+                        originalHeight = (double) dataResult.get("height");
+                    });
 
 
-                mUsernameEditText = (EditText) findViewById(R.id.editTextUsername);
-                String strUsername = mUsernameEditText.getText().toString();
-                if (TextUtils.isEmpty(strUsername)) {
-                    //get current data
-                    strUsername = originalName;
-                    Log.d("Update Profile", "Name is empty");
-                }  else {
-                    Log.d("Update Profile", "Name is not empty");
-                }
-
-                String bio = "";
-                if (mBiographyEditText.getText().toString().matches("")) {
-                    //get current data
-                    bio = originalBio;
-                } else {
-                    bio = mBiographyEditText.getText().toString();
-                }
-
-
-                Spinner spinner = findViewById(R.id.sex);
-                boolean sex = true;
-                if (spinner.getSelectedItem().toString().matches("Female")) {
-                    sex = false;
-                }
-
-                double height = 0.0;
-                if (!mHeightEditText.getText().toString().matches("")) {
-                    height = Double.parseDouble(mHeightEditText.getText().toString());
-                    height = 2.54 * height;
-                } else {
-                    //get current data
-                    height = originalHeight;
-                }
-
-                double weight = 0.0;
-                if (!mWeightEditText.getText().toString().matches("")) {
-                    weight = Double.parseDouble(mWeightEditText.getText().toString());
-                    weight = 0.453592 * weight;
-                } else {
-                    //get current data
-                    weight = originalWeight;
-                }
-
-                Map<String, Object> user = new HashMap<>();
-                user.put( "biography", bio);
-                user.put("birthday", mBirthday.getTime());
-                user.put("email", mFirebaseUser.getEmail());
-                user.put("height", height);
-                user.put("name", strUsername);
-                user.put("profile_pic", mFirebaseUser.getPhotoUrl().toString());
-                user.put("sex", sex);
-                user.put("weight", weight);
-
-
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("users")
-                        .document(mFirebaseUser.getUid())
-                        .set(user)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void aVoid) {
-                                finish();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(Exception e) {
-                                Toast.makeText(UpdateProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                setResult(Activity.RESULT_OK);
+            mUsernameEditText = findViewById(R.id.editTextUsername);
+            String strUsername = mUsernameEditText.getText().toString();
+            if (TextUtils.isEmpty(strUsername)) {
+                //get current data
+                strUsername = originalName;
+                Log.d("Update Profile", "Name is empty");
+            }  else {
+                Log.d("Update Profile", "Name is not empty");
             }
+
+            String bio = "";
+            if (mBiographyEditText.getText().toString().matches("")) {
+                //get current data
+                bio = originalBio;
+            } else {
+                bio = mBiographyEditText.getText().toString();
+            }
+
+
+            Spinner spinner = findViewById(R.id.sex);
+            boolean sex = true;
+            if (spinner.getSelectedItem().toString().matches("Female")) {
+                sex = false;
+            }
+
+            double height = 0.0;
+            if (!mHeightEditText.getText().toString().matches("")) {
+                height = Double.parseDouble(mHeightEditText.getText().toString());
+                height = 2.54 * height;
+            } else {
+                //get current data
+                height = originalHeight;
+            }
+
+            double weight = 0.0;
+            if (!mWeightEditText.getText().toString().matches("")) {
+                weight = Double.parseDouble(mWeightEditText.getText().toString());
+                weight = 0.453592 * weight;
+            } else {
+                //get current data
+                weight = originalWeight;
+            }
+
+            Map<String, Object> user = new HashMap<>();
+            user.put( "biography", bio);
+            user.put("birthday", mBirthday.getTime());
+            user.put("email", mFirebaseUser.getEmail());
+            user.put("height", height);
+            user.put("name", strUsername);
+            user.put("profile_pic", mFirebaseUser.getPhotoUrl().toString());
+            user.put("sex", sex);
+            user.put("weight", weight);
+
+            if (!mFirebaseUser.getDisplayName().equals(strUsername)) {
+                mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(strUsername).build());
+            }
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users")
+                    .document(mFirebaseUser.getUid())
+                    .set(user)
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            finish();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(Exception e) {
+                            Toast.makeText(UpdateProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+            setResult(Activity.RESULT_OK);
         });
 
         Spinner spinner = findViewById(R.id.sex);
@@ -171,21 +165,18 @@ public class UpdateProfileActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
 
         mDisplayBirthday = (TextView) findViewById(R.id.birthday);
-        mDisplayBirthday.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Calendar calendar = Calendar.getInstance();
-                int year = calendar.get(Calendar.YEAR);
-                int month = calendar.get(Calendar.MONTH);
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
+        mDisplayBirthday.setOnClickListener(view -> {
+            Calendar calendar = Calendar.getInstance();
+            int year = calendar.get(Calendar.YEAR);
+            int month = calendar.get(Calendar.MONTH);
+            int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-                DatePickerDialog dialog = new DatePickerDialog(
-                        UpdateProfileActivity.this,
-                        android.R.style.Theme_DeviceDefault_Dialog,
-                        mDateSetListener,
-                        year, month, day);
-                dialog.show();
-            }
+            DatePickerDialog dialog = new DatePickerDialog(
+                    UpdateProfileActivity.this,
+                    android.R.style.Theme_DeviceDefault_Dialog,
+                    mDateSetListener,
+                    year, month, day);
+            dialog.show();
         });
 
         mDateSetListener = new DatePickerDialog.OnDateSetListener() {
