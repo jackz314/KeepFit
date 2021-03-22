@@ -1,43 +1,24 @@
 package com.jackz314.keepfit.views;
 
-
-
-
-
-import android.app.Activity;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.VideoView;
 
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FieldValue;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.Utils;
+import com.jackz314.keepfit.controllers.BackPressingMediaController;
 import com.jackz314.keepfit.controllers.VideoController;
-import com.jackz314.keepfit.models.Media;
 
 public class VideoActivity extends AppCompatActivity{
     private VideoView mVideoView;
-    private MediaController mMediaController;
+    private BackPressingMediaController mMediaController;
 
     private int mVideoWidth;
     private int mVideoHeight;
@@ -75,18 +56,8 @@ public class VideoActivity extends AppCompatActivity{
         mVideoView.setVideoURI(uri);
 
 
-
-        MediaController mediaController = new MediaController(this);
-        mMediaController = mediaController;
-        mVideoView.setMediaController(new MediaController(this){
-            public boolean dispatchKeyEvent(KeyEvent event)
-            {
-                if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_UP)
-                    ((Activity) getContext()).finish();
-
-                return super.dispatchKeyEvent(event);
-            }
-        });
+        mMediaController = new BackPressingMediaController(this, VideoActivity.this);
+        mVideoView.setMediaController(mMediaController);
         mMediaController.setAnchorView(mVideoView);
         mVideoView.start();
 
