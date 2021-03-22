@@ -64,8 +64,11 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
         }
 
+        String thumbnail;
+        if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
+        else thumbnail = media.getLink();
         Glide.with(holder.image)
-                .load(media.getLink())
+                .load(thumbnail)
                 .fitCenter()
                 .placeholder(R.drawable.ic_thumb_placeholder)
                 .into(holder.image);
