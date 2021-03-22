@@ -44,6 +44,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.OnProgressListener;
@@ -229,7 +230,11 @@ public class UploadVideoActivity extends AppCompatActivity {
                 media.put("view_count", 0);
                 media.put("thumbnail", "");
 
-                db.collection("media").document().set(media);
+                DocumentReference mediaRef = db.collection("media").document();
+                mediaRef.set(media);
+                Map<String, Object> RefData = new HashMap<>();
+                RefData.put("ref", mediaRef);
+                db.collection("users").document(user.getUid()).collection("videos").document().set(RefData);
             }
         }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
             @Override

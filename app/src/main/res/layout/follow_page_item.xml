@@ -4,55 +4,43 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/constraintLayout"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginVertical="2dp">
+    android:layout_height="wrap_content">
 
     <TextView
         android:id="@+id/feed_title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginEnd="16dp"
+        android:layout_marginStart="16dp"
         android:text="Video Title"
-
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         app:layout_constrainedWidth="true"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/feed_profile_pic"
-        app:layout_constraintTop_toTopOf="@+id/feed_profile_pic" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/guideline5"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.24" />
 
     <ImageView
         android:id="@+id/feed_image"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:background="@color/black"
+        android:layout_width="128dp"
+        android:layout_height="72dp"
+        android:layout_marginStart="16dp"
         android:adjustViewBounds="true"
         android:scaleType="fitCenter"
-        android:background="@color/black"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="H,16:9"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline5"
+        app:layout_constraintHorizontal_bias="0.285"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_thumb_placeholder"
-        android:contentDescription="Thumbnail" />
-
-    <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/feed_profile_pic"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="12dp"
-        android:contentDescription="Profile Picture"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feed_image"
-        app:srcCompat="@drawable/ic_outline_account_circle_24"
-        tools:srcCompat="@drawable/ic_outline_account_circle_24" />
+        app:layout_constraintVertical_bias="0.555"
+        app:srcCompat="@drawable/ic_thumb_placeholder" />
 
     <TextView
         android:id="@+id/feed_detail_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Loading · 0 views · 1 day ago"
+        android:text="12 views · 1 day ago"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/feed_title_text"
@@ -61,7 +49,7 @@
     <Space
         android:id="@+id/space2"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -73,8 +61,7 @@
         android:id="@+id/feed_duration_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginStart="84dp"
         android:background="@drawable/bg_rounded_timestamp"
         android:includeFontPadding="false"
         android:paddingHorizontal="5dp"
@@ -83,7 +70,11 @@
         android:textColor="@color/white"
         android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/feed_image"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/feed_image"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/feed_image"
+        app:layout_constraintVertical_bias="1.0" />
 
     <TextView
         android:id="@+id/feed_category_text"
@@ -97,14 +88,10 @@
         app:layout_constraintStart_toStartOf="@+id/feed_title_text"
         app:layout_constraintTop_toBottomOf="@+id/feed_title_text" />
 
-    <com.like.LikeButton
-        android:id="@+id/feed_like_button"
-        android:layout_width="25dp"
-        android:layout_height="25dp"
-        android:layout_marginEnd="8dp"
-        app:icon_size="24dp"
-        app:icon_type="thumb"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feed_image" />
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".4" />
 </androidx.constraintlayout.widget.ConstraintLayout>

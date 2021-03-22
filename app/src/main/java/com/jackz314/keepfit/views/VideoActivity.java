@@ -56,6 +56,9 @@ public class VideoActivity extends AppCompatActivity{
         String value = intent.getStringExtra("uri");
         String mediaID = intent.getStringExtra("media");
         VideoView videoView = findViewById(R.id.video_view);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().hide();
+        }
 
         mVideoController = new VideoController(getBaseContext(), mediaID);
 

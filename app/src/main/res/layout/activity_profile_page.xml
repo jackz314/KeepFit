@@ -14,7 +14,7 @@
         android:orientation="vertical" >
 
         <FrameLayout
-            android:id="@+id/user_info_fragment"
+            android:id="@+id/me_fragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/purple_200"></FrameLayout>
@@ -28,7 +28,7 @@
                 android:id="@+id/following_fragment"
                 android:layout_width="205dp"
                 android:layout_height="100dp"
-                android:layout_below="@id/user_info_fragment"
+                android:layout_below="@id/me_fragment"
                 android:background="@color/white"></FrameLayout>
 
             <FrameLayout
@@ -36,7 +36,7 @@
                 android:layout_width="205dp"
                 android:layout_height="100dp"
                 android:layout_toRightOf="@id/following_fragment"
-                android:layout_below="@id/user_info_fragment"
+                android:layout_below="@id/me_fragment"
                 android:background="@color/purple_500"></FrameLayout>
         </LinearLayout>
 
