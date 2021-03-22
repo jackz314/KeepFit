@@ -85,6 +85,7 @@ class MainActivity extends AppCompatActivity {
     private void setupAfterSignIn() {
         Log.d(TAG, "setupAfterSignIn: signed in, setting up other stuff");
         Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {
+
             if (findViewById(R.id.container) == null) initMainViews();
             // otherwise it's user change, will be handled by AuthStateListener
         }, throwable -> { // unable to get user from firestore, start new user

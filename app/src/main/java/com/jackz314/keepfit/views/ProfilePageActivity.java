@@ -19,7 +19,7 @@ public class ProfilePageActivity extends AppCompatActivity {
         FollowingFragment frg1 = new FollowingFragment();
         VideosFragment frg2 = new VideosFragment();
         LikedVideosFragment frg3 = new LikedVideosFragment();
-        MeFragment frg4 = new MeFragment();
+        UserInfoFragment frg4 = new UserInfoFragment();
 
         FragmentManager fm = getSupportFragmentManager();
         fm.beginTransaction().replace(R.id.followers_fragment, frg).commit();

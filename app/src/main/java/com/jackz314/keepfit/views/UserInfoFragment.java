@@ -52,7 +52,7 @@ import us.zoom.sdk.ZoomSDK;
 
 import static com.jackz314.keepfit.GlobalConstants.RC_REAUTH_DELETE;
 
-public class userInfoFragment extends Fragment {
+public class UserInfoFragment extends Fragment {
 
     private static final String TAG = "userInfoFragment";
 
@@ -60,7 +60,8 @@ public class userInfoFragment extends Fragment {
 
     private FirebaseAuth.AuthStateListener authStateListener;
 
-    private UserController userController = new UserController();
+    private UserController userController;
+    private User user;
 
     private final List<Exercise> exerciseList = new ArrayList<>();
     private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
@@ -88,7 +89,10 @@ public class userInfoFragment extends Fragment {
             b = FragmentUserInfoBinding.inflate(inflater, container, false);
 
             authStateListener = auth -> {
-                User user = userController.getLocalUser();
+                UserControllerKt.getCurrentUser().subscribe(user -> {
+                    this.user = user;
+                    userController = new UserController();
+                });
 
                 if (user != null) {
                     b.userNameText.setText("Name: " + user.getName());

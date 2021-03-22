@@ -2,6 +2,10 @@ package com.jackz314.keepfit.controllers;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -21,8 +25,8 @@ public class UserController {
     private String TAG = "UserController";
     private Executor procES = Executors.newSingleThreadExecutor();
 
+    private User user;
     public UserController() {
-
     }
 
     public void follow(User other_user) {
@@ -43,7 +47,7 @@ public class UserController {
     }
 
     public User getLocalUser() {
-       return null;
+       return user;
     }
 
     public User getOtherUser(String UserId) {
