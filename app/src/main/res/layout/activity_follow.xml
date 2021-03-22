@@ -31,10 +31,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
-            android:text="User"
+            android:drawableEnd="@drawable/ic_baseline_female_24"
+            android:drawablePadding="4dp"
+            android:text="Hi! User"
             android:textAppearance="@android:style/TextAppearance.Material.Headline"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.361"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/user_profile_picture" />
 
@@ -63,14 +64,69 @@
 
 
         <TextView
+            android:id="@+id/user_height_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:drawableStart="@drawable/ic_height"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:text="6' 5"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintEnd_toStartOf="@+id/user_weight_text"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/user_email_text" />
+
+        <TextView
+            android:id="@+id/user_weight_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_baseline_monitor_weight_24"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:text="164 lbs"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintEnd_toStartOf="@+id/user_birthday_text"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/user_height_text"
+            app:layout_constraintTop_toTopOf="@+id/user_height_text" />
+
+        <TextView
+            android:id="@+id/user_birthday_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_baseline_cake_24"
+            android:drawablePadding="4dp"
+            android:gravity="center"
+            android:text="1/11/1985"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/user_weight_text"
+            app:layout_constraintTop_toTopOf="@+id/user_height_text" />
+
+        <TextView
+            android:id="@+id/user_biography_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/user_height_text" />
+
+        <TextView
             android:id="@+id/exercise_log_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="64dp"
             android:text="Videos"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/biography" />
+            app:layout_constraintTop_toBottomOf="@+id/user_height_text" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/exercise_log_recycler"
@@ -115,9 +171,10 @@
             android:id="@+id/biography"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="100px"
             android:text="Bio"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/user_email_text" />
 
