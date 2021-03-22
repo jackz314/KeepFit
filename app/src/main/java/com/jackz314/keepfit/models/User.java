@@ -1,14 +1,21 @@
 package com.jackz314.keepfit.models;
 
+import android.util.Log;
+
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.PropertyName;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 public class User implements Serializable {
+
+    private static final String TAG = "User";
 
     private String uid;
     private String biography;
@@ -23,6 +30,15 @@ public class User implements Serializable {
 
     public User(){
         name = "";
+    }
+
+    public static User populateFromUid(String uid) {
+        try {
+            return new User(Tasks.await(FirebaseFirestore.getInstance().collection("users").document(uid).get()));
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "populateFromUid: error getting user from uid", e);
+        }
+        return null;
     }
 
     public User(DocumentSnapshot doc) {
