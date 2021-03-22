@@ -106,7 +106,7 @@ public class FollowingFragment extends Fragment {
                                 executionException.printStackTrace();
                             }
 
-                            if (b != null) {
+                            if (b != null)  {
                                 getActivity().runOnUiThread(() -> {
                                     if (!followingList.isEmpty()) {
                                         b.emptyResultsText.setVisibility(View.GONE);
