@@ -53,7 +53,7 @@ public class ExerciseRecyclerAdapter extends RecyclerView.Adapter<ExerciseRecycl
     public void onBindViewHolder(@NotNull ViewHolder holder, int position) {
         Exercise exercise = mData.get(position);
         holder.categoryText.setText(exercise.getCategory());
-        holder.calText.setText(String.format(Locale.getDefault(), "%.3f", exercise.getCalories()));
+        holder.calText.setText(String.format(Locale.getDefault(), "%.3f Cal", exercise.getCalories()));
         holder.dateText.setText(DateUtils.getRelativeDateTimeString(mContext,  exercise.getStartingTime().getTime(), DateUtils.MINUTE_IN_MILLIS, DateUtils.WEEK_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_MONTH));
         holder.durationText.setText(UtilsKt.formatDurationTextString((exercise.getElapsedTime() / DateUtils.SECOND_IN_MILLIS)));
