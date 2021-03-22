@@ -53,8 +53,6 @@ public class VideoActivity extends AppCompatActivity{
         String value = intent.getStringExtra("uri");
         String creator = intent.getStringExtra("creator");
         VideoView videoView = findViewById(R.id.video_view);
-        Log.i("AAAAAA",value);
-        Log.i("BBBBBB",creator);
 
         try{
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,

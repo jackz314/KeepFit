@@ -26,6 +26,7 @@ class Media(doc: DocumentSnapshot): Serializable {
     @PropertyName("is_livestream")
     var isLivestream = false
     var link: String? = null
+    var categories: String? = null
 
     @PropertyName("start_time")
     var startTime: Date? = null
@@ -41,6 +42,7 @@ class Media(doc: DocumentSnapshot): Serializable {
         uid = doc.id
         isLivestream = doc.getBoolean("is_livestream") == true
         link = doc.getString("link")
+        categories = doc.getString("categories")
         startTime = doc.getDate("start_time")
         if(!isLivestream) duration = doc.getLong("duration")
         thumbnail = doc.getString("thumbnail")

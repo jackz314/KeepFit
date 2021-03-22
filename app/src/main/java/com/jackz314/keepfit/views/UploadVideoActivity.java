@@ -204,7 +204,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                 progressDialog.dismiss();
 
                 Long durationLong = durationNumber;
-
+                String categoriesString = categoryText.getText().toString();
 
                 Log.i("AAAAAAAAAAAAAAAA", durationNumber.toString());
                 String link = uri.toString();
@@ -219,6 +219,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                 media.put("start_time", timestamp);
                 media.put("title", titleText.getText().toString());
                 media.put("view_count", 0);
+                media.put("thumbnail", "");
 
                 db.collection("media").document(titleText.getText().toString()).set(media);
 

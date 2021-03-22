@@ -98,6 +98,20 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     private void populateCreatorInfo(ViewHolder holder, Media media, User creator) {
         holder.detailText.setText(media.getDetailString());
 
+        String categoriesUnrefined = media.getCategories();
+
+        String[] categories = categoriesUnrefined.split(",");
+
+        String categoryTextString = "";
+        for(int i = 0; i < categories.length ; ++i){
+            categoryTextString += categories[i];
+            if(i < categories.length-1){
+                categoryTextString += ", ";
+            }
+        }
+
+        holder.categoryText.setText(categoryTextString);
+
         Glide.with(holder.profilePic)
                 .load(creator.getProfilePic())
                 .fitCenter()
@@ -106,6 +120,8 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
 
         holder.profilePic.setOnClickListener(v -> Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show());
     }
+
+
 
     // total number of rows
     @Override
@@ -119,6 +135,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         TextView titleText;
         TextView detailText;
         TextView durationText;
+        TextView categoryText;
         ImageView profilePic;
         ImageView image;
 
@@ -127,6 +144,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             titleText = itemView.findViewById(R.id.feed_title_text);
             detailText = itemView.findViewById(R.id.feed_detail_text);
             durationText = itemView.findViewById(R.id.feed_duration_text);
+            categoryText = itemView.findViewById(R.id.feed_category_text);
             profilePic = itemView.findViewById(R.id.feed_profile_pic);
             image = itemView.findViewById(R.id.feed_image);
             itemView.setOnClickListener(this);
