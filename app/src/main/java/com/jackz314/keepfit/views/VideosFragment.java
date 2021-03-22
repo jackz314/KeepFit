@@ -104,7 +104,7 @@ public class VideosFragment extends Fragment {
                                         b.emptyFeedText.setVisibility(View.GONE);
                                     } else {
                                         b.emptyFeedText.setVisibility(View.VISIBLE);
-                                        b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+                                        b.emptyFeedText.setText("No Created Videos ¯\\_(ツ)_/¯");
                                     }
                                     feedRecyclerAdapter.notifyDataChanged();
                                 });
