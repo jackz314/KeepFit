@@ -16,7 +16,7 @@ class Media(doc: DocumentSnapshot): Serializable {
     @DocumentId
     var uid: String? = null
     var creator = MutableLiveData(User())
-    var creatorRef: DocumentReference?
+    var creatorRef: DocumentReference? = null
 
     @PropertyName("is_livestream")
     var isLivestream = false
@@ -37,27 +37,29 @@ class Media(doc: DocumentSnapshot): Serializable {
 
     init {
         if (!doc.exists()){
-
-        }
-        uid = doc.id
-        isLivestream = doc.getBoolean("is_livestream") == true
-        link = doc.getString("link")
-        categories = doc.get("categories") as List<String>
-        startTime = doc.getDate("start_time")
-        if(!isLivestream) duration = doc.getLong("duration")
-        thumbnail = doc.getString("thumbnail")
-        title = doc.getString("title")
-        viewCount = doc.getLong("view_count")?.toInt()?:0
-        creatorRef = doc.getDocumentReference("creator")
-        val task = creatorRef!!.get()
-        task.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.e(TAG, "error getting creater ref: ", task.exception)
-            }else{
-                creator.value = User(task.result)
-                Log.d(TAG, "creator: " + creator.value)
+            uid = ""
+        } else {
+            uid = doc.id
+            isLivestream = doc.getBoolean("is_livestream") == true
+            link = doc.getString("link")
+            categories = doc.get("categories") as List<String>
+            startTime = doc.getDate("start_time")
+            if(!isLivestream) duration = doc.getLong("duration")
+            thumbnail = doc.getString("thumbnail")
+            title = doc.getString("title")
+            viewCount = doc.getLong("view_count")?.toInt()?:0
+            creatorRef = doc.getDocumentReference("creator")
+            val task = creatorRef!!.get()
+            task.addOnCompleteListener { task ->
+                if (!task.isSuccessful) {
+                    Log.e(TAG, "error getting creater ref: ", task.exception)
+                }else{
+                    creator.value = User(task.result)
+                    Log.d(TAG, "creator: " + creator.value)
+                }
             }
         }
+
 
         //synchronous alternative
 //        try {

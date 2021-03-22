@@ -71,6 +71,7 @@ public class VideosFragment extends Fragment {
             startActivity(intent);
 
         });
+        fs = FirebaseStorage.getInstance();
 
     }
 
@@ -101,7 +102,12 @@ public class VideosFragment extends Fragment {
                             try {
                                 for (QueryDocumentSnapshot doc : value) {
                                     DocumentSnapshot mediaDoc = Tasks.await(doc.getDocumentReference("ref").get());
-                                    videosList.add(new Media(mediaDoc));
+                                    Media media = new Media(mediaDoc);
+                                    if (media.getUid().isEmpty()) {
+                                        doc.getReference().delete();
+                                        continue;
+                                    }
+                                    videosList.add(media);
                                 }
                             } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
                                 executionException.printStackTrace();

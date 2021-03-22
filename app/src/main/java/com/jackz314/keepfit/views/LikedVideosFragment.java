@@ -90,7 +90,12 @@ public class LikedVideosFragment extends Fragment {
                             try {
                                 for (QueryDocumentSnapshot doc : value) {
                                     DocumentSnapshot mediaDoc = Tasks.await(db.collection("media").document(doc.getId()).get());
-                                    likedVideosList.add(new Media(mediaDoc));
+                                    Media media = new Media(mediaDoc);
+                                    if (media.getUid().isEmpty()) {
+                                        doc.getReference().delete();
+                                        continue;
+                                    }
+                                    likedVideosList.add(media);
                                 }
                             } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
                                 executionException.printStackTrace();
