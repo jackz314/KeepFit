@@ -78,10 +78,11 @@ public class FeedFragment extends Fragment {
                 Intent intent = new Intent(requireActivity(), VideoActivity.class);
 
                 String videoPath = media.getLink();
-                String creatorInfo =  media.getCreator().toString();
                 //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
                 intent.putExtra("uri", videoPath);
+                int viewCount = media.getViewCount() + 1;
                 startActivity(intent);
+                db.collection("media").document(media.getTitle()).update("view_count", viewCount);
             }
 
             //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
