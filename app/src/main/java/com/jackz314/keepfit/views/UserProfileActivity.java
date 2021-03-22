@@ -26,6 +26,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
@@ -89,14 +90,20 @@ public class UserProfileActivity extends AppCompatActivity {
         if(bio.isEmpty()){
             b.biography.setText("Hello!");
         }
-        else
+        else {
             b.biography.setText("Bio: "+other_user.getBiography());
+        }
         CircleImageView prof_img = findViewById(R.id.user_profile_picture);
         Glide.with(b.getRoot())
                 .load(other_user.getProfilePic())
                 .fitCenter()
                 .placeholder(R.drawable.ic_account_circle_24)
                 .into(b.userProfilePicture);
+        //fix
+        b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, other_user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
+        b.userHeightText.setText(Utils.centimeterToFeet(other_user.getHeight()));
+        b.userWeightText.setText((int)(other_user.getWeight() *  2.205) + " lbs");
+
 
         //Fills list with videos that belong to the user
         populateList(other_user);
