@@ -45,9 +45,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".views.ProfilePageActivity"
-            android:exported="true"/>
 
         <activity
             android:name=".views.VideoActivity"
@@ -55,11 +52,12 @@
         <activity
             android:name=".views.SearchActivity"
             android:windowSoftInputMode="adjustNothing"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:theme="@style/Theme.KeepFit.NoBar"/>
         <activity android:name=".views.UploadVideoActivity"
-        android:usesCleartextTraffic="true"/>
+            android:usesCleartextTraffic="true"/>
         <activity android:name=".views.UserProfileActivity"
-            android:theme="@style/Theme.AppCompat.Light.NoActionBar"/>
+            android:theme="@style/Theme.KeepFit.NoBar"/>
+        <activity android:name=".views.UpdateProfileActivity" />
     </application>
 
 </manifest>
