@@ -1,6 +1,7 @@
 package com.jackz314.keepfit.views;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -163,8 +164,12 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                     .placeholder(R.drawable.ic_account_circle_24)
                     .into(this.profilePic);
 
-            this.profilePic.setOnClickListener(v -> Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show());
-        }
+            profilePic.setOnClickListener(v -> {
+                Intent in = new Intent(v.getContext(), UserProfileActivity.class);
+                in.putExtra("other", creator);
+                v.getContext().startActivity(in);
+//            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
+            });        }
 
         public void Bind(Media media) {
             this.media = media;
