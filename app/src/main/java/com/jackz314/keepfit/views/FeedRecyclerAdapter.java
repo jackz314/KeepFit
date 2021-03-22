@@ -72,11 +72,11 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                 media.setLiked(false);
             }
         }
+        notifyDataSetChanged();
     }
 
     public void notifyDataChanged(){
         updateMediaListLikeStatus();
-        super.notifyDataSetChanged();
     }
 
     // inflates the row layout from xml when needed
