@@ -51,6 +51,7 @@
             android:configChanges="orientation|screenSize" />
         <activity
             android:name=".views.SearchActivity"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustNothing"
             android:theme="@style/Theme.KeepFit.NoBar"/>
         <activity android:name=".views.UploadVideoActivity"

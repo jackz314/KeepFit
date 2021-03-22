@@ -30,9 +30,11 @@ import com.google.firebase.storage.UploadTask;
 import com.jackz314.keepfit.R;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.firebase.Timestamp.now;
 
@@ -170,11 +172,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
             String raw = categoryText.getText().toString();
             String[] categoryArray = raw.split(",");
-            List<String> categoryList = new ArrayList<String>();
-
-            for(int i = 0; i < categoryArray.length; ++i){
-                categoryList.add(categoryArray[i]);
-            }
+            List<String> categoryList = Arrays.stream(categoryArray).map(String::trim).collect(Collectors.toList());
 
             Map<String, Object> media = new HashMap<>();
             media.put("categories", categoryList);
