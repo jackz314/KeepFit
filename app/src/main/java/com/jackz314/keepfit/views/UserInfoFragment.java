@@ -145,6 +145,7 @@ public class UserInfoFragment extends Fragment {
             }));
         }
 
+
         return b.getRoot();
     }
 
@@ -259,4 +260,31 @@ public class UserInfoFragment extends Fragment {
         Toast.makeText(getContext(), "Reauthenticating before sensitive action", Toast.LENGTH_SHORT).show();
         Utils.createReauthenticationIntent(requireActivity(), RC_REAUTH_DELETE);
     }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+        UserControllerKt.getCurrentUser().subscribe(user -> {
+            if (user != null) {
+                b.userNameText.setText(getGreetingMsg() + user.getName());
+                b.userEmailText.setText(user.getEmail());
+                b.userHeightText.setText(Utils.centimeterToFeet(user.getHeight()));
+                b.userWeightText.setText((int)(user.getWeight() *  2.205) + " lbs");
+                b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
+                b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), user.getBirthday().getTime(),
+                        DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
+                b.userBiographyText.setText(user.getBiography());
+
+                Glide.with(b.getRoot())
+                        .load(Utils.getHighResProfilePicUrl())
+                        .fitCenter()
+                        .placeholder(R.drawable.ic_outline_account_circle_24)
+                        .into(b.userProfilePicture);
+            }
+        },throwable -> {
+            Log.d(TAG,"no current user, sign in required");
+        });
+    };
+
+
 }
