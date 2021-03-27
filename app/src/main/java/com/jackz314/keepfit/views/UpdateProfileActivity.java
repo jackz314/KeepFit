@@ -30,9 +30,11 @@ import android.widget.Toast;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.models.User;
 
 import java.util.Calendar;
 import java.util.HashMap;
@@ -53,8 +55,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
     String originalName;
     String originalBio;
-    double originalWeight;
-    double originalHeight;
+    int originalWeight;
+    int originalHeight;
 
 
     @Override
@@ -70,19 +72,20 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
         Button finishEdit = findViewById(R.id.finish_new_user_btn);
 
+        //get current user data
+        DocumentReference userDoc = db.collection("users").document(mFirebaseUser.getUid());
+        userDoc.get()
+                .addOnCompleteListener(task -> {
+                    DocumentSnapshot dataResult = task.getResult();
+                    originalName = (String) dataResult.getString("name");
+                    Log.d("Update Profile", "Name: " + originalName);
+                    originalBio =(String) dataResult.getString("biography");
+                    Log.d("Update Profile", "Bio: " + originalBio);
+                    originalWeight = dataResult.getLong("weight").intValue();
+                    originalHeight = dataResult.getLong("height").intValue();
+                });
+
         finishEdit.setOnClickListener(view -> {
-
-            //get current user data
-            db.collection("users").document(mFirebaseUser.getUid()).get()
-                    .addOnCompleteListener(task -> {
-                        DocumentSnapshot dataResult = task.getResult();
-                        originalName = (String) dataResult.get("name");
-                        originalBio =(String) dataResult.get("biography");
-                        originalWeight = (double) dataResult.get("weight");
-                        originalHeight = (double) dataResult.get("height");
-                    });
-
-
             mUsernameEditText = findViewById(R.id.editTextUsername);
             String strUsername = mUsernameEditText.getText().toString();
             if (TextUtils.isEmpty(strUsername)) {

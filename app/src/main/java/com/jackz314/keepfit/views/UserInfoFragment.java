@@ -105,6 +105,8 @@ public class UserInfoFragment extends Fragment {
                                 .placeholder(R.drawable.ic_outline_account_circle_24)
                                 .into(b.userProfilePicture);
                     }
+                },throwable -> {
+                    Log.d(TAG,"no current user, sign in required");
                 });
             };
             FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
