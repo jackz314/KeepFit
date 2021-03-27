@@ -37,6 +37,7 @@ import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.models.User;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -53,11 +54,11 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private final FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private Map mCurrentData;
 
-    String originalName;
-    String originalBio;
-    int originalWeight;
-    int originalHeight;
-
+    private String originalName;
+    private String originalBio;
+    private int originalWeight;
+    private int originalHeight;
+    private Date originalBirthday;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +84,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     Log.d("Update Profile", "Bio: " + originalBio);
                     originalWeight = dataResult.getLong("weight").intValue();
                     originalHeight = dataResult.getLong("height").intValue();
+                    originalBirthday = dataResult.getDate("birthday");
                 });
 
         finishEdit.setOnClickListener(view -> {
@@ -91,9 +93,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
             if (TextUtils.isEmpty(strUsername)) {
                 //get current data
                 strUsername = originalName;
-                Log.d("Update Profile", "Name is empty");
-            }  else {
-                Log.d("Update Profile", "Name is not empty");
             }
 
             String bio = "";
@@ -131,7 +130,12 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
             Map<String, Object> user = new HashMap<>();
             user.put( "biography", bio);
-            user.put("birthday", mBirthday.getTime());
+            //birthday check
+            if (mBirthday.get(Calendar.YEAR) >= java.time.LocalDate.now().getYear()){
+                user.put("birthday", originalBirthday);
+            } else {
+                user.put("birthday", mBirthday.getTime());
+            }
             user.put("email", mFirebaseUser.getEmail());
             user.put("height", height);
             user.put("name", strUsername);
@@ -184,7 +188,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 String date = month + "/" + day + "/" + year;
                 mDisplayBirthday.setText(date);
                 mBirthday = Calendar.getInstance();
-                mBirthday.set(year, month, day);
+                mBirthday.set(year, month - 1, day);
             }
         };
     }
