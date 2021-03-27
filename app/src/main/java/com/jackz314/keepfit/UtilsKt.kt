@@ -1,8 +1,12 @@
 package com.jackz314.keepfit
 
 import android.util.Log
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.tasks.Tasks
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import com.jackz314.keepfit.controllers.UserControllerKt
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.CompletableEmitter
@@ -139,5 +143,65 @@ object UtilsKt {
                         livestreamDoc.delete()
                     }
                 }
+    }
+
+    @JvmStatic
+    fun deleteAccountFromFirestore(): Task<Void> {
+        val db = FirebaseFirestore.getInstance()
+        val fs = FirebaseStorage.getInstance()
+        val currUserUid = FirebaseAuth.getInstance().currentUser?.uid?:"non_existence_user"
+        return UserControllerKt.currentUserDoc.collection("followers").get().continueWithTask { task ->
+            return@continueWithTask if (task.isSuccessful) {
+                val batch = db.batch()
+                Tasks.whenAll(
+                        task.result?.map { doc ->
+                            val followerRef = doc.getDocumentReference("ref")!!
+                            return@map db.document(followerRef.path).collection("following").whereEqualTo("ref", UserControllerKt.currentUserDoc).get()
+                                    .continueWithTask { task -> Tasks.call {
+                                        if (task.result!!.documents.size != 0)
+                                            batch.delete(task.result!!.documents[0].reference)
+                                    } }
+                        }
+                ).continueWithTask { batch.commit() }
+            } else Tasks.forException(task.exception?:Exception("Original exception was null"))
+        }.continueWithTask { task ->
+            return@continueWithTask if (task.isSuccessful) {
+                UserControllerKt.currentUserDoc.collection("following").get()
+            } else Tasks.forException(task.exception?:Exception("Original exception was null"))
+        }.continueWithTask { task ->
+            return@continueWithTask if (task.isSuccessful) {
+                val batch = db.batch()
+                Tasks.whenAll(
+                        task.result?.map { doc ->
+                            val followingRef = doc.getDocumentReference("ref")!!
+                            return@map db.document(followingRef.path).collection("followers").whereEqualTo("ref", UserControllerKt.currentUserDoc).get()
+                                    .continueWithTask { task -> Tasks.call {
+                                        if (task.result!!.documents.size != 0)
+                                            batch.delete(task.result!!.documents[0].reference)
+                                    } }
+                        }
+                ).continueWithTask { batch.commit() }
+            } else Tasks.forException(task.exception?:Exception("Original exception was null"))
+        }.continueWithTask { task ->
+            return@continueWithTask if (task.isSuccessful) {
+                UserControllerKt.currentUserDoc.collection("videos").get()
+            } else Tasks.forException(task.exception?:Exception("Original exception was null"))
+        }.continueWithTask { task -> // delete all videos
+            return@continueWithTask if (task.isSuccessful) {
+                val batch = db.batch()
+                return@continueWithTask Tasks.whenAll(
+                    task.result?.map { doc ->
+                        val ref = doc.getDocumentReference("ref")!!
+                        return@map ref.get().continueWithTask{ videoTask ->
+                            fs.getReferenceFromUrl(videoTask.result!!.getString("link")!!).delete()
+                        }.continueWithTask { Tasks.call { batch.delete(ref) } }
+                    }
+                ).continueWithTask { batch.commit() }
+            } else Tasks.forException(task.exception?:Exception("Original exception was null"))
+        }.continueWithTask { task ->
+            return@continueWithTask if (task.isSuccessful) {
+                UserControllerKt.currentUserDoc.delete()
+            } else Tasks.forException(task.exception?:Exception("Original exception was null"))
+        }
     }
 }

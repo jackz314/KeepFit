@@ -114,7 +114,7 @@ public class VideosFragment extends Fragment {
                                 executionException.printStackTrace();
                             }
 
-                            if (b != null) {
+                            if (b != null && getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
                                     if (!videosList.isEmpty()){
                                         b.emptyFeedText.setVisibility(View.GONE);

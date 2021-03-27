@@ -70,12 +70,9 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     }
 
     private void updateMediaListLikeStatus() {
-        for (Media media : mData) {
-            if (likedVideos.contains(media.getUid())) {
-                media.setLiked(true);
-            } else {
-                media.setLiked(false);
-            }
+        for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
+            Media media = mData.get(i);
+            media.setLiked(likedVideos.contains(media.getUid()));
         }
         notifyDataSetChanged();
     }

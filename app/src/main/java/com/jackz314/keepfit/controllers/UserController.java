@@ -33,7 +33,7 @@ public class UserController {
     public UserController() {
     }
 
-   public void follow(User other_user) {
+    public void follow(User other_user) {
         //get document references for users
         Map<String, Object> docFollowerData = new HashMap<>();
         Map<String, Object> docFollowingData = new HashMap<>();
@@ -52,11 +52,11 @@ public class UserController {
 
     }
 
-    public void unfollow(User other_user) {
+    public void unfollow(User otherUser) {
         //remove from
         UserControllerKt.getCurrentUserDoc()
                 .collection("following")
-                .whereEqualTo("ref", db.collection("users").document(other_user.getUid())).get()
+                .whereEqualTo("ref", db.collection("users").document(otherUser.getUid())).get()
                 .addOnCompleteListener(task -> {
                     // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
                     if (task.isSuccessful()) {
@@ -68,7 +68,7 @@ public class UserController {
                 });
 
         db.collection("users")
-                .document(other_user.getUid())
+                .document(otherUser.getUid())
                 .collection("followers")
                 .whereEqualTo("ref", UserControllerKt.getCurrentUserDoc()).get()
                 .addOnCompleteListener(task -> {

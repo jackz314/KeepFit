@@ -2,6 +2,7 @@
   <dictionary name="jack">
     <words>
       <w>algolia</w>
+      <w>firestore</w>
       <w>livestream</w>
     </words>
   </dictionary>

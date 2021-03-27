@@ -40,7 +40,7 @@ class ViewExerciseActivity : AppCompatActivity() {
                     DateUtils.MINUTE_IN_MILLIS, DateUtils.MINUTE_IN_MILLIS, DateUtils.FORMAT_ABBREV_MONTH or DateUtils.FORMAT_SHOW_DATE or DateUtils.FORMAT_SHOW_WEEKDAY or DateUtils.FORMAT_SHOW_TIME)
             b.viewExerciseDuration.text = UtilsKt.formatDurationTextString(exercise.elapsedTime / DateUtils.SECOND_IN_MILLIS)
             b.viewExerciseCal.text = String.format(Locale.getDefault(), "%.3f", exercise.calories)
-            b.viewExerciseCalPerMin.text = String.format(Locale.getDefault(), "%.3f", exercise.calories / (exercise.elapsedTime / DateUtils.MINUTE_IN_MILLIS))
+            b.viewExerciseCalPerMin.text = String.format(Locale.getDefault(), "%.3f", exercise.calories / (exercise.elapsedTime.toDouble() / DateUtils.MINUTE_IN_MILLIS))
         }
     }
 

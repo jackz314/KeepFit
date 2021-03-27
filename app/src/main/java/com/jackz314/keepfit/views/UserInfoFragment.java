@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
+import io.reactivex.rxjava3.disposables.CompositeDisposable;
+import io.reactivex.rxjava3.disposables.Disposable;
 import us.zoom.sdk.AccountService;
 import us.zoom.sdk.ZoomSDK;
 
@@ -64,6 +66,8 @@ public class UserInfoFragment extends Fragment {
 
     private final List<Exercise> exerciseList = new ArrayList<>();
     private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
+
+    private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
 
     @Override
@@ -88,7 +92,7 @@ public class UserInfoFragment extends Fragment {
             b = FragmentUserInfoBinding.inflate(inflater, container, false);
 
             authStateListener = auth -> {
-                UserControllerKt.getCurrentUser().subscribe(user -> {
+                Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {
                     if (user != null) {
                         b.userNameText.setText(getGreetingMsg() + user.getName());
                         b.userEmailText.setText(user.getEmail());
@@ -108,6 +112,7 @@ public class UserInfoFragment extends Fragment {
                 },throwable -> {
                     Log.d(TAG,"no current user, sign in required");
                 });
+                compositeDisposable.add(disposable);
             };
             FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
@@ -228,12 +233,18 @@ public class UserInfoFragment extends Fragment {
                                         Objects.requireNonNull(task.getException()).getLocalizedMessage(),
                                 Toast.LENGTH_SHORT).show();
                     }
+                }, throwable -> {
+                    Log.w(TAG, "onCreateView: couldn't get user", throwable);
                 });
     }
 
     private void deleteAccount() {
-        AuthUI.getInstance()
-                .delete(requireContext())
+        UtilsKt.deleteAccountFromFirestore()
+                .continueWithTask(task -> {
+                    if (task.isSuccessful())
+                        return AuthUI.getInstance().delete(requireContext());
+                    else return task;
+                })
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(requireContext(), "Account deleted successfully!", Toast.LENGTH_SHORT).show();

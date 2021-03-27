@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
+import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivityMainBinding;
 
@@ -60,9 +61,9 @@ class MainActivity extends AppCompatActivity {
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     // There are no request codes
-                    Intent data = result.getData();
+//                    Intent data = result.getData();
                     //do stuff
-                    initMainViews();
+                    if (b == null) initMainViews();
                 }
             });
 
@@ -86,10 +87,10 @@ class MainActivity extends AppCompatActivity {
         Log.d(TAG, "setupAfterSignIn: signed in, setting up other stuff");
         Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {
 
-            if (findViewById(R.id.container) == null) initMainViews();
+            if (b == null) initMainViews();
             // otherwise it's user change, will be handled by AuthStateListener
         }, throwable -> { // unable to get user from firestore, start new user
-            Log.d(TAG, "setupAfterSignIn: unable to get user from firestore, start new user " + throwable.getMessage());
+            Log.d(TAG, "setupAfterSignIn: unable to get user from firestore, start new user: " + throwable.getMessage());
             Intent intent = new Intent(this, NewUserActivity.class);
             newUserResultLauncher.launch(intent);
         });
@@ -248,16 +249,17 @@ class MainActivity extends AppCompatActivity {
                 }
             }
         } else if (requestCode == RC_REAUTH_DELETE) {
-            AuthUI.getInstance().delete(this).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Toast.makeText(this, "Account deleted successfully!", Toast.LENGTH_SHORT).show();
-                    Utils.createSignInIntent(this);
-                } else {
-                    Exception e = task.getException();
-                    Log.e(TAG, "Delete account from Firebase failed", e);
-                    Toast.makeText(this, "Error deleting the account: " +
-                            Objects.requireNonNull(e).getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-                }
+            AuthUI.getInstance().delete(this)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(this, "Account deleted successfully!", Toast.LENGTH_SHORT).show();
+                            Utils.createSignInIntent(this);
+                        } else {
+                            Exception e = task.getException();
+                            Log.e(TAG, "Delete account from Firebase failed", e);
+                            Toast.makeText(this, "Error deleting the account: " +
+                                    Objects.requireNonNull(e).getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                        }
             });
         }
     }
