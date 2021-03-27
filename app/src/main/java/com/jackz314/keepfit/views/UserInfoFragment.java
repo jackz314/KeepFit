@@ -233,8 +233,6 @@ public class UserInfoFragment extends Fragment {
                                         Objects.requireNonNull(task.getException()).getLocalizedMessage(),
                                 Toast.LENGTH_SHORT).show();
                     }
-                }, throwable -> {
-                    Log.w(TAG, "onCreateView: couldn't get user", throwable);
                 });
     }
 
