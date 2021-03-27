@@ -102,7 +102,12 @@ public class FollowingFragment extends Fragment  {
                             try {
                                 for (QueryDocumentSnapshot doc : value) {
                                     DocumentSnapshot userDoc = Tasks.await(doc.getDocumentReference("ref").get());
-                                    followingList.add(new SearchResult(new User(userDoc)));
+                                    User user = new User(userDoc);
+                                    if (user.getUid() == null) {
+                                        doc.getReference().delete();
+                                        continue;
+                                    }
+                                    followingList.add(new SearchResult(user));
                                 }
                             } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
                                 executionException.printStackTrace();
