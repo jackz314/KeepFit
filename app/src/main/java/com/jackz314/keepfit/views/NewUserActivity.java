@@ -80,13 +80,18 @@ public class NewUserActivity extends AppCompatActivity {
                 weight = 0.453592 * weight;
             }
 
+            String photoUrl = "";
+            if (mFirebaseUser.getPhotoUrl() != null) {
+                photoUrl = mFirebaseUser.getPhotoUrl().toString();
+            }
+
             Map<String, Object> user = new HashMap<>();
             user.put( "biography", mBiographyEditText.getText().toString());
             user.put("birthday", mBirthday.getTime());
             user.put("email", mFirebaseUser.getEmail());
             user.put("height", height);
             user.put("name", strUsername);
-            user.put("profile_pic", mFirebaseUser.getPhotoUrl().toString());
+            user.put("profile_pic", photoUrl);
             user.put("sex", sex);
             user.put("weight", weight);
 
