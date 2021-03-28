@@ -81,7 +81,7 @@ public class ExerciseActivity extends AppCompatActivity {
         if (exerciseType != null) exerciseType = Utils.toTitleCase(exerciseType);
         b.exerciseTitle.setText(exerciseType);
 
-        stopwatch = new StopwatchTextView(b.exerciseTimeText, 10);
+        stopwatch = new StopwatchTextView(b.exerciseTimeText, 50, this);
         stopwatch.setOnTimeUpdateListener(elapsedTime -> {
             if (exerciseController != null) {
                 runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));

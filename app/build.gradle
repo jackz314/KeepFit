@@ -63,11 +63,15 @@ dependencies {
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.3.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.3.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+
+    // testing
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    implementation 'androidx.test.espresso:espresso-core:3.3.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.3.0'
-    androidTestImplementation 'androidx.test:rules:1.4.0-alpha05'
+    androidTestImplementation 'androidx.test:core:' + rootProject.coreVersion;
+    implementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion;
+    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion;
+    androidTestImplementation 'androidx.test:runner:' + rootProject.runnerVersion;
+    androidTestImplementation 'androidx.test:rules:' + rootProject.rulesVersion;
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:' + rootProject.espressoVersion;
 
     // Firebase stuff
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'

@@ -18,11 +18,17 @@
 
 package com.jackz314.keepfit.views;
 
+import android.app.Activity;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 import android.widget.TextView;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.Locale;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Turns a TextView widget into a timer, with full stop-watch
@@ -39,8 +45,14 @@ import java.util.Locale;
  * @see Handler
  */
 // from https://github.com/Sabirjan/Android-Stopwatch-TextView/blob/master/StopwatchTextView.java
-public class StopwatchTextView implements Runnable {
+public class StopwatchTextView implements Runnable, Closeable {
 	private static final String TAG = "StopwatchTextView";
+
+	@Override
+	public void close() throws IOException {
+		handlerThread.quit();
+		handler.removeCallbacks(this);
+	}
 
 	public enum TimerState {STOPPED, PAUSED, RUNNING};
 
@@ -56,14 +68,20 @@ public class StopwatchTextView implements Runnable {
 
 	private int currScale;
 
-	public StopwatchTextView(TextView widget, long updateInterval) {
+	private final HandlerThread handlerThread;
+
+	private Activity activity;
+
+	public StopwatchTextView(TextView widget, long updateInterval, Activity activity) {
 		this.widget = widget;
 		this.updateInterval = updateInterval;
 		time = 0;
 		startTime = 0;
 		state = TimerState.STOPPED;
-		
-		handler = new Handler();
+		handlerThread = new HandlerThread("StopwatchThread");
+		handlerThread.start();
+		handler = new Handler(handlerThread.getLooper());
+		this.activity = activity;
 	}
 
 	// don't call this directly
@@ -73,7 +91,7 @@ public class StopwatchTextView implements Runnable {
 		long millis = time - startTime;
 		long seconds = (long) (millis / 1000);
 
-		widget.setText(String.format(Locale.getDefault(), "%02d:%02d.%03d", seconds / 60, seconds % 60, millis % 1000));
+		activity.runOnUiThread(() -> widget.setText(String.format(Locale.getDefault(), "%02d:%02d.%03d", seconds / 60, seconds % 60, millis % 1000)));
 
 		if (updateListener != null) {
 			currScale += 1;
@@ -188,4 +206,6 @@ public class StopwatchTextView implements Runnable {
 	public interface OnTimeUpdateListener{
 		void onTimeUpdate(long elapsedTime);
 	}
+
+
 }
