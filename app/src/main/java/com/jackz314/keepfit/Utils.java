@@ -9,6 +9,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
 
+import androidx.core.util.PatternsCompat;
 import androidx.preference.PreferenceManager;
 
 import com.facebook.AccessToken;
@@ -257,7 +258,7 @@ public class Utils {
     }
 
     public static boolean isValidEmail(CharSequence charSequence){
-        return Patterns.EMAIL_ADDRESS.matcher(charSequence).matches();
+        return PatternsCompat.EMAIL_ADDRESS.matcher(charSequence).matches();
     }
 
     // from https://stackoverflow.com/a/21333739/8170714
