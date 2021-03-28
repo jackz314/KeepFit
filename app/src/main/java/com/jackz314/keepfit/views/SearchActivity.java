@@ -86,7 +86,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
                 User user = searchResult.getUser();
                 Intent in = new Intent(this, UserProfileActivity.class);
-                in.putExtra("other",user);
+                in.putExtra(GlobalConstants.USER_PROFILE,user);
                 startActivity(in);
             }
             else{

@@ -284,7 +284,7 @@ public class UserInfoFragment extends Fragment {
                         DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
                 b.userBiographyText.setText(user.getBiography());
 
-                Glide.with(b.getRoot())
+                Glide.with(b.userProfilePicture)
                         .load(Utils.getHighResProfilePicUrl())
                         .fitCenter()
                         .placeholder(R.drawable.ic_outline_account_circle_24)

@@ -9,6 +9,7 @@ import android.util.Base64;
 import android.util.Log;
 import android.util.Patterns;
 
+import androidx.core.util.PatternsCompat;
 import androidx.preference.PreferenceManager;
 
 import com.facebook.AccessToken;
@@ -257,7 +258,7 @@ public class Utils {
     }
 
     public static boolean isValidEmail(CharSequence charSequence){
-        return Patterns.EMAIL_ADDRESS.matcher(charSequence).matches();
+        return PatternsCompat.EMAIL_ADDRESS.matcher(charSequence).matches();
     }
 
     // from https://stackoverflow.com/a/21333739/8170714
@@ -301,19 +302,21 @@ public class Utils {
     }
 
     // from https://stackoverflow.com/a/40487511/8170714
-    public static String toHumanReadableFormat(Duration duration) {
-        return duration.toString()
-                .substring(2)
-                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
-                .toLowerCase();
-    }
+//    public static String toHumanReadableFormat(Duration duration) {
+//        return duration.toString()
+//                .substring(2)
+//                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+//                .toLowerCase();
+//    }
 
     public static String centimeterToFeet(double centemeter) {
+        if (centemeter < 0) return "";
         int feetPart = 0;
         int inchesPart = 0;
         feetPart = (int) Math.floor((centemeter / 2.54) / 12);
-        System.out.println((centemeter / 2.54) - (feetPart * 12));
+//        System.out.println((centemeter / 2.54) - (feetPart * 12));
         inchesPart = (int) Math.ceil((centemeter / 2.54) - (feetPart * 12));
+        if (inchesPart == 0) return feetPart + "'";
         return String.format(Locale.US, "%d' %d''", feetPart, inchesPart);
     }
 

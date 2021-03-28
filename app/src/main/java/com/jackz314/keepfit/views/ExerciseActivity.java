@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -39,6 +40,10 @@ public class ExerciseActivity extends AppCompatActivity {
     private ExerciseController exerciseController;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    private boolean doubleBackToExitPressedOnce = false;
+
+    private String exerciseType;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,7 +82,7 @@ public class ExerciseActivity extends AppCompatActivity {
         });
         compositeDisposable.add(disposable);
 
-        String exerciseType = getIntent().getStringExtra(GlobalConstants.EXERCISE_TYPE);
+        exerciseType = getIntent().getStringExtra(GlobalConstants.EXERCISE_TYPE);
         if (exerciseType != null) exerciseType = Utils.toTitleCase(exerciseType);
         b.exerciseTitle.setText(exerciseType);
 
@@ -99,15 +104,29 @@ public class ExerciseActivity extends AppCompatActivity {
             }
         });
 
-        String finalExerciseType = exerciseType;
-        b.exerciseStopBtn.setOnClickListener(v -> {
-            long elapsedTime = stopwatch.getElapsedTime();
-            stopwatch.stop();
-            exerciseController.uploadExercise(finalExerciseType, elapsedTime);
-            Toast.makeText(this, "You exercised for " + String.format(Locale.getDefault(),
-                    "%d minutes", TimeUnit.MILLISECONDS.toMinutes(elapsedTime)), Toast.LENGTH_SHORT).show();
-            finish();
-        });
+        b.exerciseStopBtn.setOnClickListener(v -> finishExercise());
+    }
+
+    private void finishExercise() {
+        long elapsedTime = stopwatch.getElapsedTime();
+        stopwatch.stop();
+        exerciseController.uploadExercise(exerciseType, elapsedTime);
+        Toast.makeText(this, "You exercised for " + String.format(Locale.getDefault(),
+                "%d minutes", TimeUnit.MILLISECONDS.toMinutes(elapsedTime)), Toast.LENGTH_SHORT).show();
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (doubleBackToExitPressedOnce) {
+            finishExercise();
+            return;
+        }
+
+        this.doubleBackToExitPressedOnce = true;
+        Toast.makeText(this, "Press again to stop exercising", Toast.LENGTH_SHORT).show();
+
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce=false, 2000);
     }
 
     @Override

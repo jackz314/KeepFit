@@ -2,6 +2,8 @@ package com.jackz314.keepfit.models;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -160,5 +162,10 @@ public class User implements Serializable {
                 ", weight=" + weight +
                 ", sex=" + sex +
                 '}';
+    }
+
+    @NonNull
+    public User copy() {
+        return new User(uid, biography, email, name, profilePic, birthday, height, weight, sex);
     }
 }
