@@ -14,7 +14,9 @@ import us.zoom.sdk.ZoomApiError
 import us.zoom.sdk.ZoomAuthenticationError
 import us.zoom.sdk.ZoomSDK
 import us.zoom.sdk.ZoomSDKAuthenticationListener
+import java.net.URL
 import java.time.Duration
+import java.util.*
 import javax.security.auth.login.LoginException
 
 private const val TAG = "UtilsKt"
@@ -111,7 +113,8 @@ object UtilsKt {
 
     @JvmStatic
     fun createLivestream(link: String, title: String, exerciseCategories: String, thumbnail: String = "") {
-        val categories = exerciseCategories.split(",").map { it.trim() }
+        if (link.trim().isEmpty() || !isValidUrl(link)) return
+        val categories = exerciseCategories.split(",").map { it.trim().capitalize(Locale.getDefault()) }
         Log.d(TAG, "createLivestream: link: $link, categories: $categories, title: $title, thumbnail: $thumbnail")
         val db = FirebaseFirestore.getInstance()
         val docData = hashMapOf(
@@ -131,6 +134,7 @@ object UtilsKt {
 
     @JvmStatic
     fun removeLivestream(link: String) {
+        if (link.trim().isEmpty() || !isValidUrl(link)) return
         Log.d(TAG, "removeLivestream: link: $link")
         val db = FirebaseFirestore.getInstance()
         val livestreamDoc = db.collection("media").document(Utils.getMD5(link))
@@ -203,6 +207,16 @@ object UtilsKt {
             return@continueWithTask if (task.isSuccessful) {
                 UserControllerKt.currentUserDoc.delete()
             } else Tasks.forException(task.exception?:Exception("Original exception was null"))
+        }
+    }
+
+    @JvmStatic
+    fun isValidUrl(url: String): Boolean {
+        return try {
+            URL(url).toURI();
+            true
+        } catch (e: Exception) {
+            false
         }
     }
 }

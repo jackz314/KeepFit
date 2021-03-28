@@ -73,7 +73,11 @@ class Media(doc: DocumentSnapshot): Serializable {
 
     fun getDetailString(): String {
         val creator = creator.value ?: User()
-        val startTimeStr = startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }
+        val startTimeStr = startTime?.let {
+            var relativeTimeSpanString = DateUtils.getRelativeTimeSpanString(it.time)
+            if (relativeTimeSpanString.equals("0 minutes ago")) relativeTimeSpanString = "just now"
+            relativeTimeSpanString
+        }
         if (isLivestream) return "${creator.name} · ${viewCount} watching · Started $startTimeStr"
         else return "${creator.name} · ${viewCount} views · $startTimeStr"
     }

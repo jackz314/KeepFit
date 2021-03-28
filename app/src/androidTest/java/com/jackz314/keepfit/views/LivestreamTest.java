@@ -2,7 +2,6 @@ package com.jackz314.keepfit.views;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -15,9 +14,10 @@ import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.jackz314.keepfit.GlobalConstants;
+import com.google.firebase.auth.FirebaseAuth;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
+import com.jackz314.keepfit.UtilsKt;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -26,6 +26,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.Objects;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -40,12 +42,13 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.jackz314.keepfit.helper.RecyclerViewItemCountAssertion.withItemCount;
 import static com.jackz314.keepfit.helper.RecyclerViewMatcher.withRecyclerView;
 import static org.hamcrest.Matchers.allOf;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class ExerciseTest {
+public class LivestreamTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mainActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -61,81 +64,74 @@ public class ExerciseTest {
     }
 
     @Test
-    public void exerciseCompleteFlow() throws InterruptedException {
+    public void livestreamFlow() throws InterruptedException {
 //        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 //        instrumentation.waitForIdleSync();
 
-        // open fab menu
-        ViewInteraction cardView = onView(
-                allOf(withId(R.id.fab_card),
-                        childAtPosition(
-                                allOf(withId(R.id.container),
-                                        childAtPosition(
-                                                withId(R.id.main_action_btn),
-                                                0)),
-                                1),
-                        isDisplayed()));
-        cardView.perform(click());
+        String link = "https://usc.zoom.us/j/8888888888";
+        String title = "Test Livestream Pgxqc4KqCt";
+        UtilsKt.createLivestream(link, title, "Cool, fun, test", "");
 
-        ViewInteraction linearLayout = onView(
-                allOf(childAtPosition(
-                        allOf(withId(R.id.container),
-                                childAtPosition(
-                                        withId(R.id.main_action_btn),
-                                        0)),
-                        2),
-                        isDisplayed()));
-        linearLayout.perform(click());
-
-        // enter prompt info
-        ViewInteraction appCompatEditText = onView(
-                allOf(withId(R.id.prompt_category),
-                        childAtPosition(
-                                allOf(withId(R.id.container),
-                                        childAtPosition(
-                                                withId(android.R.id.content),
-                                                0)),
-                                1),
-                        isDisplayed()));
-        appCompatEditText.perform(replaceText("Test"), closeSoftKeyboard());
-
-        ViewInteraction chip = onView(
-                allOf(withId(R.id.prompt_intensity_low), withText("Light"),
-                        childAtPosition(
-                                allOf(withId(R.id.prompt_exercise_intensity),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                5)),
-                                0),
-                        isDisplayed()));
-        chip.perform(click());
-
-        onView(withId(R.id.prompt_start_btn)).perform(click());
-
-        ViewInteraction stopBtn = onView(withId(R.id.exercise_stop_btn));
-        stopBtn.check(matches(isDisplayed()));
-        Thread.sleep(1000);
-        stopBtn.perform(click());
-
-        ViewInteraction bottomNavigationItemView2 = onView(
-                allOf(withId(R.id.navigation_me), withContentDescription("Me"),
+        ViewInteraction bottomNavigationItemView = onView(
+                allOf(withId(R.id.navigation_feed), withContentDescription("Feed"),
                         childAtPosition(
                                 childAtPosition(
                                         withId(R.id.nav_view),
                                         0),
-                                1),
+                                0),
                         isDisplayed()));
-        bottomNavigationItemView2.perform(click());
+        bottomNavigationItemView.perform(click());
 
-        // verify exercise is recorded in log
-        onView(withId(R.id.exercise_log_recycler)).check(withItemCount(greaterThanOrEqualTo(1)));
-        ViewInteraction newExerciseEntry = onView(withRecyclerView(R.id.exercise_log_recycler).atPosition(0));
-        newExerciseEntry.check(matches(hasDescendant(withText("Test"))));
+        Thread.sleep(2000);
 
-        // click into detail and delete
-        newExerciseEntry.perform(click());
+        onView(withId(R.id.feed_recycler)).check(withItemCount(greaterThanOrEqualTo(1)));
+        ViewInteraction livestreamEntry = onView(withRecyclerView(R.id.feed_recycler).atPosition(0));
+        livestreamEntry.check(matches(hasDescendant(withText(title))));
+        livestreamEntry.check(matches(hasDescendant(withText("LIVE"))));
+        String displayName = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
+        if(displayName != null && !displayName.trim().isEmpty())
+            livestreamEntry.check(matches(hasDescendant(withText(containsString(displayName)))));
 
-        onView(withId(R.id.delete_exercise_btn)).check(matches(isDisplayed())).perform(click());
+        UtilsKt.removeLivestream(link);
+
+        Thread.sleep(1000);
+
+        ViewInteraction newLivestreamEntry = onView(withRecyclerView(R.id.feed_recycler).atPosition(0));
+        newLivestreamEntry.check(matches(not(hasDescendant(withText(title)))));
+    }
+
+    @Test
+    public void livestreamValidation() throws InterruptedException {
+//        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
+//        instrumentation.waitForIdleSync();
+
+        String link = ""; // empty, shouldn't add
+        String title = "Test Livestream XtUazgCDc9";
+        UtilsKt.createLivestream(link, title, "Cool, fun, test", "");
+
+        ViewInteraction bottomNavigationItemView = onView(
+                allOf(withId(R.id.navigation_feed), withContentDescription("Feed"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.nav_view),
+                                        0),
+                                0),
+                        isDisplayed()));
+        bottomNavigationItemView.perform(click());
+
+        Thread.sleep(2000);
+
+        ViewInteraction livestreamEntry = onView(withRecyclerView(R.id.feed_recycler).atPosition(0));
+        livestreamEntry.check(matches(hasDescendant(not(withText(title)))));
+
+        link = "AUSHFJASVIOSJ";
+        title = "Test Livestream sx3naxtFhp";
+        UtilsKt.createLivestream(link, title, "Cool, fun, test", "");
+
+        Thread.sleep(1500);
+
+        ViewInteraction newLivestreamEntry = onView(withRecyclerView(R.id.feed_recycler).atPosition(0));
+        newLivestreamEntry.check(matches(hasDescendant(not(withText(title)))));
     }
 
     private static Matcher<View> childAtPosition(
