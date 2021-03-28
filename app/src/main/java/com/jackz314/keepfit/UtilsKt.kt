@@ -22,11 +22,12 @@ private const val TAG = "UtilsKt"
 object UtilsKt {
     @JvmStatic
     fun formatDurationString(duration: Long?): String {
-        if (duration == null) return "0:00"
+        if (duration == null || duration < 0) return "0:00"
         val d = Duration.ofSeconds(duration)
         val hrs = d.toHours()
-        val mins = d.minusHours(hrs).toMinutes()
-        val secs = d.minusMinutes(mins).seconds
+        val minusHours = d.minusHours(hrs)
+        val mins = minusHours.toMinutes()
+        val secs = minusHours.minusMinutes(mins).seconds
         return if (hrs > 0){
             "${hrs}:${"%02d".format(mins)}:${"%02d".format(secs)}"
         } else {
