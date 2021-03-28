@@ -48,7 +48,7 @@ import static org.hamcrest.Matchers.is;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class HighLevelFlowTest {
+public class ExerciseTest {
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -64,7 +64,7 @@ public class HighLevelFlowTest {
     }
 
     @Test
-    public void exerciseFlow() throws InterruptedException {
+    public void exerciseCompleteFlow() throws InterruptedException {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 //        instrumentation.waitForIdleSync();
 
