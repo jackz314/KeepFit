@@ -28,6 +28,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.TestIdlingResource;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.UserControllerKt;
@@ -72,6 +73,7 @@ class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        TestIdlingResource.increment();
         FirebaseApp.initializeApp(this);
         checkAndRequireGooglePlayService();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -209,6 +211,7 @@ class MainActivity extends AppCompatActivity {
         //no need to change action bar titles
 //        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
+        TestIdlingResource.decrement();
     }
 
     private void checkAndRequireGooglePlayService() {
