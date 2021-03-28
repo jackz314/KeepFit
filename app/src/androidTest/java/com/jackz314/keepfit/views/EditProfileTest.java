@@ -42,7 +42,7 @@ public class EditProfileTest {
 
     @Test
     public void editProfileEmptyInputTest() throws InterruptedException {
-        Thread.sleep(6000);
+        Thread.sleep(3000);
         ViewInteraction actionMenuItemView = onView(
                 allOf(withId(R.id.edit_profile_btn), withContentDescription("Edit Profile"),
                         isDisplayed()));
@@ -67,7 +67,7 @@ public class EditProfileTest {
                 allOf(withId(R.id.finish_new_user_btn), withText("Done"),
                         isDisplayed()));
         materialButton.perform(click());
-        Thread.sleep(5000);
+        Thread.sleep(3000);
         ViewInteraction actionMenuItemView2 = onView(
                 allOf(withId(R.id.edit_profile_btn), withContentDescription("Edit Profile"),
                         isDisplayed()));
@@ -77,6 +77,11 @@ public class EditProfileTest {
                 allOf(withId(R.id.finish_new_user_btn), withText("Done"),
                         isDisplayed()));
         materialButton2.perform(click());
+        Thread.sleep(5000);
+        ViewInteraction textView = onView(
+                allOf(withId(R.id.user_biography_text),
+                        isDisplayed()));
+        textView.check(matches(withText("hey")));
     }
 
     @Test
