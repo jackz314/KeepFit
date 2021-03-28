@@ -26,6 +26,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.databinding.ActivitySearchBinding;
@@ -72,7 +73,7 @@ public class FollowingFragment extends Fragment  {
             SearchResult searchResult = followingList.get(position);
             User user = searchResult.getUser();
             Intent in = new Intent(requireActivity(), UserProfileActivity.class);
-            in.putExtra("other",user);
+            in.putExtra(GlobalConstants.USER_PROFILE,user);
             startActivity(in);
         });
     }

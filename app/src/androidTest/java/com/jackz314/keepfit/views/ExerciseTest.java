@@ -2,7 +2,6 @@ package com.jackz314.keepfit.views;
 
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -15,7 +14,9 @@ import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-import com.jackz314.keepfit.GlobalConstants;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
 
@@ -26,6 +27,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -42,6 +45,7 @@ import static com.jackz314.keepfit.helper.RecyclerViewMatcher.withRecyclerView;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -53,11 +57,18 @@ public class ExerciseTest {
     private IdlingResource idlingResource;
 
     @Before
-    public void beforeClass() {
+    public void before() {
         final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 //        FirebaseApp.initializeApp(context);
         idlingResource = TestIdlingResource.countingIdlingResource;
         IdlingRegistry.getInstance().register(idlingResource);
+    }
+
+    @Test
+    public void testFirestore() throws ExecutionException, InterruptedException {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentSnapshot ds = Tasks.await(db.collection("users").document("sample_user_1").get());
+        assertTrue(ds.exists());
     }
 
     @Test

@@ -204,7 +204,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
 
         holder.profilePic.setOnClickListener(v -> {
             Intent in = new Intent(v.getContext(), UserProfileActivity.class);
-            in.putExtra("other", creator);
+            in.putExtra(GlobalConstants.USER_PROFILE, creator);
             v.getContext().startActivity(in);
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
         });
