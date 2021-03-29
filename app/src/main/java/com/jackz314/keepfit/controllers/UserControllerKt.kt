@@ -42,13 +42,11 @@ object UserControllerKt {
 
     @JvmStatic
     fun likeVideo(uid: String) {
-        val db = FirebaseFirestore.getInstance()
         currentUserDoc.collection("liked_videos").document(uid).set(hashMapOf("liked_time" to FieldValue.serverTimestamp()))
     }
 
     @JvmStatic
     fun unlikeVideo(uid: String) {
-        val db = FirebaseFirestore.getInstance()
         currentUserDoc.collection("liked_videos").document(uid).delete()
     }
 
