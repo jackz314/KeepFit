@@ -3,6 +3,7 @@ package com.jackz314.keepfit.views;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +33,8 @@ import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -104,7 +107,7 @@ public class VideosFragment extends Fragment {
                                 for (QueryDocumentSnapshot doc : value) {
                                     DocumentSnapshot mediaDoc = Tasks.await(doc.getDocumentReference("ref").get());
                                     Media media = new Media(mediaDoc);
-                                    if (media.getUid().isEmpty()) {
+                                    if (TextUtils.isEmpty(media.getUid())) {
                                         doc.getReference().delete();
                                         continue;
                                     }
@@ -113,6 +116,8 @@ public class VideosFragment extends Fragment {
                             } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
                                 executionException.printStackTrace();
                             }
+
+                            videosList.sort(Collections.reverseOrder(Comparator.comparing(Media::getStartTime)));
 
                             if (b != null && getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
