@@ -1,6 +1,8 @@
 package com.jackz314.keepfit.views;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -8,9 +10,11 @@ import android.view.ViewParent;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.helper.Helper;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -18,6 +22,8 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -35,11 +41,15 @@ import static org.hamcrest.Matchers.allOf;
 public class LogoutTest {
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class, true, false);
 
     @Test
-    public void logoutTest() throws InterruptedException {
-        Thread.sleep(1000);
+    public void logoutTest() throws InterruptedException, ExecutionException {
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Helper.signOut(appContext);
+        Helper.signIn("logouttest@gmail.com", "123456");
+        mActivityTestRule.launchActivity(new Intent());
+        Thread.sleep(2000);
         ViewInteraction actionMenuItemView = onView(
                 allOf(withId(R.id.sign_out_btn), withContentDescription("Sign Out"),
                         childAtPosition(
