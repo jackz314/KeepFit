@@ -88,12 +88,11 @@ public class UserInfoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //        View root = inflater.inflate(R.layout.fragment_me, container, false);
-        authStateListener = auth -> populateUserInfo();
-
         if (b == null){
             // view binding ftw!
             b = FragmentUserInfoBinding.inflate(inflater, container, false);
 
+            authStateListener = auth -> populateUserInfo();
             FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
             // exercise stuff
