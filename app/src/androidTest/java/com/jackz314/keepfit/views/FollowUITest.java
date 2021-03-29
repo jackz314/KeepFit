@@ -51,7 +51,7 @@ import static org.hamcrest.Matchers.is;
 @RunWith(AndroidJUnit4.class)
 public class FollowUITest {
 
-    private IdlingResource idlingResource;
+  private IdlingResource idlingResource;
 
     @Before
     public void beforeClass() throws Exception {
@@ -59,7 +59,6 @@ public class FollowUITest {
         idlingResource = TestIdlingResource.countingIdlingResource;
         IdlingRegistry.getInstance().register(idlingResource);
     }
-
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
@@ -76,19 +75,17 @@ public class FollowUITest {
                         isDisplayed()));
         actionMenuItemView.perform(click());
 
-        Thread.sleep(1000);
         ViewInteraction searchAutoComplete = onView(
                 allOf(withClassName(is("android.widget.SearchView$SearchAutoComplete")),
                         isDisplayed()));
-
         searchAutoComplete.perform(replaceText("a"), closeSoftKeyboard());
 
         ViewInteraction searchAutoComplete2 = onView(
-                allOf(withClassName(is("android.widget.SearchView$SearchAutoComplete")), withText("a"),
+                allOf(withText("a"),
                         isDisplayed()));
         searchAutoComplete2.perform(pressImeActionButton());
 
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         ViewInteraction recyclerView = onView(
                 allOf(withId(R.id.search_recycler),
                         childAtPosition(
@@ -96,8 +93,17 @@ public class FollowUITest {
                                 2)));
         recyclerView.perform(actionOnItemAtPosition(1, click()));
 
-        Boolean following;
+        pressBack();
 
+        ViewInteraction recyclerView2 = onView(
+                allOf(withId(R.id.search_recycler),
+                        childAtPosition(
+                                withClassName(is("androidx.constraintlayout.widget.ConstraintLayout")),
+                                2)));
+        recyclerView2.perform(actionOnItemAtPosition(0, click()));
+
+        Boolean following;
+        Thread.sleep(3000);
         try {
             //currently not following user
             onView(allOf(
@@ -122,6 +128,8 @@ public class FollowUITest {
                     withId(R.id.followButton), withText("-")
             )).check(matches(isDisplayed()));
         }
+
+
     }
 
     private static Matcher<View> childAtPosition(
