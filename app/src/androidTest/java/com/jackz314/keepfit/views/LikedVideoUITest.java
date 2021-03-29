@@ -16,6 +16,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
+import com.jackz314.keepfit.helper.Helper;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -68,6 +69,7 @@ public class LikedVideoUITest {
 
         ViewInteraction likeButton = onView(withRecyclerView(R.id.feed_recycler).atPositionOnView(0, R.id.feed_like_button));
         likeButton.perform(click());
+        String likedTitle = Helper.getTextfromTextView(withRecyclerView(R.id.feed_recycler).atPositionOnView(0, R.id.feed_title_text));
 
         ViewInteraction bottomNavigationItemView2 = onView(
                 allOf(withId(R.id.navigation_me), withContentDescription("Me"),
@@ -89,12 +91,11 @@ public class LikedVideoUITest {
                         isDisplayed()));
         tabView.perform(click());
 
-        ViewInteraction textView = onView(
-                allOf(withId(R.id.feed_title_text), withText("PlayTest"),
-                        withParent(allOf(withId(R.id.constraintLayout),
-                                withParent(withId(R.id.feed_recycler)))),
-                        isDisplayed()));
-        textView.check(matches(withText("PlayTest")));
+        onView(withRecyclerView(R.id.feed_recycler).atPositionOnView(0, R.id.feed_title_text))
+                .check(matches(withText(likedTitle)));
+
+        onView(withRecyclerView(R.id.feed_recycler).atPositionOnView(0, R.id.feed_like_button))
+                .perform(click()); // unlike
     }
 
     private static Matcher<View> childAtPosition(
