@@ -76,6 +76,8 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -183,7 +185,7 @@ public class UploadVideoTest {
         materialButton3.perform(click());
 
         // Wait for the file to be uploaded
-        Thread.sleep(4000);
+        Thread.sleep(10000);
 
 
         // Check if the uploaded file exists in firebase
@@ -199,10 +201,10 @@ public class UploadVideoTest {
                             if(task.getResult().size() > 0){
 
                                 Log.d(TAG, "FOUND! ");
-                                assertEquals(true,true);
+                                assertTrue(true);
                             }
                             else{
-                                assertEquals(true,false);
+                                fail();
                             }
                         }
                         else {
@@ -211,7 +213,7 @@ public class UploadVideoTest {
                     }
                 });
 
-
+        Thread.sleep(2000);
     }
 
     private static Matcher<View> childAtPosition(

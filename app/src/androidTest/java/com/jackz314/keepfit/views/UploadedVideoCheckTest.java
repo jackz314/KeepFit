@@ -160,7 +160,7 @@ public class UploadedVideoCheckTest {
         materialButton3.perform(click());
 
         // Wait for the file to be uploaded
-        Thread.sleep(4000);
+        Thread.sleep(10000);
 
 
         // Check if the uploaded file exists in firebase
