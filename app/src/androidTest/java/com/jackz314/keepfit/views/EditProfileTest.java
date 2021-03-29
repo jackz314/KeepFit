@@ -63,9 +63,7 @@ public class EditProfileTest {
                         isDisplayed()));
         appCompatEditText3.perform(pressImeActionButton());
 
-        ViewInteraction materialButton = onView(
-                allOf(withId(R.id.finish_new_user_btn), withText("Done"),
-                        isDisplayed()));
+        ViewInteraction materialButton = onView(withId(R.id.finish_new_user_btn));
         materialButton.perform(click());
         Thread.sleep(3000);
         ViewInteraction actionMenuItemView2 = onView(

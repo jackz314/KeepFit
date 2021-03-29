@@ -106,7 +106,7 @@ public class DeleteAccountTest {
                                 3)));
         materialButton3.perform(scrollTo(), click());
 
-        Thread.sleep(3000);
+        Thread.sleep(1500);
 
         Tasks.await(Helper.createTempAccount(testemail, testpassword));
 

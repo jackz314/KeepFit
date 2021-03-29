@@ -147,7 +147,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
             user.put("sex", sex);
             user.put("weight", weight);
 
-            if (!mFirebaseUser.getDisplayName().equals(strUsername)) {
+            if (!strUsername.equals(mFirebaseUser.getDisplayName())) {
                 mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(strUsername).build());
             }
 
