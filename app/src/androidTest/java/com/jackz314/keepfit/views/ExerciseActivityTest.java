@@ -35,7 +35,7 @@ import static org.hamcrest.Matchers.equalToIgnoringCase;
 public class ExerciseActivityTest {
 
     @Rule
-    public ActivityTestRule<ExerciseActivity> exerciseActivityTestRule = new ActivityTestRule<>(ExerciseActivity.class, false, false);
+    public ActivityTestRule<ExerciseActivity> exerciseActivityTestRule = new ActivityTestRule<>(ExerciseActivity.class, true, false);
 
     @Test
     public void exercisePromptCategory() {

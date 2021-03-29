@@ -1,22 +1,27 @@
 package com.jackz314.keepfit.views;
 
 
-import android.util.Log;
+import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import androidx.annotation.NonNull;
+import androidx.test.espresso.NoMatchingRootException;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
+import com.firebase.ui.auth.AuthUI;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.helper.Helper;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -25,45 +30,64 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.concurrent.ExecutionException;
+
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
 public class DeleteAccountTest {
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
     private static final String TAG = "DeleteAccountTest";
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class, true, false);
 
     @Test
-    public void deleteAccountTest() throws InterruptedException {
-        Thread.sleep(1000);
-        ViewInteraction overflowMenuButton = onView(
-                allOf(withContentDescription("More options"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
-                                2),
-                        isDisplayed()));
-        overflowMenuButton.perform(click());
+    public void deleteAccountTest() throws InterruptedException, ExecutionException {
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        FirebaseApp.initializeApp(appContext);
+        try {
+            Tasks.await(Helper.createTempAccount("deletethis@gmail.com", "delete"));
+        } catch (ExecutionException | InterruptedException e) {
+            Tasks.await(FirebaseAuth.getInstance().signInWithEmailAndPassword("deletethis@gmail.com", "delete"));
+        }
+        String oldUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+//        Tasks.await(AuthUI.getInstance().signOut(appContext));
+//        Tasks.await(AuthUI.getInstance().silentSignIn(appContext, Collections.singletonList(new AuthUI.IdpConfig.EmailBuilder().build())));
+
+        mActivityTestRule.launchActivity(new Intent());
+
+        Thread.sleep(2000);
+
+        try {
+            ViewInteraction overflowMenuButton = onView(
+                    allOf(withContentDescription("More options"),
+                            childAtPosition(
+                                    childAtPosition(
+                                            withId(R.id.action_bar),
+                                            1),
+                                    2),
+                            isDisplayed()));
+            overflowMenuButton.perform(click());
+        } catch (NoMatchingRootException ignored){
+            pressBack();
+            Thread.sleep(1000);
+        }
 
         ViewInteraction materialTextView = onView(
                 allOf(withId(R.id.title), withText("Delete Account"),
@@ -84,35 +108,15 @@ public class DeleteAccountTest {
                                 3)));
         materialButton3.perform(scrollTo(), click());
 
-        Thread.sleep(5000);
-        ViewInteraction button = onView(
-                allOf(withId(R.id.email_button), withText("Sign in with email"),
-                        withParent(allOf(withId(R.id.btn_holder),
-                                withParent(withId(R.id.container)))),
-                        isDisplayed()));
-        button.check(matches(isDisplayed()));
+        Thread.sleep(3000);
 
-        db.collection("users")
-                .whereEqualTo("email", "newuser@gmail.com")
-                .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "SUCCESS! " + task.getResult().size());
+        Tasks.await(FirebaseAuth.getInstance().createUserWithEmailAndPassword("createthis@gmail.com", "create"));
 
-                            if(task.getResult().size() == 0){
-                                assertEquals(true,true);
-                            }
-                            else{
-                                assertEquals(true,false);
-                            }
-                        }
-                        else {
-                            Log.d(TAG, "Error deleting: ", task.getException());
-                        }
-                    }
-                });
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentSnapshot ds = Tasks.await(db.collection("users").document(oldUid).get());
+        assertFalse(ds.exists());
+
+        Tasks.await(FirebaseAuth.getInstance().getCurrentUser().delete());
     }
 
     private static Matcher<View> childAtPosition(
