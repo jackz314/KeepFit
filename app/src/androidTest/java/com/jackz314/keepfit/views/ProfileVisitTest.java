@@ -2,6 +2,7 @@ package com.jackz314.keepfit.views;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -15,16 +16,25 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
 
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
+import com.jackz314.keepfit.helper.Helper;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onData;
 import static androidx.test.espresso.Espresso.onView;
@@ -46,6 +56,7 @@ import static com.jackz314.keepfit.helper.RecyclerViewMatcher.withRecyclerView;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -55,18 +66,40 @@ public class ProfileVisitTest {
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     private IdlingResource idlingResource;
+    private String testemail;
+    private String testpassword;
+    private String oldUid;
 
     @Before
-    public void before() {
+    public void before() throws ExecutionException, InterruptedException {
         final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 //        FirebaseApp.initializeApp(context);
         idlingResource = (IdlingResource) TestIdlingResource.countingIdlingResource;
         IdlingRegistry.getInstance().register(idlingResource);
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        FirebaseApp.initializeApp(appContext);
+        testemail = "searchtest@gmail.com";
+        testpassword = "search";
+        Tasks.await(Helper.createTempAccount(testemail, testpassword));
+        oldUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+    }
+
+    @After
+    public void after() throws ExecutionException, InterruptedException {
+        Tasks.await(Helper.createTempAccount(testemail, testpassword));
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentSnapshot ds = Tasks.await(db.collection("users").document(oldUid).get());
+//        assertFalse(ds.exists());
     }
 
     @Test
-    public void visitFromFeed() throws InterruptedException {
+    public void visitFromFeed() throws InterruptedException, ExecutionException {
 
+//        Tasks.await(AuthUI.getInstance().signOut(appContext));
+//        Tasks.await(AuthUI.getInstance().silentSignIn(appContext, Collections.singletonList(new AuthUI.IdpConfig.EmailBuilder().build())));
+
+        mActivityTestRule.launchActivity(new Intent());
 
         ViewInteraction bottomNavigationItemView = onView(
                 allOf(withId(R.id.navigation_feed), withContentDescription("Feed"),
@@ -107,6 +140,8 @@ public class ProfileVisitTest {
                 )
         );
         checkProfile.check(matches(isDisplayed()));
+
+
     }
 
 
