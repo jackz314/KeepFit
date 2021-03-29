@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
+import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -44,6 +45,7 @@ import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
@@ -149,7 +151,7 @@ public class UploadVideoTest {
         materialButton3.perform(click());
 
         // Wait for the file to be uploaded
-        Thread.sleep(5000);
+        Thread.sleep(4000);
 
 
         // Check if the uploaded file exists in firebase
@@ -177,6 +179,62 @@ public class UploadVideoTest {
                     }
                 });
 
+        ViewInteraction bottomNavigationItemView = onView(
+                allOf(withId(R.id.navigation_feed), withContentDescription("Feed"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.nav_view),
+                                        0),
+                                0),
+                        isDisplayed()));
+        bottomNavigationItemView.perform(click());
+
+        instrumentation.waitForIdleSync();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.feed_recycler)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(curString)), click()));
+
+        pressBack();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction bottomNavigationItemView2 = onView(
+                allOf(withId(R.id.navigation_me), withContentDescription("Me"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.nav_view),
+                                        0),
+                                1),
+                        isDisplayed()));
+        bottomNavigationItemView2.perform(click());
+
+        ViewInteraction tabView = onView(
+                allOf(withContentDescription("My Videos"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.me_tab_layout),
+                                        0),
+                                1),
+                        isDisplayed()));
+        tabView.perform(click());
+
+        instrumentation.waitForIdleSync();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.feed_recycler)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(curString)), click()));
     }
 
     private static Matcher<View> childAtPosition(
