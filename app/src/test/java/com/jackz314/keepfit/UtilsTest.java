@@ -21,14 +21,19 @@ public class UtilsTest {
     public void isValidEmail() {
         assertTrue(Utils.isValidEmail("1@2.3"));
         assertTrue(Utils.isValidEmail("abc@gmail.com"));
+        assertTrue(Utils.isValidEmail("_@b.com"));
         assertFalse(Utils.isValidEmail("abc@gmailcom"));
         assertFalse(Utils.isValidEmail("abcgmail.com"));
         assertFalse(Utils.isValidEmail("@gmail.com"));
         assertFalse(Utils.isValidEmail("@.com"));
+        assertFalse(Utils.isValidEmail(null));
         assertFalse(Utils.isValidEmail(""));
         assertFalse(Utils.isValidEmail(" "));
         assertFalse(Utils.isValidEmail("123gmail.com"));
         assertFalse(Utils.isValidEmail("qegiuwerhgjq89"));
+        assertFalse(Utils.isValidEmail("123 456@gmail.com"));
+        assertFalse(Utils.isValidEmail("123.456@gmail com"));
+        assertFalse(Utils.isValidEmail("123.456@ gmail.com"));
     }
 
     @Test

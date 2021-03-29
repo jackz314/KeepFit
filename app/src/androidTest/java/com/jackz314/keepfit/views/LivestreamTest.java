@@ -14,10 +14,16 @@ import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
+import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.UtilsKt;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -28,6 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -45,6 +52,9 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -64,7 +74,7 @@ public class LivestreamTest {
     }
 
     @Test
-    public void livestreamFlow() throws InterruptedException {
+    public void livestreamFlow() throws InterruptedException, ExecutionException {
 //        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 //        instrumentation.waitForIdleSync();
 
@@ -82,7 +92,7 @@ public class LivestreamTest {
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
 
-        Thread.sleep(2000);
+        Thread.sleep(1500);
 
         onView(withId(R.id.feed_recycler)).check(withItemCount(greaterThanOrEqualTo(1)));
         ViewInteraction livestreamEntry = onView(withRecyclerView(R.id.feed_recycler).atPosition(0));
@@ -92,12 +102,19 @@ public class LivestreamTest {
         if(displayName != null && !displayName.trim().isEmpty())
             livestreamEntry.check(matches(hasDescendant(withText(containsString(displayName)))));
 
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentSnapshot ds = Tasks.await(db.collection("media").document(Utils.getMD5(link)).get());
+        assertTrue(ds.exists());
+        assertEquals(true, ds.getBoolean("is_livestream"));
+
         UtilsKt.removeLivestream(link);
 
         Thread.sleep(1000);
 
         ViewInteraction newLivestreamEntry = onView(withRecyclerView(R.id.feed_recycler).atPosition(0));
         newLivestreamEntry.check(matches(not(hasDescendant(withText(title)))));
+        ds = Tasks.await(db.collection("media").document(Utils.getMD5(link)).get());
+        assertFalse(ds.exists());
     }
 
     @Test
