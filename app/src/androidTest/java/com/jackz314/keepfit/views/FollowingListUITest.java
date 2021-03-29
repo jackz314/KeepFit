@@ -42,6 +42,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static com.jackz314.keepfit.helper.SelectTabAtPositionKt.selectTabAtPosition;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.is;
@@ -115,14 +116,29 @@ public class FollowingListUITest {
                                 2)));
         recyclerView.perform(actionOnItemAtPosition(1, click()));
 
-        ViewInteraction materialButton = onView(
-                allOf(withId(R.id.followButton), withText("+"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                3)));
-        materialButton.perform(scrollTo(), click());
+        try{
+            ViewInteraction materialButton = onView(
+                    allOf(withId(R.id.followButton), withText("+"),
+                            childAtPosition(
+                                    childAtPosition(
+                                            withClassName(is("android.widget.ScrollView")),
+                                            0),
+                                    3)));
+            materialButton.perform(scrollTo(), click());
+        } catch (Exception ignored){
+            ViewInteraction materialButton = onView(
+                    allOf(withId(R.id.followButton),
+                            childAtPosition(
+                                    childAtPosition(
+                                            withClassName(is("android.widget.ScrollView")),
+                                            0),
+                                    3)));
+            materialButton.perform(scrollTo(), click());
+
+            Thread.sleep(400);
+
+            materialButton.perform(scrollTo(), click());
+        }
 
         ViewInteraction appCompatImageButton = onView(
                 allOf(withId(R.id.imageButton), withContentDescription("Exits profile"),
@@ -154,28 +170,9 @@ public class FollowingListUITest {
         bottomNavigationItemView2.perform(click());
 
         Thread.sleep(500);
-        ViewInteraction tabView1 = onView(
-                allOf(withContentDescription("Followers"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.me_tab_layout),
-                                        0),
-                                3),
-                        isDisplayed()));
-        tabView1.perform(click());
+        onView(withId(R.id.me_tab_layout)).perform(selectTabAtPosition(4));
 
-        Thread.sleep(500);
-        ViewInteraction tabView2 = onView(
-                allOf(withContentDescription("Following"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.me_tab_layout),
-                                        0),
-                                4),
-                        isDisplayed()));
-        tabView2.perform(click());
-
-        Thread.sleep(3000);
+        Thread.sleep(1000);
 
         ViewInteraction viewGroup = onView(
                 allOf(withParent(allOf(withId(R.id.search_recycler),

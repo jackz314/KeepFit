@@ -46,7 +46,6 @@ public class LogoutTest {
     @Test
     public void logoutTest() throws InterruptedException, ExecutionException {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        Helper.signOut(appContext);
         Helper.signIn("logouttest@gmail.com", "123456");
         mActivityTestRule.launchActivity(new Intent());
         Thread.sleep(2000);

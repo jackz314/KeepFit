@@ -64,32 +64,32 @@ public class UserController {
     }
 
         public void unfollow(String otherUser) {
-        //remove from
-        UserControllerKt.getCurrentUserDoc()
-                .collection("following")
-                .whereEqualTo("ref", db.collection("users").document(otherUser)).get()
-                .addOnCompleteListener(task -> {
-                    // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
-                    if (task.isSuccessful()) {
-                        List<DocumentSnapshot> removeFollowingList = task.getResult().getDocuments();
-                        for (DocumentSnapshot doc: removeFollowingList) {
-                            doc.getReference().delete();
+            //remove from
+            UserControllerKt.getCurrentUserDoc()
+                    .collection("following")
+                    .whereEqualTo("ref", db.collection("users").document(otherUser)).get()
+                    .addOnCompleteListener(task -> {
+                        // BTW, `getResult()` will throw an exception if the task fails unless you first check for `task.isSuccessful()`
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> removeFollowingList = task.getResult().getDocuments();
+                            for (DocumentSnapshot doc: removeFollowingList) {
+                                doc.getReference().delete();
+                            }
                         }
-                    }
-                });
+                    });
 
-        db.collection("users")
-                .document(otherUser)
-                .collection("followers")
-                .whereEqualTo("ref", UserControllerKt.getCurrentUserDoc()).get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        List<DocumentSnapshot> removeFollowerList = task.getResult().getDocuments();
-                        for (DocumentSnapshot doc: removeFollowerList) {
-                            doc.getReference().delete();
+            db.collection("users")
+                    .document(otherUser)
+                    .collection("followers")
+                    .whereEqualTo("ref", UserControllerKt.getCurrentUserDoc()).get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            List<DocumentSnapshot> removeFollowerList = task.getResult().getDocuments();
+                            for (DocumentSnapshot doc: removeFollowerList) {
+                                doc.getReference().delete();
+                            }
                         }
-                    }
-                });
+                    });
 
     }
 

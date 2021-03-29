@@ -20,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.SimpleCountingIdlingResource;
 import com.jackz314.keepfit.TestIdlingResource;
+import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.helper.Helper;
 
 import org.hamcrest.Description;
@@ -130,14 +131,29 @@ public class FollowersListUITest {
                                 2)));
         recyclerView.perform(actionOnItemAtPosition(0, click()));
 
-        ViewInteraction materialButton3 = onView(
-                allOf(withId(R.id.followButton), withText("+"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                3)));
-        materialButton3.perform(scrollTo(), click());
+        try{
+            ViewInteraction materialButton = onView(
+                    allOf(withId(R.id.followButton), withText("+"),
+                            childAtPosition(
+                                    childAtPosition(
+                                            withClassName(is("android.widget.ScrollView")),
+                                            0),
+                                    3)));
+            materialButton.perform(scrollTo(), click());
+        } catch (Exception ignored){
+            ViewInteraction materialButton = onView(
+                    allOf(withId(R.id.followButton),
+                            childAtPosition(
+                                    childAtPosition(
+                                            withClassName(is("android.widget.ScrollView")),
+                                            0),
+                                    3)));
+            materialButton.perform(scrollTo(), click());
+
+            Thread.sleep(400);
+
+            materialButton.perform(scrollTo(), click());
+        }
 
         ViewInteraction appCompatImageButton = onView(
                 allOf(withId(R.id.imageButton), withContentDescription("Exits profile"),
@@ -268,13 +284,8 @@ public class FollowersListUITest {
 
         Thread.sleep(1000);
         ViewInteraction materialButton10 = onView(
-                allOf(withId(R.id.followButton), withText("-"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                3)));
-        materialButton10.perform(scrollTo(), click());
+                allOf(withId(R.id.followButton), withText("-")));
+        materialButton10.perform(click());
 
         Thread.sleep(1000);
         ViewInteraction appCompatImageButton4 = onView(

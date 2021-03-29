@@ -67,11 +67,11 @@ public class ExerciseTest {
         IdlingRegistry.getInstance().register(idlingResource);
     }
 
-    @Test
-    public void testFirebase() throws ExecutionException, InterruptedException {
-        DocumentSnapshot ds = Tasks.await(UserControllerKt.getCurrentUserDoc().get());
-        assertTrue(ds.exists());
-    }
+//    @Test
+//    public void testFirebase() throws ExecutionException, InterruptedException {
+//        DocumentSnapshot ds = Tasks.await(UserControllerKt.getCurrentUserDoc().get());
+//        assertTrue(ds.exists());
+//    }
 
     @Test
     public void exerciseCompleteFlow() throws InterruptedException, ExecutionException {

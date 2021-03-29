@@ -60,6 +60,7 @@ public class UserProfileActivity extends AppCompatActivity {
     private Executor procES = Executors.newSingleThreadExecutor();
     private ListenerRegistration registration;
     private LivestreamController livestreamController;
+    private ListenerRegistration lr;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,8 +81,6 @@ public class UserProfileActivity extends AppCompatActivity {
         setContentView(v);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         b.exerciseLogRecycler.setLayoutManager(layoutManager);
-
-
 
         if (!mList.isEmpty() && b.exerciseLogRecycler.getVisibility() == View.VISIBLE) {
             b.exerciseLogRecycler.setVisibility(View.GONE);
@@ -121,7 +120,7 @@ public class UserProfileActivity extends AppCompatActivity {
             if (otherUserUid.equals(currentUser.getUid())){
                 followBtn.setVisibility(View.GONE);
             }
-            UserControllerKt.getCurrentUserDoc().collection("following").whereEqualTo("ref", db.collection("users").document(otherUserUid))
+            lr = UserControllerKt.getCurrentUserDoc().collection("following").whereEqualTo("ref", db.collection("users").document(otherUserUid))
                     .addSnapshotListener((value, e) -> {
                         if (e != null || value == null) {
                             Log.w(TAG, "Listen failed.", e);
@@ -130,9 +129,11 @@ public class UserProfileActivity extends AppCompatActivity {
                         if (value.isEmpty()) {
                             followBtn.setText(String.valueOf('+'));
                             following = false;
+                            Log.d(TAG, "onCreate: follow: false");
                         } else {
                             followBtn.setText(String.valueOf('-'));
                             following = true;
+                            Log.d(TAG, "onCreate: follow: true");
                         }});
 
             //Fills list with videos that belong to the user
@@ -167,8 +168,10 @@ public class UserProfileActivity extends AppCompatActivity {
             followBtn.setOnClickListener(view -> {
                 UserController ucontrol = new UserController();
                 if (following) {
+                    Log.d(TAG, "onCreate: unfollowing");
                     ucontrol.unfollow(otherUserUid);
                 } else {
+                    Log.d(TAG, "onCreate: following");
                     ucontrol.follow(otherUserUid);
                 }
             });
@@ -223,6 +226,7 @@ public class UserProfileActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        if(lr != null) lr.remove();
         if(registration!=null) registration.remove();
         super.onDestroy();
     }
