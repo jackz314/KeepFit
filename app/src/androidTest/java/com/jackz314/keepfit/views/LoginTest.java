@@ -95,7 +95,7 @@ public class LoginTest {
                                 4)));
         materialButton2.perform(scrollTo(), click());
 
-        Thread.sleep(3000);
+        Thread.sleep(5000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_email_text),
                         withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.ScrollView.class))),
