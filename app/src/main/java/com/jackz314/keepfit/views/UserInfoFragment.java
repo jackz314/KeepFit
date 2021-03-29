@@ -92,29 +92,7 @@ public class UserInfoFragment extends Fragment {
             // view binding ftw!
             b = FragmentUserInfoBinding.inflate(inflater, container, false);
 
-            authStateListener = auth -> {
-                Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {
-                    if (user != null) {
-                        b.userNameText.setText(getGreetingMsg() + user.getName());
-                        b.userEmailText.setText(user.getEmail());
-                        b.userHeightText.setText(Utils.centimeterToFeet(user.getHeight()));
-                        b.userWeightText.setText((int)(user.getWeight() *  2.205) + " lbs");
-                        b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
-                        b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), user.getBirthday().getTime(),
-                                DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
-                        b.userBiographyText.setText(user.getBiography());
-
-                        Glide.with(b.getRoot())
-                                .load(Utils.getHighResProfilePicUrl())
-                                .fitCenter()
-                                .placeholder(R.drawable.ic_outline_account_circle_24)
-                                .into(b.userProfilePicture);
-                    }
-                },throwable -> {
-                    Log.d(TAG,"no current user, sign in required");
-                });
-                compositeDisposable.add(disposable);
-            };
+            authStateListener = auth -> populateUserInfo();
             FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
 
             // exercise stuff
@@ -153,6 +131,32 @@ public class UserInfoFragment extends Fragment {
 
 
         return b.getRoot();
+    }
+
+    private void populateUserInfo() {
+        Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {
+            if (user != null) {
+                b.userNameText.setText(getGreetingMsg() + user.getName());
+                b.userEmailText.setText(user.getEmail());
+                b.userHeightText.setText(Utils.centimeterToFeet(user.getHeight()));
+                b.userWeightText.setText((int)(user.getWeight() *  2.205) + " lbs");
+                b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
+                b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), user.getBirthday().getTime(),
+                        DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
+                b.userBiographyText.setText(user.getBiography());
+
+                if (getActivity() != null) {
+                    Glide.with(requireActivity().getApplicationContext())
+                            .load(Utils.getHighResProfilePicUrl())
+                            .fitCenter()
+                            .placeholder(R.drawable.ic_outline_account_circle_24)
+                            .into(b.userProfilePicture);
+                }
+            }
+        },throwable -> {
+            Log.d(TAG,"no current user, sign in required");
+        });
+        compositeDisposable.add(disposable);
     }
 
     @Override
@@ -274,26 +278,7 @@ public class UserInfoFragment extends Fragment {
     @Override
     public void onResume(){
         super.onResume();
-        UserControllerKt.getCurrentUser().subscribe(user -> {
-            if (user != null) {
-                b.userNameText.setText(getGreetingMsg() + user.getName());
-                b.userEmailText.setText(user.getEmail());
-                b.userHeightText.setText(Utils.centimeterToFeet(user.getHeight()));
-                b.userWeightText.setText((int)(user.getWeight() *  2.205) + " lbs");
-                b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
-                b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), user.getBirthday().getTime(),
-                        DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
-                b.userBiographyText.setText(user.getBiography());
-
-                Glide.with(b.userProfilePicture)
-                        .load(Utils.getHighResProfilePicUrl())
-                        .fitCenter()
-                        .placeholder(R.drawable.ic_outline_account_circle_24)
-                        .into(b.userProfilePicture);
-            }
-        },throwable -> {
-            Log.d(TAG,"no current user, sign in required");
-        });
+        populateUserInfo();
     };
 
 

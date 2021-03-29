@@ -63,9 +63,14 @@ public class ExerciseTest {
     @Before
     public void before() {
         final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-//        FirebaseApp.initializeApp(context);
         idlingResource = TestIdlingResource.countingIdlingResource;
         IdlingRegistry.getInstance().register(idlingResource);
+    }
+
+    @Test
+    public void testFirebase() throws ExecutionException, InterruptedException {
+        DocumentSnapshot ds = Tasks.await(UserControllerKt.getCurrentUserDoc().get());
+        assertTrue(ds.exists());
     }
 
     @Test

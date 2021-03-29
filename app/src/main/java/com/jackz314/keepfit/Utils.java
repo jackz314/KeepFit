@@ -274,8 +274,8 @@ public class Utils {
             }
             return sb.toString();
         } catch (NoSuchAlgorithmException ignored) {
+            return ""; // should never happen
         }
-        return ""; // should never happen
     }
 
     // from https://www.baeldung.com/java-string-title-case
@@ -312,10 +312,9 @@ public class Utils {
 
     public static String centimeterToFeet(double centemeter) {
         if (centemeter < 0) return "";
-        int feetPart = 0;
-        int inchesPart = 0;
+        int feetPart;
+        int inchesPart;
         feetPart = (int) Math.floor((centemeter / 2.54) / 12);
-//        System.out.println((centemeter / 2.54) - (feetPart * 12));
         inchesPart = (int) Math.ceil((centemeter / 2.54) - (feetPart * 12));
         if (inchesPart == 0) return feetPart + "'";
         return String.format(Locale.US, "%d' %d''", feetPart, inchesPart);

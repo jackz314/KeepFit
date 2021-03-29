@@ -45,10 +45,11 @@ object UtilsKt {
         }
         val d = Duration.ofSeconds(duration)
         val hrs = d.toHours()
-        val mins = d.minusHours(hrs).toMinutes()
-        val secs = d.minusMinutes(mins).seconds
+        val minusHours = d.minusHours(hrs)
+        val mins = minusHours.toMinutes()
+        val secs = minusHours.minusMinutes(mins).seconds
         return if (hrs > 0){
-            "$hrs hr $mins min"
+            "$hrs hr${if (mins != 0L) " $mins min" else ""}"
         } else {
             "$mins min $secs s"
         }

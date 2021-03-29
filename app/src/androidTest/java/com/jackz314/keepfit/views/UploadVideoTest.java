@@ -80,8 +80,6 @@ public class UploadVideoTest {
     @Test
     public void uploadVideoTest() throws InterruptedException {
 
-
-
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 
 
