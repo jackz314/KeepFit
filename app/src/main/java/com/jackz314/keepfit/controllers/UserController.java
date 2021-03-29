@@ -40,7 +40,7 @@ public class UserController {
                 .collection("following")
                 .whereEqualTo("ref", db.collection("users").document(other_user))
                 .addSnapshotListener((value, e) -> {
-                    if (value.isEmpty()) {
+                    if (value != null && value.isEmpty()) {
                         alreadyFollowing = false;
                         //get document references for users
                         Map<String, Object> docFollowerData = new HashMap<>();
