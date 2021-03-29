@@ -14,7 +14,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
@@ -80,13 +80,13 @@ public class ProfileVisitTest {
         FirebaseApp.initializeApp(appContext);
         testemail = "searchtest@gmail.com";
         testpassword = "search";
-        Tasks.await(Helper.createTempAccount(testemail, testpassword));
+        Tasks.await(Helper.createOrSignInTempAccount(testemail, testpassword));
         oldUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
     }
 
     @After
     public void after() throws ExecutionException, InterruptedException {
-        Tasks.await(Helper.createTempAccount(testemail, testpassword));
+        Tasks.await(Helper.createOrSignInTempAccount(testemail, testpassword));
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentSnapshot ds = Tasks.await(db.collection("users").document(oldUid).get());

@@ -7,14 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
-import androidx.test.espresso.NoMatchingRootException;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,8 +28,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -63,7 +59,7 @@ public class DeleteAccountTest {
         FirebaseApp.initializeApp(appContext);
         String testemail = "deletethis@gmail.com";
         String testpassword = "delete";
-        Tasks.await(Helper.createTempAccount(testemail, testpassword));
+        Tasks.await(Helper.createOrSignInTempAccount(testemail, testpassword));
         String oldUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 //        Tasks.await(AuthUI.getInstance().signOut(appContext));
 //        Tasks.await(AuthUI.getInstance().silentSignIn(appContext, Collections.singletonList(new AuthUI.IdpConfig.EmailBuilder().build())));
@@ -108,7 +104,7 @@ public class DeleteAccountTest {
 
         Thread.sleep(1500);
 
-        Tasks.await(Helper.createTempAccount(testemail, testpassword));
+        Tasks.await(Helper.createOrSignInTempAccount(testemail, testpassword));
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentSnapshot ds = Tasks.await(db.collection("users").document(oldUid).get());

@@ -1,18 +1,26 @@
 package com.jackz314.keepfit.helper;
 
+import android.content.Context;
+
+import androidx.test.rule.ActivityTestRule;
+
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jackz314.keepfit.Utils;
+import com.jackz314.keepfit.views.MainActivity;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 
 public class Helper {
 
-    public static Task<Void> createTempAccount(String email, String password) {
+    public static Task<Void> createOrSignInTempAccount(String email, String password) {
         return FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).continueWithTask(task -> {
             if (task.isSuccessful()){
                 Map<String, Object> user = new HashMap<>();
@@ -47,5 +55,10 @@ public class Helper {
             }
         });
         
+    }
+
+    public static void signOut(ActivityTestRule activityTestRule) throws ExecutionException, InterruptedException {
+        Tasks.await(AuthUI.getInstance().signOut(activityTestRule.getActivity()));
+        Utils.createSignInIntent(activityTestRule.getActivity());
     }
 }
