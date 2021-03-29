@@ -61,10 +61,12 @@ public class DeleteAccountTest {
     public void deleteAccountTest() throws InterruptedException, ExecutionException {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         FirebaseApp.initializeApp(appContext);
+        String testemail = "deletethis@gmail.com";
+        String testpassword = "delete";
         try {
-            Tasks.await(Helper.createTempAccount("deletethis@gmail.com", "delete"));
+            Tasks.await(Helper.createTempAccount(testemail, testpassword));
         } catch (ExecutionException | InterruptedException e) {
-            Tasks.await(FirebaseAuth.getInstance().signInWithEmailAndPassword("deletethis@gmail.com", "delete"));
+            Tasks.await(FirebaseAuth.getInstance().signInWithEmailAndPassword(testemail, testpassword));
         }
         String oldUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 //        Tasks.await(AuthUI.getInstance().signOut(appContext));
