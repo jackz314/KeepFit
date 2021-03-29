@@ -49,7 +49,7 @@ import static org.junit.Assert.assertEquals;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class FollowingTest {
+public class FollowingListUITest {
     private boolean following;
 
     @Rule
