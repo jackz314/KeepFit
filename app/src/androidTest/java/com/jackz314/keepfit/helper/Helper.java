@@ -60,4 +60,8 @@ public class Helper {
     public static void signOut(Context context) throws ExecutionException, InterruptedException {
         Tasks.await(AuthUI.getInstance().signOut(context));
     }
+
+    public static void signIn(String email, String password) throws ExecutionException, InterruptedException {
+        Tasks.await(FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password));
+    }
 }
