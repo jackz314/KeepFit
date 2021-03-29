@@ -63,11 +63,7 @@ public class DeleteAccountTest {
         FirebaseApp.initializeApp(appContext);
         String testemail = "deletethis@gmail.com";
         String testpassword = "delete";
-        try {
-            Tasks.await(Helper.createTempAccount(testemail, testpassword));
-        } catch (ExecutionException | InterruptedException e) {
-            Tasks.await(FirebaseAuth.getInstance().signInWithEmailAndPassword(testemail, testpassword));
-        }
+        Tasks.await(Helper.createTempAccount(testemail, testpassword));
         String oldUid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 //        Tasks.await(AuthUI.getInstance().signOut(appContext));
 //        Tasks.await(AuthUI.getInstance().silentSignIn(appContext, Collections.singletonList(new AuthUI.IdpConfig.EmailBuilder().build())));
@@ -86,7 +82,7 @@ public class DeleteAccountTest {
                                     2),
                             isDisplayed()));
             overflowMenuButton.perform(click());
-        } catch (NoMatchingRootException ignored){
+        } catch (Exception ignored){
             pressBack();
             Thread.sleep(1000);
         }
@@ -112,13 +108,12 @@ public class DeleteAccountTest {
 
         Thread.sleep(3000);
 
-        Tasks.await(FirebaseAuth.getInstance().createUserWithEmailAndPassword("createthis@gmail.com", "create"));
+        Tasks.await(Helper.createTempAccount(testemail, testpassword));
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentSnapshot ds = Tasks.await(db.collection("users").document(oldUid).get());
         assertFalse(ds.exists());
-
-        Tasks.await(FirebaseAuth.getInstance().getCurrentUser().delete());
+//        Tasks.await(FirebaseAuth.getInstance().getCurrentUser().delete());
     }
 
     private static Matcher<View> childAtPosition(

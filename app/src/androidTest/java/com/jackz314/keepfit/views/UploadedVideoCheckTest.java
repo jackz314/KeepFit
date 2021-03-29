@@ -80,7 +80,7 @@ public class UploadedVideoCheckTest {
     private IdlingResource idlingResource;
 
     @Before
-    public void beforeClass() throws Exception {
+    public void beforeClass() {
         final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 //        FirebaseApp.initializeApp(context);
         idlingResource = TestIdlingResource.countingIdlingResource;

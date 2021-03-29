@@ -28,7 +28,23 @@ public class Helper {
                 return db.collection("users")
                         .document(task.getResult().getUser().getUid())
                         .set(user);   
-            } else return Tasks.forException(Objects.requireNonNull(task.getException()));
+            } else {
+                return FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).continueWithTask(task1 -> {
+                    Map<String, Object> user = new HashMap<>();
+                    user.put( "biography", "test account");
+                    user.put("birthday", new Date(2000,1,1));
+                    user.put("email", email);
+                    user.put("height", 180);
+                    user.put("name", "Test Account");
+                    user.put("profile_pic", "");
+                    user.put("sex", true);
+                    user.put("weight", 75);
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    return db.collection("users")
+                            .document(task1.getResult().getUser().getUid())
+                            .set(user);
+                });
+            }
         });
         
     }

@@ -34,6 +34,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.reactivex.rxjava3.core.Single;
 import io.reactivex.rxjava3.core.SingleEmitter;
@@ -50,6 +51,7 @@ public class Utils {
         activity.startActivityForResult(
                 AuthUI.getInstance()
                         .createSignInIntentBuilder()
+                        .setIsSmartLockEnabled(!Utils.isRunningTest())
                         .setAvailableProviders(getSupportedProviders())
                         .setLogo(R.mipmap.ic_launcher_round)
                         .setTosAndPrivacyPolicyUrls(TOS_URL, PRIVACY_POLICY_URL)
@@ -320,4 +322,22 @@ public class Utils {
         return String.format(Locale.US, "%d' %d''", feetPart, inchesPart);
     }
 
+    private static AtomicBoolean isRunningTest;
+
+    public static synchronized boolean isRunningTest() {
+        if (null == isRunningTest) {
+            boolean istest;
+
+            try {
+                Class.forName ("androidx.test.espresso.Espresso");
+                istest = true;
+            } catch (ClassNotFoundException e) {
+                istest = false;
+            }
+
+            isRunningTest = new AtomicBoolean (istest);
+        }
+
+        return isRunningTest.get();
+    }
 }
