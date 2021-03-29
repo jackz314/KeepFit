@@ -57,8 +57,7 @@ public class Helper {
         
     }
 
-    public static void signOut(ActivityTestRule activityTestRule) throws ExecutionException, InterruptedException {
-        Tasks.await(AuthUI.getInstance().signOut(activityTestRule.getActivity()));
-        Utils.createSignInIntent(activityTestRule.getActivity());
+    public static void signOut(Context context) throws ExecutionException, InterruptedException {
+        Tasks.await(AuthUI.getInstance().signOut(context));
     }
 }

@@ -1,6 +1,8 @@
 package com.jackz314.keepfit.views;
 
 
+import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,7 @@ import android.view.ViewParent;
 import androidx.annotation.NonNull;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -54,11 +57,13 @@ public class NewUserTest {
     private static final String TAG = "NewUserTest";
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class, true, false);
 
     @Test
     public void newUserTest() throws InterruptedException, ExecutionException {
-        Helper.signOut(mActivityTestRule);
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Helper.signOut(appContext);
+        mActivityTestRule.launchActivity(new Intent());
         ViewInteraction supportVectorDrawablesButton = onView(
                 allOf(withId(R.id.email_button), withText("Sign in with email"),
                         childAtPosition(
