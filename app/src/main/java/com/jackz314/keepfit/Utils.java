@@ -258,6 +258,7 @@ public class Utils {
     }
 
     public static boolean isValidEmail(CharSequence charSequence){
+        if (charSequence == null) return false;
         return PatternsCompat.EMAIL_ADDRESS.matcher(charSequence).matches();
     }
 

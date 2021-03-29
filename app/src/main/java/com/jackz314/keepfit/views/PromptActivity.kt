@@ -45,7 +45,7 @@ class PromptActivity : AppCompatActivity() {
                 (b.promptCategory.layoutParams as ViewGroup.MarginLayoutParams).topMargin -= 72
                 b.promptCategory.requestLayout()
                 if(b.promptCategory.requestFocus()) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-                b.promptDescription.text = "Track exercise"
+                b.promptDescription.text = "Track Exercise"
             }
         }
 
@@ -56,6 +56,7 @@ class PromptActivity : AppCompatActivity() {
                 b.promptStartBtn.isEnabled = false
             } else {
                 titleValid = true
+                b.promptTitle.error = null
                 if (categoryValid) b.promptStartBtn.isEnabled = true
             }
         }
@@ -69,6 +70,7 @@ class PromptActivity : AppCompatActivity() {
                     b.promptStartBtn.isEnabled = false
                 } else {
                     categoryValid = true
+                    b.promptCategory.error = null
                     if (titleValid) b.promptStartBtn.isEnabled = true
                 }
             }
