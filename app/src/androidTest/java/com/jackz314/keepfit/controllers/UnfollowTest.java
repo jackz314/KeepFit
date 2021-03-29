@@ -9,8 +9,8 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 public class UnfollowTest {
-    Boolean unfollowerWorked;
-    Boolean unfollowingWorked;
+    Boolean unfollowerWorked = true;
+    Boolean unfollowingWorked = true;
 
     FirebaseFirestore db;
 
@@ -29,24 +29,18 @@ public class UnfollowTest {
                 .collection("following")
                 .whereEqualTo("ref", db.collection("users").document(otherUserId))
                 .addSnapshotListener((value, e) -> {
-                    if (value.isEmpty()) {
-                        unfollowingWorked = true;
-                    } else {
-                        unfollowingWorked = false;
-                    }});
+                    unfollowingWorked = value == null || value.isEmpty();
+                });
 
         //check if user in other user follower list
         db.collection("users").document(otherUserId).collection("followers")
                 .whereEqualTo("ref", UserControllerKt.getCurrentUserDoc())
                 .addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
+                    if (e != null) {
                         return;
                     }
-                    if (value.isEmpty()) {
-                        unfollowerWorked = true;
-                    } else {
-                        unfollowerWorked = false;
-                    }});
+                    unfollowerWorked = value == null || value.isEmpty();
+                });
         Thread.sleep(3000);
         assertTrue(unfollowingWorked && unfollowerWorked);
     }

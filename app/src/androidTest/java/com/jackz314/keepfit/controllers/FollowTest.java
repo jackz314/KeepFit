@@ -37,11 +37,8 @@ public class FollowTest {
                 .collection("following")
                 .whereEqualTo("ref", db.collection("users").document(otherUserId))
                         .addSnapshotListener((value, e) -> {
-                            if (value == null || value.isEmpty()) {
-                                followingWorked = false;
-                            } else {
-                                followingWorked = true;
-                            }});
+                            followingWorked = value != null && !value.isEmpty();
+                        });
 
         //check if user in other user follower list
         db.collection("users").document(otherUserId).collection("followers")
@@ -50,11 +47,8 @@ public class FollowTest {
                             if (e != null || value == null) {
                                 return;
                             }
-                            if (value.isEmpty()) {
-                                followerWorked = false;
-                            } else {
-                                followerWorked = true;
-                            }});
+                            followerWorked = !value.isEmpty();
+                        });
         Thread.sleep(3000);
         assertTrue(followingWorked && followerWorked);
     }

@@ -97,6 +97,7 @@ class MainActivity extends AppCompatActivity {
             Log.d(TAG, "setupAfterSignIn: unable to get user from firestore, start new user: " + throwable.getMessage());
             Intent intent = new Intent(this, NewUserActivity.class);
             newUserResultLauncher.launch(intent);
+            TestIdlingResource.decrement();
         });
         compositeDisposable.add(disposable);
     }
