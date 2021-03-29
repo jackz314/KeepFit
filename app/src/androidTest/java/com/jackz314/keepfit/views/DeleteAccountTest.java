@@ -66,7 +66,8 @@ public class DeleteAccountTest {
 
         mActivityTestRule.launchActivity(new Intent());
 
-        Thread.sleep(2000);
+//        Thread.sleep(1000);
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
 
         try {
             ViewInteraction overflowMenuButton = onView(

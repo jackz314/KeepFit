@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 
 import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
@@ -35,6 +36,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static com.jackz314.keepfit.helper.RecyclerViewMatcher.withRecyclerView;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
@@ -45,10 +47,15 @@ public class LikedVideoUITest {
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
+    @Before
+    public void before() {
+        final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        IdlingResource idlingResource = TestIdlingResource.countingIdlingResource;
+        IdlingRegistry.getInstance().register(idlingResource);
+    }
+
     @Test
     public void LikedVideoUITest() throws InterruptedException{
-        Thread.sleep(300);
-
         ViewInteraction bottomNavigationItemView = onView(
                 allOf(withId(R.id.navigation_feed), withContentDescription("Feed"),
                         childAtPosition(
@@ -59,9 +66,7 @@ public class LikedVideoUITest {
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
 
-        Thread.sleep(300);
-
-        ViewInteraction likeButton = onView(allOf(withId(R.id.feed_like_button), isDisplayed()));
+        ViewInteraction likeButton = onView(withRecyclerView(R.id.feed_recycler).atPositionOnView(0, R.id.feed_like_button));
         likeButton.perform(click());
 
         ViewInteraction bottomNavigationItemView2 = onView(

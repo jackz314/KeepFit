@@ -62,8 +62,6 @@ public class PlayVideoTest {
     @Test
     public void playVideoTest() {
 
-
-
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 
 
