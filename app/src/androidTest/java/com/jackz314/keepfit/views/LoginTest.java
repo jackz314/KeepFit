@@ -1,22 +1,28 @@
 package com.jackz314.keepfit.views;
 
 
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.runner.AndroidJUnit4;
 
 import com.google.android.material.textfield.TextInputLayout;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.TestIdlingResource;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,11 +47,14 @@ import static org.hamcrest.Matchers.is;
 @RunWith(AndroidJUnit4.class)
 public class LoginTest {
 
+    private IdlingResource idlingResource;
+
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
     public void loginTest() throws InterruptedException {
+        Thread.sleep(1000);
         ViewInteraction supportVectorDrawablesButton = onView(
                 allOf(withId(R.id.email_button), withText("Sign in with email"),
                         childAtPosition(
@@ -72,6 +81,7 @@ public class LoginTest {
                                 2)));
         materialButton.perform(scrollTo(), click());
 
+        Thread.sleep(1000);
         ViewInteraction textInputEditText2 = onView(
                 allOf(withId(2131298336)));
         textInputEditText2.perform(scrollTo(), click(), replaceText("123456"), closeSoftKeyboard());
@@ -85,7 +95,7 @@ public class LoginTest {
                                 4)));
         materialButton2.perform(scrollTo(), click());
 
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_email_text),
                         withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.ScrollView.class))),
