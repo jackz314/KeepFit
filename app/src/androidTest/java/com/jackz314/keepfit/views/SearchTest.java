@@ -61,10 +61,10 @@ public class SearchTest {
                                                 1)),
                                 0),
                         isDisplayed()));
-        searchAutoComplete.perform(replaceText("test"), closeSoftKeyboard());
+        searchAutoComplete.perform(replaceText("hello"), closeSoftKeyboard());
 
         ViewInteraction searchAutoComplete2 = onView(
-                allOf(withClassName(is("android.widget.SearchView$SearchAutoComplete")), withText("test"),
+                allOf(withClassName(is("android.widget.SearchView$SearchAutoComplete")), withText("hello"),
                         childAtPosition(
                                 allOf(withClassName(is("android.widget.LinearLayout")),
                                         childAtPosition(
@@ -75,12 +75,12 @@ public class SearchTest {
         searchAutoComplete2.perform(pressImeActionButton());
 
         //Buffer to allow data population
-        Thread.sleep(5000);
+        Thread.sleep(3000);
 
 
         onView(withId(R.id.search_recycler)).check(withItemCount(greaterThanOrEqualTo(1)));
         ViewInteraction videoResult = onView(withRecyclerView(R.id.search_recycler).atPosition(0));
-        ViewInteraction profileResult = onView(withRecyclerView(R.id.search_recycler).atPosition(2));
+        ViewInteraction profileResult = onView(withRecyclerView(R.id.search_recycler).atPosition(1));
 
         videoResult.check(matches(hasDescendant(withId(R.id.feed_title_text)))); // title of first video result
         profileResult.check(matches(hasDescendant(withId(R.id.user_email_text)))); // email of first profile result
