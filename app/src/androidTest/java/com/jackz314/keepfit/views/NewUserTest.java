@@ -64,6 +64,7 @@ public class NewUserTest {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         Helper.signOut(appContext);
         mActivityTestRule.launchActivity(new Intent());
+
         ViewInteraction supportVectorDrawablesButton = onView(
                 allOf(withId(R.id.email_button), withText("Sign in with email"),
                         childAtPosition(

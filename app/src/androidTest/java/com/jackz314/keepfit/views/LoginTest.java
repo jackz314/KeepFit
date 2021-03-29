@@ -2,6 +2,7 @@ package com.jackz314.keepfit.views;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -17,6 +18,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.google.android.material.textfield.TextInputLayout;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
+import com.jackz314.keepfit.helper.Helper;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -26,6 +28,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.clearText;
@@ -50,11 +54,14 @@ public class LoginTest {
     private IdlingResource idlingResource;
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class, true, false);
 
     @Test
-    public void loginTest() throws InterruptedException {
-        Thread.sleep(1000);
+    public void loginTest() throws InterruptedException, ExecutionException {
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Helper.signOut(appContext);
+        mActivityTestRule.launchActivity(new Intent());
+
         ViewInteraction supportVectorDrawablesButton = onView(
                 allOf(withId(R.id.email_button), withText("Sign in with email"),
                         childAtPosition(
@@ -68,7 +75,6 @@ public class LoginTest {
         Thread.sleep(1000);
         ViewInteraction textInputEditText = onView(
                 allOf(withId(2131297098)));
-        textInputEditText.perform(scrollTo(), click());
         textInputEditText.perform(replaceText("logintest@gmail.com"), closeSoftKeyboard());
 
         ViewInteraction materialButton = onView(
