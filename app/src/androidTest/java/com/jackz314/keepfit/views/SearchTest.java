@@ -79,8 +79,8 @@ public class SearchTest {
 
 
         onView(withId(R.id.search_recycler)).check(withItemCount(greaterThanOrEqualTo(1)));
-        ViewInteraction videoResult = onView(withRecyclerView(R.id.search_recycler).atPosition(0));
-        ViewInteraction profileResult = onView(withRecyclerView(R.id.search_recycler).atPosition(1));
+        ViewInteraction videoResult = onView(withRecyclerView(R.id.search_recycler).atPosition(1));
+        ViewInteraction profileResult = onView(withRecyclerView(R.id.search_recycler).atPosition(0));
 
         videoResult.check(matches(hasDescendant(withId(R.id.feed_title_text)))); // title of first video result
         profileResult.check(matches(hasDescendant(withId(R.id.user_email_text)))); // email of first profile result
