@@ -26,6 +26,7 @@ import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.Query;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
@@ -125,7 +126,7 @@ public class UserInfoFragment extends Fragment {
                     layoutManager.getOrientation());
             b.exerciseLogRecycler.addItemDecoration(dividerItemDecoration);
 
-            UserControllerKt.getCurrentUserDoc().collection("exercises").addSnapshotListener(((value, error) -> {
+            UserControllerKt.getCurrentUserDoc().collection("exercises").orderBy("starting_time", Query.Direction.DESCENDING).addSnapshotListener(((value, error) -> {
                 if (error != null || value == null) {
                     Log.w(TAG, "Listen failed.", error);
                     return;

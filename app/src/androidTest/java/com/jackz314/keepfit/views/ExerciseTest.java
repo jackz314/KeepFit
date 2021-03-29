@@ -17,8 +17,11 @@ import androidx.test.rule.ActivityTestRule;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
+import com.jackz314.keepfit.Utils;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -45,6 +48,7 @@ import static com.jackz314.keepfit.helper.RecyclerViewMatcher.withRecyclerView;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 @LargeTest
@@ -65,14 +69,7 @@ public class ExerciseTest {
     }
 
     @Test
-    public void testFirestore() throws ExecutionException, InterruptedException {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        DocumentSnapshot ds = Tasks.await(db.collection("users").document("sample_user_1").get());
-        assertTrue(ds.exists());
-    }
-
-    @Test
-    public void exerciseCompleteFlow() throws InterruptedException {
+    public void exerciseCompleteFlow() throws InterruptedException, ExecutionException {
 //        Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 //        instrumentation.waitForIdleSync();
 
@@ -108,7 +105,8 @@ public class ExerciseTest {
                                                 0)),
                                 1),
                         isDisplayed()));
-        appCompatEditText.perform(replaceText("Test"), closeSoftKeyboard());
+        String category = "test 9230048693486734";
+        appCompatEditText.perform(replaceText(category), closeSoftKeyboard());
 
         ViewInteraction chip = onView(
                 allOf(withId(R.id.prompt_intensity_low), withText("Light"),
@@ -141,12 +139,20 @@ public class ExerciseTest {
         // verify exercise is recorded in log
         onView(withId(R.id.exercise_log_recycler)).check(withItemCount(greaterThanOrEqualTo(1)));
         ViewInteraction newExerciseEntry = onView(withRecyclerView(R.id.exercise_log_recycler).atPosition(0));
-        newExerciseEntry.check(matches(hasDescendant(withText("Test"))));
+        newExerciseEntry.check(matches(hasDescendant(withText(Utils.toTitleCase(category)))));
+
+        QuerySnapshot qs = Tasks.await(UserControllerKt.getCurrentUserDoc().collection("exercises").whereEqualTo("category", Utils.toTitleCase(category)).get());
+        assertFalse(qs.isEmpty());
 
         // click into detail and delete
         newExerciseEntry.perform(click());
 
         onView(withId(R.id.delete_exercise_btn)).check(matches(isDisplayed())).perform(click());
+
+        Thread.sleep(500);
+
+        qs = Tasks.await(UserControllerKt.getCurrentUserDoc().collection("exercises").whereEqualTo("category", Utils.toTitleCase(category)).get());
+        assertTrue(qs.isEmpty());
     }
 
     private static Matcher<View> childAtPosition(
