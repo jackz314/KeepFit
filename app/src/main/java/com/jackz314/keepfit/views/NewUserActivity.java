@@ -125,6 +125,7 @@ public class NewUserActivity extends AppCompatActivity {
                     android.R.style.Theme_DeviceDefault_Dialog,
                     mDateSetListener,
                     year, month, day);
+            dialog.getDatePicker().setMaxDate(System.currentTimeMillis());
             dialog.show();
         });
 
