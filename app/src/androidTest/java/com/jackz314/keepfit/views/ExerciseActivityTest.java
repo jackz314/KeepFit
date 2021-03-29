@@ -54,14 +54,18 @@ public class ExerciseActivityTest {
         intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, 3);
         exerciseActivityTestRule.launchActivity(intent);
         onView(withId(R.id.exercise_intensity)).check(matches(withText("Vigorous Intensity")));
+        exerciseActivityTestRule.finishActivity();
 
         intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, 1);
         exerciseActivityTestRule.launchActivity(intent);
         onView(withId(R.id.exercise_intensity)).check(matches(withText("Light Intensity")));
+        exerciseActivityTestRule.finishActivity();
 
         intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, 2);
         exerciseActivityTestRule.launchActivity(intent);
         onView(withId(R.id.exercise_intensity)).check(matches(withText("Moderate Intensity")));
+        exerciseActivityTestRule.finishActivity();
+
     }
 
     private static Matcher<View> childAtPosition(

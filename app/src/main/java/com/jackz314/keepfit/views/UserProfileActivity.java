@@ -30,6 +30,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.LivestreamController;
@@ -69,7 +70,7 @@ public class UserProfileActivity extends AppCompatActivity {
         //Will pass other_user object with Intent
 
         Intent intent = getIntent();
-        User otherUser = (User)intent.getSerializableExtra("other");
+        User otherUser = (User)intent.getSerializableExtra(GlobalConstants.USER_PROFILE);
         //User other_user = new User();
         db = FirebaseFirestore.getInstance();
         followerRecyclerAdapter = new FollowRecyclerAdapter(this, mList);

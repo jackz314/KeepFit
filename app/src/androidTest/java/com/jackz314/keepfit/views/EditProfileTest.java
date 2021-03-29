@@ -77,7 +77,7 @@ public class EditProfileTest {
                 allOf(withId(R.id.finish_new_user_btn), withText("Done"),
                         isDisplayed()));
         materialButton2.perform(click());
-        Thread.sleep(5000);
+        Thread.sleep(3000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_biography_text),
                         isDisplayed()));
@@ -128,7 +128,7 @@ public class EditProfileTest {
                 allOf(withId(R.id.finish_new_user_btn), withText("Done"),
                         isDisplayed()));
         materialButton.perform(click());
-        Thread.sleep(5000);
+        Thread.sleep(3000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_biography_text),
                         isDisplayed()));
