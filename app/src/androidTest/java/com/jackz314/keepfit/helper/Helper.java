@@ -6,22 +6,18 @@ import android.widget.TextView;
 
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
-import androidx.test.rule.ActivityTestRule;
 
 import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jackz314.keepfit.Utils;
-import com.jackz314.keepfit.views.MainActivity;
 
 import org.hamcrest.Matcher;
 
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onView;
@@ -60,6 +56,20 @@ public class Helper {
                     return db.collection("users")
                             .document(task1.getResult().getUser().getUid())
                             .set(user);
+                });
+            }
+        });
+    }
+
+    public static Task<Object> createOrSignInTempAccountNoDoc(String email, String password) {
+        return FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).continueWith(task -> {
+            if (task.isSuccessful()){
+                return true;
+            } else {
+                return FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).continueWith(task1 -> {
+                    if (task1.isSuccessful()) {
+                        return FirebaseFirestore.getInstance().collection("users").document(task1.getResult().getUser().getUid()).delete();
+                    } else return false;
                 });
             }
         });

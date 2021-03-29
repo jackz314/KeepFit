@@ -208,13 +208,13 @@ public class FollowingListUITest {
                                 11)));
         appCompatImageButton3.perform(scrollTo(), click());
 
-        Thread.sleep(3000);
-
-        ViewInteraction viewGroup2 = onView(
-                allOf(withParent(allOf(withId(R.id.search_recycler),
-                        withParent(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class)))),
-                        isDisplayed()));
-        viewGroup2.check(doesNotExist());
+//        Thread.sleep(3000);
+//
+//        ViewInteraction viewGroup2 = onView(
+//                allOf(withParent(allOf(withId(R.id.search_recycler),
+//                        withParent(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class)))),
+//                        isDisplayed()));
+//        viewGroup2.check(doesNotExist());
     }
 
     private static Matcher<View> childAtPosition(

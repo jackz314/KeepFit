@@ -15,8 +15,10 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.firebase.ui.auth.AuthUI;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
@@ -47,6 +49,8 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 @LargeTest
 @RunWith(AndroidJUnit4.class)
@@ -63,55 +67,11 @@ public class NewUserTest {
     public void newUserTest() throws InterruptedException, ExecutionException {
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
         Helper.signOut(appContext);
+        Tasks.await(Helper.createOrSignInTempAccountNoDoc("newuser@gmail.com", "123456"));
+        Thread.sleep(1000);
         mActivityTestRule.launchActivity(new Intent());
 
-        ViewInteraction supportVectorDrawablesButton = onView(
-                allOf(withId(R.id.email_button), withText("Sign in with email"),
-                        childAtPosition(
-                                allOf(withId(R.id.btn_holder),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                0)),
-                                0)));
-        supportVectorDrawablesButton.perform(scrollTo(), click());
-
-        ViewInteraction textInputEditText = onView(
-                allOf(withId(2131297098)));
-        textInputEditText.perform(scrollTo(), click(), replaceText("newuser@gmail.com"), closeSoftKeyboard());
-
-        ViewInteraction materialButton = onView(
-                allOf(withId(R.id.button_next), withText("Next"),
-                        childAtPosition(
-                                allOf(withId(R.id.email_top_layout),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.ScrollView")),
-                                                0)),
-                                2)));
-        materialButton.perform(scrollTo(), click());
-
-        ViewInteraction textInputEditText2 = onView(
-                allOf(withId(R.id.name),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.name_layout),
-                                        0),
-                                0)));
-        textInputEditText2.perform(scrollTo(), replaceText("User"), closeSoftKeyboard());
-
-        ViewInteraction textInputEditText3 = onView(
-                allOf(withId(2131298336)));
-        textInputEditText3.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
-
-        ViewInteraction materialButton2 = onView(
-                allOf(withId(R.id.button_create), withText("Save"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                3)));
-        materialButton2.perform(scrollTo(), click());
-
-        Thread.sleep(2000);
+        Thread.sleep(1500);
         ViewInteraction appCompatEditText = onView(
                 allOf(withId(R.id.editTextTextBio),
                         childAtPosition(
@@ -181,7 +141,7 @@ public class NewUserTest {
                         isDisplayed()));
         materialButton4.perform(click());
 
-        Thread.sleep(5000);
+        Thread.sleep(2000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_email_text), withText("newuser@gmail.com"),
                         withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.ScrollView.class))),
@@ -192,26 +152,24 @@ public class NewUserTest {
         db.collection("users")
                 .whereEqualTo("email", "newuser@gmail.com")
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            Log.d(TAG, "SUCCESS! " + task.getResult().size());
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Log.d(TAG, "SUCCESS! " + task.getResult().size());
 
-                            if(task.getResult().size() > 0){
+                        if(task.getResult().size() > 0){
 
-                                Log.d(TAG, "FOUND! ");
-                                assertEquals(true,true);
-                            }
-                            else{
-                                assertEquals(true,false);
-                            }
+                            Log.d(TAG, "FOUND! ");
+                            assertTrue(true);
                         }
-                        else {
-                            Log.d(TAG, "Error getting documents: ", task.getException());
+                        else{
+                            fail();
                         }
                     }
+                    else {
+                        Log.d(TAG, "Error getting documents: ", task.getException());
+                    }
                 });
+        Thread.sleep(1500);
     }
 
     private static Matcher<View> childAtPosition(

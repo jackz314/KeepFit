@@ -81,6 +81,7 @@ class MainActivity extends AppCompatActivity {
         if (user == null) {
             // not signed in, sign in
             Utils.createSignInIntent(this);
+            TestIdlingResource.decrement();
         } else {
             setupAfterSignIn();
         }
