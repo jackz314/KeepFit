@@ -173,6 +173,11 @@ public class UploadVideoActivity extends AppCompatActivity {
             String raw = categoryText.getText().toString();
             List<String> categoryList = Arrays.stream(raw.split(",")).map(String::trim).collect(Collectors.toList());
 
+            String titleTmp = titleText.getText().toString();
+            if(titleTmp.length() == 0){
+                titleTmp = "Untitled";
+            }
+
             Map<String, Object> media = new HashMap<>();
             media.put("categories", categoryList);
             media.put("creator", uidRef);
@@ -180,7 +185,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             media.put("link", link);
             media.put("duration", (Long) durationLong);
             media.put("start_time", timestamp);
-            media.put("title", titleText.getText().toString());
+            media.put("title", titleTmp);
             media.put("view_count", 0);
             media.put("thumbnail", "");
 
