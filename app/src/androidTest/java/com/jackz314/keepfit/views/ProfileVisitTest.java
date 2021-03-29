@@ -201,6 +201,7 @@ public class ProfileVisitTest {
                         withChild(withId(R.id.followButton))
                 )
         );
+
         checkProfile.check(matches(isDisplayed()));
 
 

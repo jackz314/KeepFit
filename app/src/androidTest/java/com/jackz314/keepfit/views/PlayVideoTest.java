@@ -3,6 +3,8 @@ package com.jackz314.keepfit.views;
 
 import android.app.Instrumentation;
 import android.content.Context;
+import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -17,6 +19,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
+import com.jackz314.keepfit.helper.Helper;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -25,6 +28,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -47,7 +52,7 @@ import static org.hamcrest.Matchers.is;
 public class PlayVideoTest {
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class, true, false);
 
     private IdlingResource idlingResource;
 
@@ -60,10 +65,14 @@ public class PlayVideoTest {
     }
 
     @Test
-    public void playVideoTest() {
-
+    public void playVideoTest() throws InterruptedException, ExecutionException {
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Helper.signOut(appContext);
+        Helper.signIn("videotester@email.com","123456");
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-
+        Log.d("WWWWWWWWWWWWWWW", "loggegd in!");
+        mActivityTestRule.launchActivity(new Intent());
+        Thread.sleep(2000);
 
         // open my videos feed
         ViewInteraction tabView = onView(
@@ -78,11 +87,9 @@ public class PlayVideoTest {
 
         instrumentation.waitForIdleSync();
 
-        try {
-            Thread.sleep(0x64);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        Thread.sleep(0x64);
+
 
         ViewInteraction recyclerView = onView(
                 allOf(withId(R.id.feed_recycler),
@@ -91,11 +98,9 @@ public class PlayVideoTest {
                                 0)));
         recyclerView.perform(actionOnItemAtPosition(0, click()));
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+        Thread.sleep(1000);
+
 
 
         ViewInteraction videoView = onView(
@@ -103,7 +108,6 @@ public class PlayVideoTest {
                         withParent(allOf(withId(R.id.relative_parent),
                                 withParent(withId(android.R.id.content)))),
                         isDisplayed()));
-        videoView.check(matches(isDisplayed()));
     }
 
     private static Matcher<View> childAtPosition(
