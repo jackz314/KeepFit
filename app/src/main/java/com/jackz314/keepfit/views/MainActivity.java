@@ -15,6 +15,7 @@ import androidx.annotation.DrawableRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
@@ -200,7 +201,7 @@ class MainActivity extends AppCompatActivity {
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
                 R.id.navigation_me, R.id.navigation_feed)
                 .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment);
+        NavController navController = NavHostFragment.findNavController(Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)));
 
         navController.getNavigatorProvider().addNavigator(new KeepStateNavigator(this,
                 Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment))
