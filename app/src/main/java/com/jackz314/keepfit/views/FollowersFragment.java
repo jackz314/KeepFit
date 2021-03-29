@@ -113,8 +113,8 @@ public class FollowersFragment extends Fragment {
                                 executionException.printStackTrace();
                             }
 
-                            if (b != null) {
-                                getActivity().runOnUiThread(() -> {
+                            if (b != null && getActivity() != null) {
+                                requireActivity().runOnUiThread(() -> {
                                     if (!followersList.isEmpty()) {
                                         b.emptyResultsText.setVisibility(View.GONE);
                                     } else {

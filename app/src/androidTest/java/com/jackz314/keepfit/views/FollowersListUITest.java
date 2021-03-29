@@ -1,7 +1,10 @@
 package com.jackz314.keepfit.views;
 
 
+import android.app.Activity;
+import android.app.Instrumentation;
 import android.content.Context;
+import android.content.Intent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -17,6 +20,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.SimpleCountingIdlingResource;
 import com.jackz314.keepfit.TestIdlingResource;
+import com.jackz314.keepfit.helper.Helper;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -27,6 +31,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.util.concurrent.ExecutionException;
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
@@ -36,12 +42,15 @@ import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static com.jackz314.keepfit.helper.SelectTabAtPositionKt.selectTabAtPosition;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 
@@ -50,54 +59,21 @@ import static org.hamcrest.Matchers.is;
 public class FollowersListUITest {
 
     @Rule
-    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class, true, false);
+
+    @Before
+    public void before() {
+        SimpleCountingIdlingResource idlingResource = TestIdlingResource.countingIdlingResource;
+        IdlingRegistry.getInstance().register((IdlingResource) idlingResource);
+    }
 
     @Test
-    public void followersListUITest() throws InterruptedException {
-        ViewInteraction supportVectorDrawablesButton = onView(
-                allOf(withId(R.id.email_button), withText("Sign in with email"),
-                        childAtPosition(
-                                allOf(withId(R.id.btn_holder),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                0)),
-                                0)));
-        supportVectorDrawablesButton.perform(scrollTo(), click());
-
-        Thread.sleep(1000);
-
-        ViewInteraction textInputEditText = onView(
-                allOf(withId(R.id.email)));
-        Thread.sleep(1000);
-        textInputEditText.perform(scrollTo(), replaceText("otherFollowersTest@UI.com"), closeSoftKeyboard());
-
-        ViewInteraction materialButton = onView(
-                allOf(withId(R.id.button_next), withText("Next"),
-                        childAtPosition(
-                                allOf(withId(R.id.email_top_layout),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.ScrollView")),
-                                                0)),
-                                2)));
-        materialButton.perform(scrollTo(), click());
-
-        Thread.sleep(1000);
-
-        ViewInteraction textInputEditText2 = onView(
-                allOf(withId(R.id.password)));
-
-        textInputEditText2.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
-
-        ViewInteraction materialButton2 = onView(
-                allOf(withId(R.id.button_done), withText("Sign in"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                4)));
-        materialButton2.perform(scrollTo(), click());
-
-        Thread.sleep(1000);
+    public void followersListUITest() throws InterruptedException, ExecutionException {
+        Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        Helper.signIn("otherFollowersTest@UI.com", "123456");
+        mActivityTestRule.launchActivity(new Intent());
+//        Thread.sleep(500);
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
 
         ViewInteraction bottomNavigationItemView = onView(
                 allOf(withId(R.id.navigation_feed), withContentDescription("Feed"),
@@ -109,6 +85,8 @@ public class FollowersListUITest {
                         isDisplayed()));
         bottomNavigationItemView.perform(click());
 
+        Thread.sleep(500);
+
         ViewInteraction actionMenuItemView = onView(
                 allOf(withId(R.id.app_bar_search), withContentDescription("Search"),
                         childAtPosition(
@@ -118,6 +96,8 @@ public class FollowersListUITest {
                                 0),
                         isDisplayed()));
         actionMenuItemView.perform(click());
+
+        Thread.sleep(500);
 
         ViewInteraction searchAutoComplete = onView(
                 allOf(withClassName(is("android.widget.SearchView$SearchAutoComplete")),
@@ -178,84 +158,46 @@ public class FollowersListUITest {
                         isDisplayed()));
         appCompatImageButton2.perform(click());
 
-        ViewInteraction bottomNavigationItemView2 = onView(
-                allOf(withId(R.id.navigation_me), withContentDescription("Me"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.nav_view),
-                                        0),
-                                1),
-                        isDisplayed()));
-        bottomNavigationItemView2.perform(click());
+//        ViewInteraction bottomNavigationItemView2 = onView(
+//                allOf(withId(R.id.navigation_me), withContentDescription("Me"),
+//                        childAtPosition(
+//                                childAtPosition(
+//                                        withId(R.id.nav_view),
+//                                        0),
+//                                1),
+//                        isDisplayed()));
+//        bottomNavigationItemView2.perform(click());
+//
+//        ViewInteraction actionMenuItemView2 = onView(
+//                allOf(withId(R.id.sign_out_btn), withContentDescription("Sign Out"),
+//                        childAtPosition(
+//                                childAtPosition(
+//                                        withId(R.id.action_bar),
+//                                        1),
+//                                0),
+//                        isDisplayed()));
+//        actionMenuItemView2.perform(click());
+//
+//        ViewInteraction materialButton4 = onView(
+//                allOf(withId(android.R.id.button1), withText("OK"),
+//                        childAtPosition(
+//                                childAtPosition(
+//                                        withId(R.id.buttonPanel),
+//                                        0),
+//                                3)));
+//        materialButton4.perform(scrollTo(), click());
+//        Thread.sleep(1000);
 
-        ViewInteraction actionMenuItemView2 = onView(
-                allOf(withId(R.id.sign_out_btn), withContentDescription("Sign Out"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
-                                0),
-                        isDisplayed()));
-        actionMenuItemView2.perform(click());
+        mActivityTestRule.finishActivity();
+        Helper.signIn("followerstest@UI.com", "123456");
+        Thread.sleep(500);
+        mActivityTestRule.launchActivity(new Intent());
 
-        ViewInteraction materialButton4 = onView(
-                allOf(withId(android.R.id.button1), withText("OK"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                3)));
-        materialButton4.perform(scrollTo(), click());
+        Thread.sleep(1500);
 
-        ViewInteraction supportVectorDrawablesButton2 = onView(
-                allOf(withId(R.id.email_button), withText("Sign in with email"),
-                        childAtPosition(
-                                allOf(withId(R.id.btn_holder),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                0)),
-                                0)));
-        supportVectorDrawablesButton2.perform(scrollTo(), click());
+        onView(withId(R.id.me_tab_layout)).perform(selectTabAtPosition(3));
 
-        ViewInteraction textInputEditText3 = onView(
-                allOf(withId(R.id.email)));
-        textInputEditText3.perform(scrollTo(), replaceText("followerstest@UI.com"), closeSoftKeyboard());
-
-        Thread.sleep(1000);
-        ViewInteraction materialButton5 = onView(
-                allOf(withId(R.id.button_next), withText("Next"),
-                        childAtPosition(
-                                allOf(withId(R.id.email_top_layout),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.ScrollView")),
-                                                0)),
-                                2)));
-        materialButton5.perform(scrollTo(), click());
-
-        ViewInteraction textInputEditText4 = onView(
-                allOf(withId(R.id.password)));
-        textInputEditText4.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
-
-        Thread.sleep(1000);
-        ViewInteraction materialButton6 = onView(
-                allOf(withId(R.id.button_done), withText("Sign in"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                4)));
-        materialButton6.perform(scrollTo(), click());
-
-        Thread.sleep(1000);
-        ViewInteraction tabView = onView(
-                allOf(withContentDescription("Followers"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.me_tab_layout),
-                                        0),
-                                3),
-                        isDisplayed()));
-        tabView.perform(click());
+        Thread.sleep(1500);
 
         ViewInteraction viewGroup = onView(
                 allOf(withParent(allOf(withId(R.id.search_recycler),
@@ -281,80 +223,42 @@ public class FollowersListUITest {
                                 11)));
         appCompatImageButton3.perform(scrollTo(), click());
 
-        Thread.sleep(1000);
-        ViewInteraction tabView3 = onView(
-                allOf(withContentDescription("Info")));
-        tabView3.perform(scrollTo(), click());
+//        Thread.sleep(1000);
+//        ViewInteraction tabView3 = onView(
+//                allOf(withContentDescription("Info")));
+//        tabView3.perform(scrollTo(), click());
+//
+//        Thread.sleep(1000);
+//        ViewInteraction actionMenuItemView3 = onView(
+//                allOf(withId(R.id.sign_out_btn), withContentDescription("Sign Out"),
+//                        childAtPosition(
+//                                childAtPosition(
+//                                        withId(R.id.action_bar),
+//                                        1),
+//                                0),
+//                        isDisplayed()));
+//        actionMenuItemView3.perform(click());
+//
+//        Thread.sleep(1000);
+//        ViewInteraction materialButton7 = onView(
+//                allOf(withId(android.R.id.button1), withText("OK"),
+//                        childAtPosition(
+//                                childAtPosition(
+//                                        withId(R.id.buttonPanel),
+//                                        0),
+//                                3)));
+//        materialButton7.perform(scrollTo(), click());
 
-        Thread.sleep(1000);
-        ViewInteraction actionMenuItemView3 = onView(
-                allOf(withId(R.id.sign_out_btn), withContentDescription("Sign Out"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
-                                0),
-                        isDisplayed()));
-        actionMenuItemView3.perform(click());
+        mActivityTestRule.finishActivity();
+        Helper.signIn("otherFollowersTest@UI.com", "123456");
+        Thread.sleep(500);
+        mActivityTestRule.launchActivity(new Intent());
 
-        Thread.sleep(1000);
-        ViewInteraction materialButton7 = onView(
-                allOf(withId(android.R.id.button1), withText("OK"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                3)));
-        materialButton7.perform(scrollTo(), click());
+        Thread.sleep(1500);
 
-        Thread.sleep(1000);
-        ViewInteraction supportVectorDrawablesButton3 = onView(
-                allOf(withId(R.id.email_button), withText("Sign in with email"),
-                        childAtPosition(
-                                allOf(withId(R.id.btn_holder),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                0)),
-                                0)));
-        supportVectorDrawablesButton3.perform(scrollTo(), click());
+        onView(withId(R.id.me_tab_layout)).perform(selectTabAtPosition(4));
 
-        Thread.sleep(1000);
-        ViewInteraction textInputEditText5 = onView(
-                allOf(withId(R.id.email)));
-        textInputEditText5.perform(scrollTo(), replaceText("otherFollowerstest@UI.com"), closeSoftKeyboard());
-
-        Thread.sleep(1000);
-        ViewInteraction materialButton8 = onView(
-                allOf(withId(R.id.button_next), withText("Next"),
-                        childAtPosition(
-                                allOf(withId(R.id.email_top_layout),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.ScrollView")),
-                                                0)),
-                                2)));
-        materialButton8.perform(scrollTo(), click());
-
-        Thread.sleep(1000);
-        ViewInteraction textInputEditText6 = onView(
-                allOf(withId(R.id.password)));
-        textInputEditText6.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
-
-        Thread.sleep(1000);
-        ViewInteraction materialButton9 = onView(
-                allOf(withId(R.id.button_done), withText("Sign in"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                4)));
-        materialButton9.perform(scrollTo(), click());
-
-        Thread.sleep(1000);
-        ViewInteraction tabView5 = onView(
-                allOf(withContentDescription("Following")));
-        tabView5.perform(scrollTo(), click());
-
-        Thread.sleep(1000);
+        Thread.sleep(1500);
         ViewInteraction recyclerView3 = onView(
                 allOf(withId(R.id.search_recycler),
                         childAtPosition(
@@ -381,81 +285,19 @@ public class FollowersListUITest {
                                         0),
                                 11)));
         appCompatImageButton4.perform(scrollTo(), click());
+        mActivityTestRule.finishActivity();
 
-        Thread.sleep(1000);
-        ViewInteraction tabView6 = onView(
-                allOf(withContentDescription("Info")));
-        tabView6.perform(scrollTo(), click());
+//        intending(hasAction(Intent.ACTION_CHOOSER)).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, null));
 
-        ViewInteraction actionMenuItemView4 = onView(
-                allOf(withId(R.id.sign_out_btn), withContentDescription("Sign Out"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.action_bar),
-                                        1),
-                                0),
-                        isDisplayed()));
-        actionMenuItemView4.perform(click());
+        Helper.signIn("followerstest@UI.com", "123456");
+        Thread.sleep(500);
+        mActivityTestRule.launchActivity(new Intent());
 
-        ViewInteraction materialButton11 = onView(
-                allOf(withId(android.R.id.button1), withText("OK"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.buttonPanel),
-                                        0),
-                                3)));
-        materialButton11.perform(scrollTo(), click());
+        Thread.sleep(1500);
 
-        Thread.sleep(1000);
+        onView(withId(R.id.me_tab_layout)).perform(selectTabAtPosition(3));
 
-        ViewInteraction supportVectorDrawablesButton4 = onView(
-                allOf(withId(R.id.email_button), withText("Sign in with email"),
-                        childAtPosition(
-                                allOf(withId(R.id.btn_holder),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                0)),
-                                0)));
-        supportVectorDrawablesButton4.perform(scrollTo(), click());
-
-        ViewInteraction textInputEditText7 = onView(
-                allOf(withId(R.id.email)));
-        textInputEditText7.perform(scrollTo(), replaceText("followerstest@UI.com"), closeSoftKeyboard());
-
-        Thread.sleep(1000);
-        ViewInteraction materialButton12 = onView(
-                allOf(withId(R.id.button_next), withText("Next"),
-                        childAtPosition(
-                                allOf(withId(R.id.email_top_layout),
-                                        childAtPosition(
-                                                withClassName(is("android.widget.ScrollView")),
-                                                0)),
-                                2)));
-        materialButton12.perform(scrollTo(), click());
-
-        ViewInteraction textInputEditText8 = onView(
-                allOf(withId(R.id.password)));
-        textInputEditText8.perform(scrollTo(), replaceText("123456"), closeSoftKeyboard());
-
-        Thread.sleep(1000);
-        ViewInteraction materialButton14 = onView(
-                allOf(withId(R.id.button_done), withText("Sign in"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withClassName(is("android.widget.ScrollView")),
-                                        0),
-                                4)));
-        materialButton14.perform(scrollTo(), click());
-
-        ViewInteraction tabView8 = onView(
-                allOf(withContentDescription("Followers"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(R.id.me_tab_layout),
-                                        0),
-                                3),
-                        isDisplayed()));
-        tabView8.perform(click());
+        Thread.sleep(1500);
 
         ViewInteraction viewGroup2 = onView(
                 allOf(withParent(allOf(withId(R.id.search_recycler),

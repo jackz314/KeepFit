@@ -228,6 +228,10 @@ class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_SIGN_IN) {
+            if(Utils.isRunningTest()){
+                setupAfterSignIn();
+                return;
+            }
             IdpResponse response = IdpResponse.fromResultIntent(data);
             Log.d(TAG, "onActivityResult: got sign in intent response: " + response);
             if (resultCode == RESULT_OK) {

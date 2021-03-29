@@ -63,7 +63,10 @@ public class Helper {
                 });
             }
         });
-        
+    }
+
+    public static void signInWithDefaultAccount() throws ExecutionException, InterruptedException {
+        Tasks.await(createOrSignInTempAccount("defaulttestaccount@gmail.com", "defaulttest"));
     }
 
     public static void signOut(Context context) throws ExecutionException, InterruptedException {

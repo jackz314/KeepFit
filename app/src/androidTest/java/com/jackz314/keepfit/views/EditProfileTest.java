@@ -1,11 +1,15 @@
 package com.jackz314.keepfit.views;
 
 import androidx.test.espresso.DataInteraction;
+import androidx.test.espresso.IdlingRegistry;
+import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.filters.LargeTest;
+import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -20,11 +24,13 @@ import static androidx.test.espresso.assertion.ViewAssertions.*;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
 
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.TestIdlingResource;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeMatcher;
 import org.hamcrest.core.IsInstanceOf;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -40,9 +46,14 @@ public class EditProfileTest {
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
+    @Before
+    public void before() {
+        IdlingResource idlingResource = TestIdlingResource.countingIdlingResource;
+        IdlingRegistry.getInstance().register(idlingResource);
+    }
+
     @Test
     public void editProfileEmptyInputTest() throws InterruptedException {
-        Thread.sleep(3000);
         ViewInteraction actionMenuItemView = onView(
                 allOf(withId(R.id.edit_profile_btn), withContentDescription("Edit Profile"),
                         isDisplayed()));
@@ -65,7 +76,7 @@ public class EditProfileTest {
 
         ViewInteraction materialButton = onView(withId(R.id.finish_new_user_btn));
         materialButton.perform(click());
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         ViewInteraction actionMenuItemView2 = onView(
                 allOf(withId(R.id.edit_profile_btn), withContentDescription("Edit Profile"),
                         isDisplayed()));
@@ -75,7 +86,7 @@ public class EditProfileTest {
                 allOf(withId(R.id.finish_new_user_btn), withText("Done"),
                         isDisplayed()));
         materialButton2.perform(click());
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_biography_text),
                         isDisplayed()));
@@ -84,7 +95,6 @@ public class EditProfileTest {
 
     @Test
     public void editProfileNewBioTest() throws InterruptedException {
-        Thread.sleep(6000);
         ViewInteraction actionMenuItemView = onView(
                 allOf(withId(R.id.edit_profile_btn), withContentDescription("Edit Profile"),
                         isDisplayed()));
@@ -126,7 +136,7 @@ public class EditProfileTest {
                 allOf(withId(R.id.finish_new_user_btn), withText("Done"),
                         isDisplayed()));
         materialButton.perform(click());
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_biography_text),
                         isDisplayed()));

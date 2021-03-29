@@ -91,6 +91,8 @@ public class LikedVideoUITest {
                         isDisplayed()));
         tabView.perform(click());
 
+        InstrumentationRegistry.getInstrumentation().waitForIdleSync();
+
         onView(withRecyclerView(R.id.feed_recycler).atPositionOnView(0, R.id.feed_title_text))
                 .check(matches(withText(likedTitle)));
 

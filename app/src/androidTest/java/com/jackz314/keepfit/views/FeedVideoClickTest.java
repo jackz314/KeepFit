@@ -68,8 +68,6 @@ public class FeedVideoClickTest {
     @Test
     public void videoClickTest() {
 
-
-
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
 
 
@@ -101,11 +99,7 @@ public class FeedVideoClickTest {
         }
 
 
-        ViewInteraction videoView = onView(
-                allOf(withId(R.id.video_view),
-                        withParent(allOf(withId(R.id.relative_parent),
-                                withParent(withId(android.R.id.content)))),
-                        isDisplayed()));
+        ViewInteraction videoView = onView(withId(R.id.video_view));
         videoView.check(matches(isDisplayed()));
     }
 

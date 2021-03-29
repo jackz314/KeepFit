@@ -37,7 +37,7 @@ public class FollowTest {
                 .collection("following")
                 .whereEqualTo("ref", db.collection("users").document(otherUserId))
                         .addSnapshotListener((value, e) -> {
-                            if (value.isEmpty()) {
+                            if (value == null || value.isEmpty()) {
                                 followingWorked = false;
                             } else {
                                 followingWorked = true;

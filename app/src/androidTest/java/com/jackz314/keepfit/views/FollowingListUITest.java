@@ -57,7 +57,6 @@ public class FollowingListUITest {
 
     @Before
     public void before() {
-        final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 //        FirebaseApp.initializeApp(context);
         SimpleCountingIdlingResource idlingResource = TestIdlingResource.countingIdlingResource;
         IdlingRegistry.getInstance().register((IdlingResource) idlingResource);
@@ -65,7 +64,6 @@ public class FollowingListUITest {
 
     @Test
     public void followingListUITest1() throws InterruptedException{
-        Thread.sleep(3000);
         ViewInteraction bottomNavigationItemView = onView(
                 allOf(withId(R.id.navigation_feed), withContentDescription("Feed"),
                         childAtPosition(
