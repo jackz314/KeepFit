@@ -14,6 +14,9 @@ import androidx.test.runner.AndroidJUnit4;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
@@ -24,6 +27,8 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -48,13 +53,15 @@ public class DeleteAccountTest {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private static final String TAG = "DeleteAccountTest";
+    private final FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     @Test
-    public void deleteAccountTest() throws InterruptedException {
+    public void deleteAccountTest() throws InterruptedException, ExecutionException {
         Thread.sleep(1000);
+        String currentEmail = mFirebaseUser.getEmail();
         ViewInteraction overflowMenuButton = onView(
                 allOf(withContentDescription("More options"),
                         childAtPosition(
@@ -93,7 +100,7 @@ public class DeleteAccountTest {
         button.check(matches(isDisplayed()));
 
         db.collection("users")
-                .whereEqualTo("email", "newuser@gmail.com")
+                .whereEqualTo("email", currentEmail)
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
