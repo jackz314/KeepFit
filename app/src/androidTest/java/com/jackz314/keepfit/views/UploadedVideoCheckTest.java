@@ -1,5 +1,13 @@
 package com.jackz314.keepfit.views;
 
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.filters.LargeTest;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import org.junit.Rule;
+
+
 
 import android.app.Instrumentation;
 import android.content.Context;
@@ -16,7 +24,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
-import androidx.test.runner.AndroidJUnit4;
+
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -57,9 +65,10 @@ import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
+
 @LargeTest
 @RunWith(AndroidJUnit4.class)
-public class UploadVideoTest {
+public class UploadedVideoCheckTest {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -179,7 +188,62 @@ public class UploadVideoTest {
                     }
                 });
 
+        ViewInteraction bottomNavigationItemView = onView(
+                allOf(withId(R.id.navigation_feed), withContentDescription("Feed"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.nav_view),
+                                        0),
+                                0),
+                        isDisplayed()));
+        bottomNavigationItemView.perform(click());
 
+        instrumentation.waitForIdleSync();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.feed_recycler)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(curString)), click()));
+
+        pressBack();
+
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        ViewInteraction bottomNavigationItemView2 = onView(
+                allOf(withId(R.id.navigation_me), withContentDescription("Me"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.nav_view),
+                                        0),
+                                1),
+                        isDisplayed()));
+        bottomNavigationItemView2.perform(click());
+
+        ViewInteraction tabView = onView(
+                allOf(withContentDescription("My Videos"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.me_tab_layout),
+                                        0),
+                                1),
+                        isDisplayed()));
+        tabView.perform(click());
+
+        instrumentation.waitForIdleSync();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.feed_recycler)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(curString)), click()));
     }
 
     private static Matcher<View> childAtPosition(
@@ -200,8 +264,4 @@ public class UploadVideoTest {
             }
         };
     }
-
-
-
-
 }
