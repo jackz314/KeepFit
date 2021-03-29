@@ -112,77 +112,73 @@ public class UserProfileActivity extends AppCompatActivity {
         b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), otherUser.getBirthday().getTime(),
                 DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
 
-        Button followBtn = findViewById(R.id.followButton);
-        if (otherUser.getUid().equals(FirebaseAuth.getInstance().getCurrentUser().getUid())){
-            followBtn.setVisibility(View.GONE);
+
+        String otherUserUid = otherUser.getUid();
+        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (otherUserUid != null && currentUser != null) {
+            Button followBtn = findViewById(R.id.followButton);
+            if (otherUserUid.equals(currentUser.getUid())){
+                followBtn.setVisibility(View.GONE);
+            }
+            UserControllerKt.getCurrentUserDoc().collection("following").whereEqualTo("ref", db.collection("users").document(otherUserUid))
+                    .addSnapshotListener((value, e) -> {
+                        if (e != null || value == null) {
+                            Log.w(TAG, "Listen failed.", e);
+                            return;
+                        }
+                        if (value.isEmpty()) {
+                            followBtn.setText(String.valueOf('+'));
+                            following = false;
+                        } else {
+                            followBtn.setText(String.valueOf('-'));
+                            following = true;
+                        }});
+
+            //Fills list with videos that belong to the user
+            populateList(otherUser);
+            followerRecyclerAdapter.setClickListener((view, position) -> {
+                // TODO: 3/6/21 replace with activity intent
+
+                Media media = mList.get(position);
+                if(media.isLivestream()) {
+                    livestreamController.setLivestream(media);
+                    livestreamController.joinLivestream();
+                }
+
+                else{
+                    Intent videoPlay = new Intent(this, VideoActivity.class);
+
+                    //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
+                    videoPlay.putExtra("uri", media.getLink());
+                    videoPlay.putExtra("media", media.getUid());
+                    startActivity(videoPlay);
+                }
+
+                //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
+            });
+
+
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(b.exerciseLogRecycler.getContext(),
+                    layoutManager.getOrientation());
+            b.exerciseLogRecycler.addItemDecoration(dividerItemDecoration);
+            b.exerciseLogRecycler.setAdapter(followerRecyclerAdapter);
+
+            followBtn.setOnClickListener(view -> {
+                UserController ucontrol = new UserController();
+                if (following) {
+                    ucontrol.unfollow(otherUserUid);
+                } else {
+                    ucontrol.follow(otherUserUid);
+                }
+            });
         }
-        UserControllerKt.getCurrentUserDoc().collection("following").whereEqualTo("ref", db.collection("users").document(otherUser.getUid()))
-                .addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-                    if (value.isEmpty()) {
-                        followBtn.setText(String.valueOf('+'));
-                        following = false;
-                    } else {
-                        followBtn.setText(String.valueOf('-'));
-                        following = true;
-                    }});
-
-        //Fills list with videos that belong to the user
-        populateList(otherUser);
-        followerRecyclerAdapter.setClickListener((view, position) -> {
-            // TODO: 3/6/21 replace with activity intent
-
-            Media media = mList.get(position);
-            if(media.isLivestream()) {
-                livestreamController.setLivestream(media);
-                livestreamController.joinLivestream();
-            }
-
-            else{
-                Intent videoPlay = new Intent(this, VideoActivity.class);
-
-                //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
-                videoPlay.putExtra("uri", media.getLink());
-                videoPlay.putExtra("media", media.getUid());
-                startActivity(videoPlay);
-            }
-
-            //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
-        });
-
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(b.exerciseLogRecycler.getContext(),
-                layoutManager.getOrientation());
-        b.exerciseLogRecycler.addItemDecoration(dividerItemDecoration);
-        b.exerciseLogRecycler.setAdapter(followerRecyclerAdapter);
-//        }
-
-
-
-        followButtonChange(followBtn, otherUser);
-        followBtn.setOnClickListener(view -> {
-            UserController ucontrol = new UserController();
-            if (following) {
-                ucontrol.unfollow(otherUser.getUid());
-            } else {
-                ucontrol.follow(otherUser.getUid());
-            }
-        });
-    }
-
-
-
-    public void followButtonChange(Button follow_btn, User other_user) {
     }
 
     public void populateList(User other){
 
         db = FirebaseFirestore.getInstance();
         registration = db.collection("media")
-//                .whereEqualTo("state", "CA")
                 .addSnapshotListener((value, e) -> {
                     if (e != null || value == null) {
                         Log.w(TAG, "Listen failed.", e);
