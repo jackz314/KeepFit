@@ -212,8 +212,6 @@ class MainActivity extends AppCompatActivity {
 //        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
         TestIdlingResource.decrement();
-        FirebaseAuth.AuthStateListener authStateListener = auth -> recreate();
-        FirebaseAuth.getInstance().addAuthStateListener(authStateListener);
     }
 
     private void checkAndRequireGooglePlayService() {

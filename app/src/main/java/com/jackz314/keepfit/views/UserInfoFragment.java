@@ -231,7 +231,8 @@ public class UserInfoFragment extends Fragment {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         Toast.makeText(getContext(), "You signed out", Toast.LENGTH_SHORT).show();
-                        Utils.createSignInIntent(requireActivity());
+                        requireActivity().recreate();
+//                        Utils.createSignInIntent(requireActivity());
                     } else {
                         Log.e(TAG, "signOut: failure", task.getException());
                         Toast.makeText(requireContext(), "Failed to sign out: " +
