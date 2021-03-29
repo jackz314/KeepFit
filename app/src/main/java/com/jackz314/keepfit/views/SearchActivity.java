@@ -121,12 +121,32 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         } else if(editsearch.requestFocus()) getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
+    public static String stripQuery(String query){
+        return query.replaceAll("^[ \t]+|[ \t]+$", "");
+    }
+
+    public static boolean isValidQuery(String query){
+        query = stripQuery(query);
+        return !query.isEmpty() && query.matches("[a-zA-Z0-9]*");
+    }
+
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-
+       query = stripQuery(query);
+        if(!isValidQuery(query)){
+            b.emptyResultsText.setText("Please input valid search");
+            b.emptyResultsText.setVisibility(View.VISIBLE);
+            b.searchRecycler.setVisibility(View.INVISIBLE);
+            return true;
+        }
         processSearch(query);
         Log.d(TAG, query);
+        if(b.searchRecycler.getVisibility() == View.INVISIBLE){
+           b.emptyResultsText.setVisibility(View.GONE);
+            b.searchRecycler.setVisibility(View.VISIBLE);
+        }
+
 
         return false;
     }
