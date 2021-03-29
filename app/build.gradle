@@ -68,6 +68,7 @@ dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test:core:' + rootProject.coreVersion;
     implementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion;
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:' + rootProject.espressoVersion;
     androidTestImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion;
     androidTestImplementation 'androidx.test:runner:' + rootProject.runnerVersion;
     androidTestImplementation 'androidx.test:rules:' + rootProject.rulesVersion;

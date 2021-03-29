@@ -97,7 +97,8 @@ public class UploadVideoActivity extends AppCompatActivity {
         Intent intent = new Intent();
         intent.setType("video/*");
         intent.setAction(intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent,"VIDEO FILE SELECT"),12);
+        Intent videoFileSelect = Intent.createChooser(intent, "VIDEO FILE SELECT");
+        startActivityForResult(videoFileSelect,12);
     }
 
     @Override

@@ -1,8 +1,14 @@
 package com.jackz314.keepfit.views;
 
 
+import android.app.Activity;
 import android.app.Instrumentation;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Parcelable;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +19,7 @@ import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.espresso.intent.Intents;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
@@ -37,6 +44,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -45,6 +58,12 @@ import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.action.ViewActions.scrollTo;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
+import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.espresso.intent.Intents.intending;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.anyIntent;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.isInternal;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
@@ -55,6 +74,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 
 @LargeTest
@@ -72,7 +92,6 @@ public class UploadVideoTest {
 
     @Before
     public void beforeClass() throws Exception {
-        final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
 //        FirebaseApp.initializeApp(context);
         idlingResource = TestIdlingResource.countingIdlingResource;
         IdlingRegistry.getInstance().register(idlingResource);
@@ -80,10 +99,10 @@ public class UploadVideoTest {
 
 
     @Test
-    public void uploadVideoTest() throws InterruptedException {
-
+    public void uploadVideoTest() throws InterruptedException, IOException, URISyntaxException {
+        final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
-
+        Intents.init();
 
         ViewInteraction cardView = onView(
                 allOf(withId(R.id.fab_card),
@@ -130,6 +149,17 @@ public class UploadVideoTest {
                         isDisplayed()));
         appCompatEditText2.perform(replaceText("Upload"), closeSoftKeyboard());
 
+        String fileName = "smallsize.mp4";
+
+//        // match file picker intent
+        Intent resultData = new Intent();
+        Uri uri1 = Uri.parse("android.resource://" + context.getPackageName() + "/raw/smallsize.mp4");
+        // Create the Intent that will include the bundle.
+        resultData.setData(uri1);
+
+        // todo not working
+//        intending(hasAction(Intent.ACTION_CHOOSER)).respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, resultData));
+
         ViewInteraction appCompatEditText3 = onView(
                 allOf(withId(R.id.choose_file_to_upload),
                         childAtPosition(
@@ -139,6 +169,8 @@ public class UploadVideoTest {
                                 0),
                         isDisplayed()));
         appCompatEditText3.perform(click());
+
+//        Thread.sleep(1000);
 
         ViewInteraction materialButton3 = onView(
                 allOf(withId(R.id.btn_video_upload), withText("Upload Video"),
