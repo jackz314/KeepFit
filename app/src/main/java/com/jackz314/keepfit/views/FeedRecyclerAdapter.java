@@ -196,7 +196,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             }
         });
 
-        Glide.with(holder.profilePic)
+        Glide.with(mInflater.getContext().getApplicationContext())
                 .load(creator.getProfilePic())
                 .fitCenter()
                 .placeholder(R.drawable.ic_account_circle_24)
