@@ -172,6 +172,7 @@ public class NewUserTest {
                         isDisplayed()));
         materialButton4.perform(click());
 
+        Thread.sleep(5000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_email_text), withText("newuser@gmail.com"),
                         withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.ScrollView.class))),
