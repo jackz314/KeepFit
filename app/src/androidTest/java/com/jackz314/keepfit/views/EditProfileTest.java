@@ -145,7 +145,7 @@ public class EditProfileTest {
 
         ViewInteraction textView2 = onView(
                 allOf(withId(R.id.user_name_text),
-                        withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.ScrollView.class))),
+                        withParent(withParent(IsInstanceOf.instanceOf(android.widget.ScrollView.class))),
                         isDisplayed()));
         textView2.check(matches(withText(containsString("B"))));
     }

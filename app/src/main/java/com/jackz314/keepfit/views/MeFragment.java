@@ -1,36 +1,17 @@
 package com.jackz314.keepfit.views;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.fragment.app.Fragment;
-import androidx.viewpager2.widget.ViewPager2;
 
-import com.firebase.ui.auth.AuthUI;
 import com.google.android.material.tabs.TabLayoutMediator;
-import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
-import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.databinding.FragmentMeBinding;
-
-import java.util.Objects;
-
-import us.zoom.sdk.AccountService;
-import us.zoom.sdk.ZoomSDK;
-
-import static com.jackz314.keepfit.GlobalConstants.RC_REAUTH_DELETE;
+import com.jackz314.keepfit.views.other.MeCollectionAdapter;
 
 public class MeFragment extends Fragment {
 

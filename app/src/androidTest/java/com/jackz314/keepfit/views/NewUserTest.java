@@ -144,7 +144,7 @@ public class NewUserTest {
         Thread.sleep(2000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_email_text), withText("newuser@gmail.com"),
-                        withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.ScrollView.class))),
+                        withParent(withParent(IsInstanceOf.instanceOf(android.widget.ScrollView.class))),
                         isDisplayed()));
         textView.check(matches(withText("newuser@gmail.com")));
 

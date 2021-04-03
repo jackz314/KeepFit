@@ -23,11 +23,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 public class UserController {
-    private FirebaseUser curruser = FirebaseAuth.getInstance().getCurrentUser();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseUser curruser = FirebaseAuth.getInstance().getCurrentUser();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private String TAG = "UserController";
-    private Executor procES = Executors.newSingleThreadExecutor();
+    private final String TAG = "UserController";
+    private final Executor procES = Executors.newSingleThreadExecutor();
 
     Boolean alreadyFollowing;
 

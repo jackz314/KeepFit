@@ -33,7 +33,7 @@ class PromptActivity : AppCompatActivity() {
         when (intent.action) {
             GlobalConstants.ACTION_LIVESTREAM -> {
                 isLivestream = true
-                if(b.promptTitle.requestFocus()) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                if(b.promptTitle.requestFocus()) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                 b.promptCategory.hint = "Category (use \",\" to separate multiple ones)"
                 b.promptExerciseIntensity.visibility = View.GONE
                 b.promptIntensityLabel.visibility = View.GONE
@@ -44,7 +44,7 @@ class PromptActivity : AppCompatActivity() {
                 titleValid = true
                 (b.promptCategory.layoutParams as ViewGroup.MarginLayoutParams).topMargin -= 72
                 b.promptCategory.requestLayout()
-                if(b.promptCategory.requestFocus()) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+                if(b.promptCategory.requestFocus()) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                 b.promptDescription.text = "Track Exercise"
             }
         }

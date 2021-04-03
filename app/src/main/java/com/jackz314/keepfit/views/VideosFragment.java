@@ -1,7 +1,6 @@
 package com.jackz314.keepfit.views;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,25 +11,20 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.ListFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
+import com.jackz314.keepfit.views.other.VideosRecyclerAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,10 +44,10 @@ public class VideosFragment extends Fragment {
     private VideosRecyclerAdapter videoRecyclerAdapter;
     private FragmentFeedBinding b;
 
-    private List<Media> videosList = new ArrayList<>();
+    private final List<Media> videosList = new ArrayList<>();
     private final List<DocumentReference> videoRefList = new ArrayList<>();
 
-    private Executor procES = Executors.newSingleThreadExecutor();
+    private final Executor procES = Executors.newSingleThreadExecutor();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -137,7 +131,7 @@ public class VideosFragment extends Fragment {
         return b.getRoot();
     }
 
-    protected void deleteVideo(String mediaID, String CreatorID, String StorageLink){
+    public void deleteVideo(String mediaID, String CreatorID, String StorageLink){
 
         db.collection("users").document(CreatorID).collection("videos")
                 .whereEqualTo("ref", db.collection("media").document(mediaID)).get()

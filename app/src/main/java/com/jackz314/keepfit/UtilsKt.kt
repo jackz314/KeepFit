@@ -88,7 +88,7 @@ object UtilsKt {
             } else if (ssoToken != null) { // user supplied
                 sdk.loginWithSSOToken(ssoToken)
             } else { // try from saved preferences
-                sdk.tryAutoLoginZoom();
+                sdk.tryAutoLoginZoom()
 //                val prefs = PreferenceManager.getDefaultSharedPreferences(context)
 //                val savedSSOToken = prefs.getString(GlobalConstants.ZOOM_SSO_TOKEN_KEY, null)
 //                if (savedSSOToken == null) { // token doesn't exist, try getting username and password
@@ -214,7 +214,7 @@ object UtilsKt {
     @JvmStatic
     fun isValidUrl(url: String): Boolean {
         return try {
-            URL(url).toURI();
+            URL(url).toURI()
             true
         } catch (e: Exception) {
             false

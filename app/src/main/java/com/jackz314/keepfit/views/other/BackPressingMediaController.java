@@ -1,4 +1,4 @@
-package com.jackz314.keepfit.controllers;
+package com.jackz314.keepfit.views.other;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.widget.MediaController;
 
 // from https://stackoverflow.com/a/62715887/8170714
 public class BackPressingMediaController extends MediaController {
-    private Activity mParentActivity;
+    private final Activity mParentActivity;
 
     public BackPressingMediaController(Context context, Activity parentActivity) {
         super(context);

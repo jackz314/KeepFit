@@ -1,4 +1,4 @@
-package com.jackz314.keepfit.views;
+package com.jackz314.keepfit.views.other;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -24,11 +24,11 @@ public class ExerciseRecyclerAdapter extends RecyclerView.Adapter<ExerciseRecycl
 
     private static final String TAG = "ExerciseRecyclerAdapter";
 
-    private List<Exercise> mData;
+    private final List<Exercise> mData;
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
-    private Context mContext;
+    private final Context mContext;
 
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
 

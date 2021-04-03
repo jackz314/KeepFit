@@ -2,7 +2,6 @@ package com.jackz314.keepfit.views;
 
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.controllers.BackPressingMediaController;
+import com.jackz314.keepfit.views.other.BackPressingMediaController;
 import com.jackz314.keepfit.controllers.VideoController;
 
 public class VideoActivity extends AppCompatActivity{

@@ -13,7 +13,7 @@ public class VideoController {
 
     private final Context context;
     private final FirebaseFirestore db;
-    private String mID;
+    private final String mID;
 
     private Media livestream;
 

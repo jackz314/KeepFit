@@ -217,7 +217,7 @@ public class FollowersListUITest {
 
         ViewInteraction viewGroup = onView(
                 allOf(withParent(allOf(withId(R.id.search_recycler),
-                        withParent(IsInstanceOf.<View>instanceOf(android.view.ViewGroup.class)))),
+                        withParent(IsInstanceOf.instanceOf(android.view.ViewGroup.class)))),
                         isDisplayed()));
         viewGroup.check(matches(isDisplayed()));
 

@@ -1,4 +1,4 @@
-package com.jackz314.keepfit.views
+package com.jackz314.keepfit.views.other
 
 import android.content.Context
 import android.os.Bundle

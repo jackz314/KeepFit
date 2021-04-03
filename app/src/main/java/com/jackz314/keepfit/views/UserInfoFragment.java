@@ -25,27 +25,22 @@ import com.bumptech.glide.Glide;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.Query;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.ExerciseController;
-import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
-import com.jackz314.keepfit.databinding.FragmentMeBinding;
 import com.jackz314.keepfit.models.Exercise;
 import com.jackz314.keepfit.databinding.FragmentUserInfoBinding;
-import com.jackz314.keepfit.models.User;
+import com.jackz314.keepfit.views.other.ExerciseRecyclerAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -68,7 +63,7 @@ public class UserInfoFragment extends Fragment {
     private final List<Exercise> exerciseList = new ArrayList<>();
     private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
 
     @Override
@@ -280,7 +275,7 @@ public class UserInfoFragment extends Fragment {
     public void onResume(){
         super.onResume();
         populateUserInfo();
-    };
+    }
 
 
 }

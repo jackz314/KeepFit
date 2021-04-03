@@ -68,7 +68,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         mUsernameEditText = (EditText) findViewById(R.id.editTextUsername);
         mBiographyEditText = (EditText) findViewById(R.id.editTextTextBio);
         mHeightEditText = (EditText) findViewById(R.id.editTextHeight);
-        mWeightEditText = (EditText) findViewById(R.id.editTextWeight);;
+        mWeightEditText = (EditText) findViewById(R.id.editTextWeight);
 
 
         Button finishEdit = findViewById(R.id.finish_new_user_btn);

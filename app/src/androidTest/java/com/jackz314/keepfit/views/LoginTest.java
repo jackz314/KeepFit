@@ -104,7 +104,7 @@ public class LoginTest {
         Thread.sleep(5000);
         ViewInteraction textView = onView(
                 allOf(withId(R.id.user_email_text),
-                        withParent(withParent(IsInstanceOf.<View>instanceOf(android.widget.ScrollView.class))),
+                        withParent(withParent(IsInstanceOf.instanceOf(android.widget.ScrollView.class))),
                         isDisplayed()));
         textView.check(matches(withText("logintest@gmail.com")));
     }

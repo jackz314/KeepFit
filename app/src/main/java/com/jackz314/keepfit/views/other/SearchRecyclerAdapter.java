@@ -1,4 +1,4 @@
-package com.jackz314.keepfit.views;
+package com.jackz314.keepfit.views.other;
 
 import android.content.Context;
 import android.content.Intent;
@@ -26,6 +26,8 @@ import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
+import com.jackz314.keepfit.views.SearchActivity;
+import com.jackz314.keepfit.views.UserProfileActivity;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
 
@@ -47,8 +49,8 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     private static final String TAG = "SearchRecyclerAdapter";
 
     private final List<String> greetings = Arrays.asList("Hello", "Hi!", "Let's Be Friends");
-    private List<SearchResult> mData;
-    private LayoutInflater mInflater;
+    private final List<SearchResult> mData;
+    private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
 
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
@@ -58,7 +60,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     ArrayList<Object> models;
     final static int USER =1;
     final static int MEDIA=2;
-    private HashSet<String> likedVideos = new HashSet<>();
+    private final HashSet<String> likedVideos = new HashSet<>();
 
 
 

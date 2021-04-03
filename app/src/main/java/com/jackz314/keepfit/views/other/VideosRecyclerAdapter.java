@@ -1,7 +1,6 @@
-package com.jackz314.keepfit.views;
+package com.jackz314.keepfit.views.other;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -9,45 +8,72 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
+import com.jackz314.keepfit.views.VideosFragment;
 
-import java.util.ArrayList;
+
+import java.util.HashSet;
 import java.util.List;
 
-public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAdapter.ViewHolder> {
+public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAdapter.ViewHolder> {
 
-    private static final String TAG = "FeedRecyclerAdapter";
+    private static final String TAG = "VideosRecyclerAdapter";
 
-    private List<Media> mData;
-    private LayoutInflater mInflater;
+    private final List<Media> mData;
+    private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
+    private final HashSet<String> ownVideos = new HashSet<>();
+    private final VideosFragment frag;
 
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
 
 
     // data is passed into the constructor
-    public FollowRecyclerAdapter(Context context, List<Media> data) {
+    public VideosRecyclerAdapter(Context context, List<Media> data, VideosFragment fragment) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
+        this.frag = fragment;
+        UserControllerKt.getCurrentUserDoc().collection("videos").addSnapshotListener(((value, e) -> {
+            if (e != null || value == null) {
+                Log.w(TAG, "Listen failed.", e);
+                return;
+            }
+
+            ownVideos.clear();
+            for (QueryDocumentSnapshot doc : value) {
+                ownVideos.add(doc.getId());
+            }
+
+        }));
+    }
+
+
+
+    public void notifyDataChanged(){
+
+        super.notifyDataSetChanged();
     }
 
     // inflates the row layout from xml when needed
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.follow_page_item, parent, false);
+        View view = mInflater.inflate(R.layout.video_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -62,6 +88,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
             holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8,0x03, 0x06)));
         }else{
             holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
+            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         }
 
         String thumbnail;
@@ -90,6 +117,17 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         }else{
             populateCreatorInfo(holder, media, creator);
         }
+        holder.deleteButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(frag.getContext())
+                    .setMessage(R.string.delete_video_confirm)
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> frag.deleteVideo(media.getUid(),media.getCreatorRef().getId(),media.getLink()))
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+//            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
+        });
+
+
+
 
         //use ref directly, similar speed
 //        media.getCreatorRef().get().addOnSuccessListener(snapshot -> {
@@ -116,7 +154,6 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         holder.categoryText.setText(categoryTextString);
 
 
-
     }
 
 
@@ -135,6 +172,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         TextView durationText;
         TextView categoryText;
         ImageView image;
+        ImageButton deleteButton;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -143,6 +181,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
             durationText = itemView.findViewById(R.id.feed_duration_text);
             categoryText = itemView.findViewById(R.id.feed_category_text);
             image = itemView.findViewById(R.id.feed_image);
+            deleteButton = itemView.findViewById(R.id.delete_video);
             itemView.setOnClickListener(this);
         }
 

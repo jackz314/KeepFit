@@ -18,6 +18,7 @@ import com.jackz314.keepfit.controllers.ExerciseController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivityExerciseBinding;
 import com.jackz314.keepfit.models.User;
+import com.jackz314.keepfit.views.other.StopwatchTextView;
 
 import java.time.LocalDate;
 import java.time.ZoneId;

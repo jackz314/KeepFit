@@ -149,7 +149,7 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
     }
 
     override fun onMeetingStatusChanged(meetingStatus: MeetingStatus?, errorCode: Int, internalErrorCode: Int) {
-        Log.d(TAG, "onMeetingStatusChanged, meetingStatus=$meetingStatus, errorCode=$errorCode, internalErrorCode=$internalErrorCode");
+        Log.d(TAG, "onMeetingStatusChanged, meetingStatus=$meetingStatus, errorCode=$errorCode, internalErrorCode=$internalErrorCode")
         if (meetingStatus == MeetingStatus.MEETING_STATUS_INMEETING && errorCode == MeetingError.MEETING_ERROR_SUCCESS){
             // user joined meeting, publish live stream
             currMeetingLink = sdk.inMeetingService.currentMeetingUrl

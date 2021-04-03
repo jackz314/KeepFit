@@ -26,6 +26,7 @@ import com.jackz314.keepfit.databinding.ActivitySearchBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
+import com.jackz314.keepfit.views.other.SearchRecyclerAdapter;
 
 import org.json.JSONObject;
 
@@ -42,13 +43,13 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private static final String TAG = "SearchActivity";
     private SearchView editsearch;
     private final List<SearchResult> mList = new ArrayList<>();
-    private Executor procES = Executors.newSingleThreadExecutor();
+    private final Executor procES = Executors.newSingleThreadExecutor();
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private LivestreamController livestreamController;
     private FirebaseFirestore db;
     private ActivitySearchBinding b;
 
-    private CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private com.algolia.search.saas.Index index;
 
     @Override

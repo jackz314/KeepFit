@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.jackz314.keepfit.views;
+package com.jackz314.keepfit.views.other;
 
 import android.app.Activity;
 import android.os.Handler;
@@ -54,9 +54,9 @@ public class StopwatchTextView implements Runnable, Closeable {
 		handler.removeCallbacks(this);
 	}
 
-	public enum TimerState {STOPPED, PAUSED, RUNNING};
+	public enum TimerState {STOPPED, PAUSED, RUNNING}
 
-	private final TextView widget;
+    private final TextView widget;
 	private long updateInterval;
 	private long time;
 	private long startTime;
@@ -70,7 +70,7 @@ public class StopwatchTextView implements Runnable, Closeable {
 
 	private final HandlerThread handlerThread;
 
-	private Activity activity;
+	private final Activity activity;
 
 	public StopwatchTextView(TextView widget, long updateInterval, Activity activity) {
 		this.widget = widget;

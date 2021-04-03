@@ -2,34 +2,22 @@ package com.jackz314.keepfit.views;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
-import android.view.LayoutInflater;
-import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
@@ -37,10 +25,9 @@ import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivityUserProfileBinding;
-import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import com.jackz314.keepfit.views.other.FollowRecyclerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,8 +43,8 @@ public class UserProfileActivity extends AppCompatActivity {
     private FirebaseFirestore db;
     private FollowRecyclerAdapter followerRecyclerAdapter;
     boolean following;
-    private List<Media> mList = new ArrayList<>();
-    private Executor procES = Executors.newSingleThreadExecutor();
+    private final List<Media> mList = new ArrayList<>();
+    private final Executor procES = Executors.newSingleThreadExecutor();
     private ListenerRegistration registration;
     private LivestreamController livestreamController;
     private ListenerRegistration lr;

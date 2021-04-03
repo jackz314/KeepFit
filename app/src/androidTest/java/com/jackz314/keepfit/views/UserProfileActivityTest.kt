@@ -41,13 +41,13 @@ class UserProfileActivityTest {
 
     @Test
     fun profileName() {
-        val instrumentation = InstrumentationRegistry.getInstrumentation();
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
 
         val intent = Intent()
         intent.putExtra(GlobalConstants.USER_PROFILE, dummyUser)
         profileActivityTestRule.launchActivity(intent)
 
-        instrumentation.waitForIdleSync();
+        instrumentation.waitForIdleSync()
 
         onView(ViewMatchers.withId(R.id.user_name_text)).check(ViewAssertions.matches(ViewMatchers.withText(dummyUser.name)))
 
@@ -57,7 +57,7 @@ class UserProfileActivityTest {
         intent.putExtra(GlobalConstants.USER_PROFILE, dummyUser.apply { name = "New User Name" })
         profileActivityTestRule.launchActivity(intent)
 
-        instrumentation.waitForIdleSync();
+        instrumentation.waitForIdleSync()
 
         onView(ViewMatchers.withId(R.id.user_name_text)).check(ViewAssertions.matches(ViewMatchers.withText(dummyUser.name)))
         profileActivityTestRule.finishActivity()
@@ -65,13 +65,13 @@ class UserProfileActivityTest {
 
     @Test
     fun profileBio() {
-        val instrumentation = InstrumentationRegistry.getInstrumentation();
+        val instrumentation = InstrumentationRegistry.getInstrumentation()
 
         val intent = Intent()
         intent.putExtra(GlobalConstants.USER_PROFILE, dummyUser)
         profileActivityTestRule.launchActivity(intent)
 
-        instrumentation.waitForIdleSync();
+        instrumentation.waitForIdleSync()
 
         onView(ViewMatchers.withId(R.id.biography)).check(ViewAssertions.matches(ViewMatchers.withText(containsString(dummyUser.biography))))
 
@@ -80,7 +80,7 @@ class UserProfileActivityTest {
         intent.putExtra(GlobalConstants.USER_PROFILE, dummyUser.apply { biography = "" })
         profileActivityTestRule.launchActivity(intent)
 
-        instrumentation.waitForIdleSync();
+        instrumentation.waitForIdleSync()
 
         onView(ViewMatchers.withId(R.id.biography)).check(ViewAssertions.matches(ViewMatchers.withText(containsString("Hello"))))
     }

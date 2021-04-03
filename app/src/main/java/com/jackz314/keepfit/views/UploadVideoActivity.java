@@ -96,7 +96,7 @@ public class UploadVideoActivity extends AppCompatActivity {
     private void selectVideo() {
         Intent intent = new Intent();
         intent.setType("video/*");
-        intent.setAction(intent.ACTION_GET_CONTENT);
+        intent.setAction(Intent.ACTION_GET_CONTENT);
         Intent videoFileSelect = Intent.createChooser(intent, "VIDEO FILE SELECT");
         startActivityForResult(videoFileSelect,12);
     }
@@ -151,7 +151,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         String filePath = getPathFromURI(data);
 
         String path = uidRef.toString();
-        String segments[] = path.split("@");
+        String[] segments = path.split("@");
         String userID = segments[segments.length -1];
 
         StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + user.getUid()+".mp4");

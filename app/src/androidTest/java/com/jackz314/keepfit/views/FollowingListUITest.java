@@ -176,7 +176,7 @@ public class FollowingListUITest {
 
         ViewInteraction viewGroup = onView(
                 allOf(withParent(allOf(withId(R.id.search_recycler),
-                        withParent(IsInstanceOf.<View>instanceOf(ViewGroup.class)))),
+                        withParent(IsInstanceOf.instanceOf(ViewGroup.class)))),
                         isDisplayed()));
         viewGroup.check(matches(isDisplayed()));
 

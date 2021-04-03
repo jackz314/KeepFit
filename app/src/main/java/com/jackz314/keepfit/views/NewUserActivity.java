@@ -49,7 +49,7 @@ public class NewUserActivity extends AppCompatActivity {
         mUsernameEditText = (EditText) findViewById(R.id.editTextUsername);
         mBiographyEditText = (EditText) findViewById(R.id.editTextTextBio);
         mHeightEditText = (EditText) findViewById(R.id.editTextHeight);
-        mWeightEditText = (EditText) findViewById(R.id.editTextWeight);;
+        mWeightEditText = (EditText) findViewById(R.id.editTextWeight);
         mUsernameEditText.setText(mFirebaseUser.getDisplayName());
         b.finishNewUserBtn.setOnClickListener(v -> {
             setResult(Activity.RESULT_OK);

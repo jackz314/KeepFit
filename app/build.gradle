@@ -69,13 +69,13 @@ dependencies {
 
     // testing
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test:core:' + rootProject.coreVersion;
-    implementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion;
-    androidTestImplementation 'androidx.test.espresso:espresso-intents:' + rootProject.espressoVersion;
-    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion;
-    androidTestImplementation 'androidx.test:runner:' + rootProject.runnerVersion;
-    androidTestImplementation 'androidx.test:rules:' + rootProject.rulesVersion;
-    androidTestImplementation 'androidx.test.espresso:espresso-contrib:' + rootProject.espressoVersion;
+    androidTestImplementation 'androidx.test:core:' + rootProject.coreVersion
+    implementation 'androidx.test.espresso:espresso-core:' + rootProject.espressoVersion
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:' + rootProject.espressoVersion
+    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.extJUnitVersion
+    androidTestImplementation 'androidx.test:runner:' + rootProject.runnerVersion
+    androidTestImplementation 'androidx.test:rules:' + rootProject.rulesVersion
+    androidTestImplementation 'androidx.test.espresso:espresso-contrib:' + rootProject.espressoVersion
 
     // Firebase stuff
     implementation 'com.firebaseui:firebase-ui-auth:6.4.0'
