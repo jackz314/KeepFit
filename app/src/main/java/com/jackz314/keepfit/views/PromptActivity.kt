@@ -5,9 +5,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
@@ -47,7 +45,7 @@ class PromptActivity : AppCompatActivity() {
                 // Create an ArrayAdapter using the string array and a default spinner layout
                 ArrayAdapter.createFromResource(
                         this,
-                        R.array.categories,
+                        R.array.exercise_categories,
                         android.R.layout.simple_spinner_item
                 ).also { adapter ->
                     // Specify the layout to use when the list of choices appears
@@ -83,11 +81,11 @@ class PromptActivity : AppCompatActivity() {
         if (isLivestream){
             val intent = Intent(this, StartLivestreamActivity::class.java)
             intent.putExtra(GlobalConstants.MEDIA_TITLE, b.promptTitle.text.toString())
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.getSelectedItem().toString())
+            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.selectedItem.toString())
             startActivity(intent)
         } else {
             val intent = Intent(this, ExerciseActivity::class.java)
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.getSelectedItem().toString())
+            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.selectedItem.toString())
             intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
             startActivity(intent)
         }
