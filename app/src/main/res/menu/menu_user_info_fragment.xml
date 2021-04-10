@@ -13,6 +13,11 @@
         android:title="Edit Profile"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/clear_exercise_log_btn"
+        android:icon="@drawable/ic_baseline_clear_all_24"
+        android:title="Clear Exercise Log"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/sign_out_zoom_btn"
         android:icon="@drawable/ic_zoom_24"
         android:title="Sign out of Zoom"

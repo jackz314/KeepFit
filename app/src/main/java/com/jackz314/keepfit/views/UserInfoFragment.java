@@ -32,8 +32,8 @@ import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.ExerciseController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
-import com.jackz314.keepfit.models.Exercise;
 import com.jackz314.keepfit.databinding.FragmentUserInfoBinding;
+import com.jackz314.keepfit.models.Exercise;
 import com.jackz314.keepfit.views.other.ExerciseRecyclerAdapter;
 
 import org.jetbrains.annotations.NotNull;
@@ -44,6 +44,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
@@ -64,6 +66,8 @@ public class UserInfoFragment extends Fragment {
     private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+
+    private final ExecutorService es = Executors.newSingleThreadExecutor();
 
 
     @Override
@@ -156,7 +160,9 @@ public class UserInfoFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        if (authStateListener != null) FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+        if (authStateListener != null)
+            FirebaseAuth.getInstance().removeAuthStateListener(authStateListener);
+        if (!es.isShutdown()) es.shutdown();
         super.onDestroy();
     }
 
@@ -179,7 +185,7 @@ public class UserInfoFragment extends Fragment {
     // setOptionalIconsVisible bug, see https://stackoverflow.com/q/41150995/8170714
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_me_fragment, menu);
+        inflater.inflate(R.menu.menu_user_info_fragment, menu);
         if (menu instanceof MenuBuilder) {
             ((MenuBuilder) menu).setOptionalIconsVisible(true);
         }
@@ -211,6 +217,12 @@ public class UserInfoFragment extends Fragment {
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> deleteAccount())
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
+        } else if (item.getItemId() == R.id.clear_exercise_log_btn) {
+            new AlertDialog.Builder(requireContext())
+                    .setMessage(R.string.clear_exercise_log_confirm_msg)
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> clearExerciseLog())
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -218,6 +230,11 @@ public class UserInfoFragment extends Fragment {
     private void editProfile() {
         Intent activity2Intent = new Intent(getActivity(), UpdateProfileActivity.class);
         startActivity(activity2Intent);
+    }
+
+    private void clearExerciseLog() {
+        UtilsKt.deleteCollection(UserControllerKt.getCurrentUserDoc().collection("exercises"), es);
+        Toast.makeText(getContext(), "Exercise log cleared!", Toast.LENGTH_SHORT).show();
     }
 
     private void signOut() {
@@ -276,6 +293,5 @@ public class UserInfoFragment extends Fragment {
         super.onResume();
         populateUserInfo();
     }
-
 
 }

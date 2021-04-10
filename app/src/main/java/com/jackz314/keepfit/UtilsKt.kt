@@ -1,11 +1,11 @@
 package com.jackz314.keepfit
 
 import android.util.Log
+import androidx.annotation.WorkerThread
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
 import com.jackz314.keepfit.controllers.UserControllerKt
 import io.reactivex.rxjava3.core.Completable
@@ -17,6 +17,7 @@ import us.zoom.sdk.ZoomSDKAuthenticationListener
 import java.net.URL
 import java.time.Duration
 import java.util.*
+import java.util.concurrent.Executor
 import javax.security.auth.login.LoginException
 
 private const val TAG = "UtilsKt"
@@ -219,5 +220,37 @@ object UtilsKt {
         } catch (e: Exception) {
             false
         }
+    }
+
+    // from https://stackoverflow.com/a/52146033/8170714
+    @JvmStatic
+    fun deleteCollection(collection: CollectionReference, executor: Executor) {
+        Tasks.call(executor) {
+            val batchSize = 10
+            var query = collection.orderBy(FieldPath.documentId()).limit(batchSize.toLong())
+            var deleted = deleteQueryBatch(query)
+
+            while (deleted.size >= batchSize) {
+                val last = deleted[deleted.size - 1]
+                query = collection.orderBy(FieldPath.documentId()).startAfter(last.id).limit(batchSize.toLong())
+
+                deleted = deleteQueryBatch(query)
+            }
+            null
+        }
+    }
+
+    @WorkerThread
+    @Throws(Exception::class)
+    private fun deleteQueryBatch(query: Query): List<DocumentSnapshot> {
+        val querySnapshot = Tasks.await(query.get())
+
+        val batch = query.firestore.batch()
+        for (snapshot in querySnapshot) {
+            batch.delete(snapshot.reference)
+        }
+        Tasks.await(batch.commit())
+
+        return querySnapshot.documents
     }
 }
