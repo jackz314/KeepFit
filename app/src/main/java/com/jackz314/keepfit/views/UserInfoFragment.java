@@ -69,6 +69,8 @@ public class UserInfoFragment extends Fragment {
 
     private final ExecutorService es = Executors.newSingleThreadExecutor();
 
+    private MenuItem clearExerciseItem;
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -112,10 +114,11 @@ public class UserInfoFragment extends Fragment {
                 exerciseList.addAll(value.toObjects(Exercise.class));
                 exerciseRecyclerAdapter.notifyDataSetChanged();
 
-
                 if (!exerciseList.isEmpty()){
+                    if (clearExerciseItem != null) clearExerciseItem.setVisible(true);
                     b.emptyExerciseLogText.setVisibility(View.GONE);
                 } else {
+                    if (clearExerciseItem != null) clearExerciseItem.setVisible(false);
                     b.emptyExerciseLogText.setVisibility(View.VISIBLE);
                     b.emptyExerciseLogText.setText("Go out and exercise more? ¯\\_(ツ)_/¯");
                 }
@@ -189,6 +192,7 @@ public class UserInfoFragment extends Fragment {
         if (menu instanceof MenuBuilder) {
             ((MenuBuilder) menu).setOptionalIconsVisible(true);
         }
+        clearExerciseItem = menu.findItem(R.id.clear_exercise_log_btn);
         super.onCreateOptionsMenu(menu, inflater);
     }
 
