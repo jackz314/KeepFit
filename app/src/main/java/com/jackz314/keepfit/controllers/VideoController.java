@@ -26,4 +26,14 @@ public class VideoController {
     public void updateVideoStatus(){
         db.collection("media").document(mID).update("view_count", FieldValue.increment(1));
     }
+
+    static public void likeVideo(String mediaID){
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database.collection("media").document(mediaID).update("likes", FieldValue.increment(1));
+    }
+
+    static public void unlikeVideo(String mediaID){
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database.collection("media").document(mediaID).update("likes", FieldValue.increment(-1));
+    }
 }

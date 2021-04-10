@@ -22,6 +22,7 @@ import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.UserControllerKt;
+import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.SearchActivity;
@@ -136,11 +137,13 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             @Override
             public void liked(LikeButton likeButton) {
                 UserControllerKt.likeVideo(media.getUid());
+                VideoController.likeVideo(media.getUid());
             }
 
             @Override
             public void unLiked(LikeButton likeButton) {
                 UserControllerKt.unlikeVideo(media.getUid());
+                VideoController.unlikeVideo(media.getUid());
             }
         });
 

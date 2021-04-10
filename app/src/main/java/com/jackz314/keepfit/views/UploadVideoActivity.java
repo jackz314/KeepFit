@@ -184,6 +184,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             media.put("creator", uidRef);
             media.put("is_livestream", false);
             media.put("link", link);
+            media.put("likes", 0);
             media.put("duration", (Long) durationLong);
             media.put("start_time", timestamp);
             media.put("title", titleTmp);

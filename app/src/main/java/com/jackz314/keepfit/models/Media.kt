@@ -31,7 +31,7 @@ class Media(doc: DocumentSnapshot): Serializable {
 
     @PropertyName("view_count")
     var viewCount: Int = 0
-
+    var likes: Int = 0
     @Exclude
     var liked = false
 
@@ -48,6 +48,7 @@ class Media(doc: DocumentSnapshot): Serializable {
             thumbnail = doc.getString("thumbnail")
             title = doc.getString("title")
             viewCount = doc.getLong("view_count")?.toInt()?:0
+            likes = doc.getLong("likes")?.toInt()?:0
             creatorRef = doc.getDocumentReference("creator")
             val task = creatorRef!!.get()
             task.addOnCompleteListener { task ->
@@ -79,7 +80,7 @@ class Media(doc: DocumentSnapshot): Serializable {
             relativeTimeSpanString
         }
         if (isLivestream) return "${creator.name} · ${viewCount} watching · Started $startTimeStr"
-        else return "${creator.name} · ${viewCount} views · $startTimeStr"
+        else return "${creator.name} · ${viewCount} views · ${likes} likes · $startTimeStr"
     }
     fun getProfileString():String{
         if (isLivestream) return "${viewCount} watching · Started ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
@@ -92,6 +93,7 @@ class Media(doc: DocumentSnapshot): Serializable {
                 ", creater=" + creator +
                 ", isLivestream=" + isLivestream +
                 ", link='" + link + '\'' +
+                ", likes='" + likes + '\'' +
                 ", startTime=" + startTime +
                 ", thumbnail='" + thumbnail + '\'' +
                 ", title='" + title + '\'' +
