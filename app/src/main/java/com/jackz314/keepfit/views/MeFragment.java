@@ -44,12 +44,15 @@ public class MeFragment extends Fragment {
                         tab.setText("My Videos");
                         break;
                     case 2:
-                        tab.setText("Liked Videos");
+                        tab.setText("Watch History");
                         break;
                     case 3:
-                        tab.setText("Followers");
+                        tab.setText("Liked Videos");
                         break;
                     case 4:
+                        tab.setText("Followers");
+                        break;
+                    case 5:
                         tab.setText("Following");
                         break;
                 }
