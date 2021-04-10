@@ -51,7 +51,7 @@ public class HistoryFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        historyRecyclerAdapter = new HistoryRecyclerAdapter(getContext(), watchedList, this);
+        historyRecyclerAdapter = new HistoryRecyclerAdapter(getContext(), watchedList);
         historyRecyclerAdapter.setClickListener((view, position) -> {
 
             Media media = watchedList.get(position);

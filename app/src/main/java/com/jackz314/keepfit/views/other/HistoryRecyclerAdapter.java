@@ -47,16 +47,16 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private final HashSet<String> likedVideos = new HashSet<>();
-    private final HistoryFragment frag;
+    private Context con;
 
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
 
 
     // data is passed into the constructor
-    public HistoryRecyclerAdapter(Context context, List<Media> data, HistoryFragment hFrag) {
+    public HistoryRecyclerAdapter(Context context, List<Media> data) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
-        this.frag = hFrag;
+        this.con = context;
         UserControllerKt.getCurrentUserDoc().collection("liked_videos").addSnapshotListener(((value, e) -> {
             if (e != null || value == null) {
                 Log.w(TAG, "Listen failed.", e);
@@ -149,9 +149,9 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
             }
         });
         holder.deleteButton.setOnClickListener(v -> {
-            new AlertDialog.Builder(frag.getContext())
+            new AlertDialog.Builder(con)
                     .setMessage(R.string.delete_history_confirm)
-                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> frag.deleteHistoryVideo(media.getUid()))
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> UserControllerKt.deleteFromHistory(media.getUid()))
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
