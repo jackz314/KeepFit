@@ -2,6 +2,8 @@ package com.jackz314.keepfit.views;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 
@@ -16,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -23,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,13 +37,19 @@ import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.models.User;
 
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class UpdateProfileActivity extends AppCompatActivity {
 
@@ -60,15 +70,57 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private int originalHeight;
     private Date originalBirthday;
 
+    /////
+    // views for button
+    private Button btnSelect, btnUpload;
+    // view for image view
+    private ImageView imageView;
+
+
+    // Uri indicates, where the image will be picked from
+    private Uri filePath = null;
+    String imgLink = "";
+
+    StorageReference storageReference;
+
+    // request code
+    private final int PICK_IMAGE_REQUEST = 22;
+    /////
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_update_profile);
 
+
         mUsernameEditText = (EditText) findViewById(R.id.editTextUsername);
         mBiographyEditText = (EditText) findViewById(R.id.editTextTextBio);
         mHeightEditText = (EditText) findViewById(R.id.editTextHeight);
         mWeightEditText = (EditText) findViewById(R.id.editTextWeight);
+
+        /////
+        storageReference = FirebaseStorage.getInstance().getReference();
+        // initialise views
+        btnSelect = findViewById(R.id.btnChoose);
+        imageView = findViewById(R.id.imgView);
+        btnUpload = findViewById(R.id.btnUpload);
+
+        btnSelect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                SelectImage();
+            }
+        });
+
+        btnUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+                uploadImage();
+            }
+        });
+        /////
 
 
         Button finishEdit = findViewById(R.id.finish_new_user_btn);
@@ -86,6 +138,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     originalHeight = dataResult.getLong("height").intValue();
                     originalBirthday = dataResult.getDate("birthday");
                 });
+
+
 
         finishEdit.setOnClickListener(view -> {
             mUsernameEditText = findViewById(R.id.editTextUsername);
@@ -139,10 +193,19 @@ public class UpdateProfileActivity extends AppCompatActivity {
             user.put("email", mFirebaseUser.getEmail());
             user.put("height", height);
             user.put("name", strUsername);
-            Uri photoUrl = mFirebaseUser.getPhotoUrl();
+            ////
             String photoStr;
-            if (photoUrl == null) photoStr = "";
-            else photoStr = photoUrl.toString();
+            if (filePath == null) {
+                Uri photoUrl = mFirebaseUser.getPhotoUrl();
+                if (photoUrl == null) photoStr = "";
+                else photoStr = photoUrl.toString();
+                Log.d("Update Profile", "Link: null" );
+                Log.d("Update Profile", "Link: " + photoStr);
+            } else {
+                photoStr = imgLink;
+                Log.d("Update Profile", "Link: not null");
+                Log.d("Update Profile", "Link: " + photoStr);
+            }
             user.put("profile_pic", photoStr);
             user.put("sex", sex);
             user.put("weight", weight);
@@ -191,4 +254,120 @@ public class UpdateProfileActivity extends AppCompatActivity {
             }
         };
     }
+
+
+    // Select Image method
+    private void SelectImage()
+    {
+
+        // Defining Implicit Intent to mobile gallery
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(
+                Intent.createChooser(
+                        intent,
+                        "Select Image from here..."),
+                PICK_IMAGE_REQUEST);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode,
+                                    int resultCode,
+                                    Intent data)
+    {
+
+        super.onActivityResult(requestCode,
+                resultCode,
+                data);
+
+        // checking request code and result code
+        // if request code is PICK_IMAGE_REQUEST and
+        // resultCode is RESULT_OK
+        // then set image in the image view
+        if (requestCode == PICK_IMAGE_REQUEST
+                && resultCode == RESULT_OK
+                && data != null
+                && data.getData() != null) {
+
+            // Get the Uri of data
+            filePath = data.getData();
+            try {
+
+                // Setting image on image view using Bitmap
+                Bitmap bitmap = MediaStore
+                        .Images
+                        .Media
+                        .getBitmap(
+                                getContentResolver(),
+                                filePath);
+                imageView.setImageBitmap(bitmap);
+            }
+
+            catch (IOException e) {
+                // Log the exception
+                e.printStackTrace();
+            }
+
+            Log.d("Update Profile", "Link: " + filePath);
+        }
+    }
+
+
+
+    // UploadImage method
+    private void uploadImage() {
+        if (filePath != null) {
+            // Defining the child of storageReference
+            StorageReference ref
+                    = storageReference
+                    .child(
+                            "images/"
+                                    + UUID.randomUUID().toString());
+
+            // adding listeners on upload
+            // or failure of image
+            ref.putFile(filePath)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+
+                                @Override
+                                public void onSuccess(
+                                        UploadTask.TaskSnapshot taskSnapshot) {
+                                    Log.d("Update Profile", "Uploaded!");
+
+                                    /////from upload video
+                                    Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                                    while (!uriTask.isComplete());
+                                    Uri uri = uriTask.getResult();
+
+                                    imgLink = uri.toString();
+                                    Log.d("Update Profile", imgLink);
+
+                                    /////
+                                }
+                            })
+
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("Update Profile", "Failed to Upload");
+                        }
+                    })
+                    .addOnProgressListener(
+                            new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onProgress(
+                                        UploadTask.TaskSnapshot taskSnapshot) {
+                                    double progress
+                                            = (100.0
+                                            * taskSnapshot.getBytesTransferred()
+                                            / taskSnapshot.getTotalByteCount());
+                                    Log.d("Update Profile", "Uploaded " + (int) progress + "%");
+                                }
+                            });
+        }
+    }
+
+
 }
