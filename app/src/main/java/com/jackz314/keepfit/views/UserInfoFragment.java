@@ -146,7 +146,7 @@ public class UserInfoFragment extends Fragment {
 
                 if (getActivity() != null) {
                     Glide.with(requireActivity().getApplicationContext())
-                            .load(Utils.getHighResProfilePicUrl())
+                            .load(user.getProfilePic())
                             .fitCenter()
                             .placeholder(R.drawable.ic_outline_account_circle_24)
                             .into(b.userProfilePicture);
