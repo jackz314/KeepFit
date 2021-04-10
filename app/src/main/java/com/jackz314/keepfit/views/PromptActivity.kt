@@ -8,13 +8,13 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.ArrayAdapter
 import android.widget.EditText
-import android.widget.Spinner
 import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import com.jackz314.keepfit.GlobalConstants
 import com.jackz314.keepfit.R
+import com.jackz314.keepfit.controllers.ExerciseController
 import com.jackz314.keepfit.databinding.ActivityPromptBinding
 
 class PromptActivity : AppCompatActivity() {
@@ -42,18 +42,20 @@ class PromptActivity : AppCompatActivity() {
                 b.promptTitle.visibility = View.GONE
                 b.promptDescription.text = "Track Exercise"
                 titleValid = true
-                val spinner: Spinner = findViewById(R.id.prompt_category)
-                // Create an ArrayAdapter using the string array and a default spinner layout
-                ArrayAdapter.createFromResource(
-                        this,
-                        R.array.exercise_categories,
-                        android.R.layout.simple_spinner_item
-                ).also { adapter ->
-                    // Specify the layout to use when the list of choices appears
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    // Apply the adapter to the spinner
-                    spinner.adapter = adapter
+                val exerciseCategoryAdapter: ArrayAdapter<String>
+                val recentExercise = ExerciseController.getMostRecentExercise(this)
+                val exerciseArr = resources.getStringArray(R.array.exercise_categories)
+                if (recentExercise != null) {
+                    val exerciseCategories = exerciseArr.toMutableList().apply { add(0, "$recentExercise • Most Recent") }
+                    exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseCategories)
+                } else {
+                    exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseArr)
                 }
+                // Create an ArrayAdapter using the string array and a default spinner layout
+                // Specify the layout to use when the list of choices appears
+                exerciseCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                // Apply the adapter to the spinner
+                b.promptCategory.adapter = exerciseCategoryAdapter
             }
         }
 

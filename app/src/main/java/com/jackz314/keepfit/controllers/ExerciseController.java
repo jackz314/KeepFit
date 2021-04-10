@@ -1,9 +1,14 @@
 package com.jackz314.keepfit.controllers;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import androidx.preference.PreferenceManager;
+
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.models.Exercise;
 import com.jackz314.keepfit.models.User;
 
@@ -115,5 +120,15 @@ public class ExerciseController {
 
     public static long getTotalExerciseTime(List<Exercise> exercises) {
         return exercises.stream().mapToLong(Exercise::getElapsedTime).sum();
+    }
+
+    public static void setMostRecentExercise(Context context, String exercise) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putString(GlobalConstants.RECENT_EXERCISE_KEY, exercise).apply();
+    }
+
+    public static String getMostRecentExercise(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(GlobalConstants.RECENT_EXERCISE_KEY, null);
     }
 }
