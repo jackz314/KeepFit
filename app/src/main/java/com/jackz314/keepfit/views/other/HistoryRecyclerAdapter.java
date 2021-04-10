@@ -1,4 +1,4 @@
-package com.jackz314.keepfit.views;
+package com.jackz314.keepfit.views.other;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,9 +15,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -29,11 +26,12 @@ import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
+import com.jackz314.keepfit.views.HistoryFragment;
+import com.jackz314.keepfit.views.SearchActivity;
+import com.jackz314.keepfit.views.UserProfileActivity;
 import com.like.LikeButton;
 import com.like.OnLikeListener;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -45,11 +43,11 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
 
     private static final String TAG = "HistoryRecyclerAdapter";
 
-    private List<Media> mData;
-    private LayoutInflater mInflater;
+    private final List<Media> mData;
+    private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
-    private HashSet<String> likedVideos = new HashSet<>();
-    private HistoryFragment frag;
+    private final HashSet<String> likedVideos = new HashSet<>();
+    private final HistoryFragment frag;
 
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
 
