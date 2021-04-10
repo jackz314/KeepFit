@@ -40,6 +40,7 @@ class PromptActivity : AppCompatActivity() {
             GlobalConstants.ACTION_EXERCISE -> {
                 isLivestream = false
                 b.promptTitle.visibility = View.GONE
+                b.promptDescription.text = "Track Exercise"
                 titleValid = true
                 val spinner: Spinner = findViewById(R.id.prompt_category)
                 // Create an ArrayAdapter using the string array and a default spinner layout
