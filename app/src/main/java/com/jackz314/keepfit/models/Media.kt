@@ -84,7 +84,7 @@ class Media(doc: DocumentSnapshot): Serializable {
     }
     fun getProfileString():String{
         if (isLivestream) return "${viewCount} watching · Started ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
-        else return "${viewCount} views · ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
+        else return "${viewCount} views · ${likes} likes · ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
     }
 
     override fun toString(): String {
