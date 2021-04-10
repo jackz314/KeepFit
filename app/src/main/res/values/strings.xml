@@ -19,6 +19,14 @@
         <item>Male</item>
         <item>Female</item>
     </string-array>
+
+    <string-array name="categories">
+        <item>Strength</item>
+        <item>Stretching</item>
+        <item>Cardio</item>
+        <item>Balance</item>
+        <item>Yoga</item>
+    </string-array>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_exercise">FullscreenActivity</string>

@@ -8,7 +8,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
+import android.widget.ArrayAdapter
 import android.widget.EditText
+import android.widget.Spinner
 import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
@@ -34,7 +36,6 @@ class PromptActivity : AppCompatActivity() {
             GlobalConstants.ACTION_LIVESTREAM -> {
                 isLivestream = true
                 if(b.promptTitle.requestFocus()) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                b.promptCategory.hint = "Category (use \",\" to separate multiple ones)"
                 b.promptExerciseIntensity.visibility = View.GONE
                 b.promptIntensityLabel.visibility = View.GONE
             }
@@ -42,49 +43,25 @@ class PromptActivity : AppCompatActivity() {
                 isLivestream = false
                 b.promptTitle.visibility = View.GONE
                 titleValid = true
-                (b.promptCategory.layoutParams as ViewGroup.MarginLayoutParams).topMargin -= 72
-                b.promptCategory.requestLayout()
-                if(b.promptCategory.requestFocus()) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
-                b.promptDescription.text = "Track Exercise"
+                val spinner: Spinner = findViewById(R.id.prompt_category)
+                // Create an ArrayAdapter using the string array and a default spinner layout
+                ArrayAdapter.createFromResource(
+                        this,
+                        R.array.categories,
+                        android.R.layout.simple_spinner_item
+                ).also { adapter ->
+                    // Specify the layout to use when the list of choices appears
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                    // Apply the adapter to the spinner
+                    spinner.adapter = adapter
+                }
             }
         }
 
-        b.promptTitle.afterTextChanged {
-            if (!validate(it)){
-                titleValid = false
-                b.promptTitle.error = "Please enter a valid title."
-                b.promptStartBtn.isEnabled = false
-            } else {
-                titleValid = true
-                b.promptTitle.error = null
-                if (categoryValid) b.promptStartBtn.isEnabled = true
-            }
-        }
 
-        b.promptCategory.apply {
-            afterTextChanged {
-                // TODO: 3/20/21 auto complete?
-                if (!validate(it)){
-                    categoryValid = false
-                    b.promptCategory.error = "Please enter valid categories."
-                    b.promptStartBtn.isEnabled = false
-                } else {
-                    categoryValid = true
-                    b.promptCategory.error = null
-                    if (titleValid) b.promptStartBtn.isEnabled = true
-                }
-            }
-
-            setOnEditorActionListener { _, actionId, _ ->
-                when (actionId) {
-                    EditorInfo.IME_ACTION_DONE -> start()
-                }
-                false
-            }
-
-            b.promptStartBtn.setOnClickListener {
-                start()
-            }
+        b.promptStartBtn.isEnabled = true
+        b.promptStartBtn.setOnClickListener {
+            start()
         }
     }
 
@@ -106,11 +83,11 @@ class PromptActivity : AppCompatActivity() {
         if (isLivestream){
             val intent = Intent(this, StartLivestreamActivity::class.java)
             intent.putExtra(GlobalConstants.MEDIA_TITLE, b.promptTitle.text.toString())
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.text.toString())
+            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.getSelectedItem().toString())
             startActivity(intent)
         } else {
             val intent = Intent(this, ExerciseActivity::class.java)
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.text.toString())
+            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.getSelectedItem().toString())
             intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
             startActivity(intent)
         }
