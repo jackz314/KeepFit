@@ -11,11 +11,19 @@ import android.widget.VideoView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.StorageReference;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.views.other.BackPressingMediaController;
+import com.jackz314.keepfit.views.other.BackPressingMediaController;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.controllers.VideoController;
+import com.jackz314.keepfit.models.Media;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class VideoActivity extends AppCompatActivity{
     private static final String TAG = "VideoActivity";
@@ -39,6 +47,7 @@ public class VideoActivity extends AppCompatActivity{
         Intent intent = getIntent();
         String value = intent.getStringExtra("uri");
         String mediaID = intent.getStringExtra("media");
+        addToHistory(mediaID);
         VideoView videoView = findViewById(R.id.video_view);
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
@@ -81,6 +90,13 @@ public class VideoActivity extends AppCompatActivity{
     public void openVideoActivity() {
         Intent intent = new Intent(this, VideoActivity.class);
         startActivity(intent);
+    }
+
+    public void addToHistory(String mediaID){
+        Map<String, Object> obj = new HashMap<>();
+        obj.put("watched", new Timestamp(new Date()));
+
+        UserControllerKt.getCurrentUserDoc().collection("history").document(mediaID).set(obj);
     }
 
 
