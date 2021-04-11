@@ -35,15 +35,19 @@
         android:ems="10"
         android:inputType="textPersonName"
         android:hint="Title" />
+
     <EditText
         android:id="@+id/categories_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/choose_file_to_upload"
         android:layout_centerHorizontal="true"
+        android:clickable="true"
+        android:focusable="false"
         android:ems="10"
         android:inputType="textPersonName"
-        android:hint="Category (Ex. Stength, Balance)" />
+        android:hint="Select Category"
+         />
 
 
 
