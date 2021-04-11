@@ -73,13 +73,16 @@
         app:layout_constraintBottom_toBottomOf="@+id/feed_image"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <TextView
+    <co.lujun.androidtagview.TagContainerLayout
         android:id="@+id/feed_category_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:container_background_color="@android:color/transparent"
+        app:container_border_width="0dp"
         android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
-        android:text="Categories:"
+        app:tag_clickable="true"
+        app:tag_vertical_padding="4dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/feed_title_text"
