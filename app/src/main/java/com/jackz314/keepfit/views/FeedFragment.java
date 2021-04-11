@@ -32,6 +32,32 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+class categoryVariable {
+    private String category = "Blank";
+    private ChangeListener listener;
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+        if (listener != null) listener.onChange();
+    }
+
+    public ChangeListener getListener() {
+        return listener;
+    }
+
+    public void setListener(ChangeListener listener) {
+        this.listener = listener;
+    }
+
+    public interface ChangeListener {
+        void onChange();
+    }
+}
+
 public class FeedFragment extends Fragment {
 
     private static final String TAG = "FeedFragment";
@@ -48,6 +74,8 @@ public class FeedFragment extends Fragment {
 
 
     private ListenerRegistration registration;
+
+    private categoryVariable category = new categoryVariable();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,7 +104,9 @@ public class FeedFragment extends Fragment {
         });
 
         db = FirebaseFirestore.getInstance();
+
         registration = db.collection("media").orderBy("start_time", Query.Direction.DESCENDING)
+
 //                .whereEqualTo("state", "CA")
                 .addSnapshotListener((value, e) -> {
                     if (e != null || value == null) {
@@ -94,7 +124,7 @@ public class FeedFragment extends Fragment {
                         requireActivity().runOnUiThread(() -> {
 
                             if (b != null) {
-                                if (!mediaList.isEmpty()){
+                                if (!mediaList.isEmpty()) {
                                     b.emptyFeedText.setVisibility(View.GONE);
                                 } else {
                                     b.emptyFeedText.setVisibility(View.VISIBLE);
@@ -107,6 +137,45 @@ public class FeedFragment extends Fragment {
                         Log.d(TAG, "media collection update: " + mediaList);
                     });
                 });
+
+        category.setListener(new categoryVariable.ChangeListener() {
+            @Override
+            public void onChange() {
+                registration.remove();
+                registration = db.collection("media").whereArrayContains("categories", category.getCategory())
+
+//                .whereEqualTo("state", "CA")
+                        .addSnapshotListener((value, e) -> {
+                            if (e != null || value == null) {
+                                Log.w(TAG, "Listen failed.", e);
+                                return;
+                            }
+
+                            procES.execute(() -> {
+                                mediaList.clear();
+                                for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
+                                    mediaList.add(new Media(queryDocumentSnapshot));
+                                }
+
+                                // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
+                                requireActivity().runOnUiThread(() -> {
+
+                                    if (b != null) {
+                                        if (!mediaList.isEmpty()) {
+                                            b.emptyFeedText.setVisibility(View.GONE);
+                                        } else {
+                                            b.emptyFeedText.setVisibility(View.VISIBLE);
+                                            b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+                                        }
+                                    }
+
+                                    feedRecyclerAdapter.notifyDataChanged();
+                                });
+                                Log.d(TAG, "media collection update: " + mediaList);
+                            });
+                        });
+            }
+        });
     }
 
     @Override
@@ -144,10 +213,25 @@ public class FeedFragment extends Fragment {
         if (item.getItemId() == R.id.app_bar_search) {
             Intent intent = new Intent(getContext(), SearchActivity.class);
             startActivity(intent);
-        }else{
+        }
+        else if (item.getItemId() == R.id.strength_filter_btn) {
+            category.setCategory("Strength");
+        }
+        else if (item.getItemId() == R.id.stretching_filter_btn) {
+            category.setCategory("Stretching");
+        }
+        else if (item.getItemId() == R.id.cardio_filter_btn) {
+            category.setCategory("Cardio");
+        }
+        else if (item.getItemId() == R.id.balance_filter_btn) {
+            category.setCategory("Balance");
+        }
+        else if (item.getItemId() == R.id.yoga_filter_btn) {
+            category.setCategory("Yoga");
+        }
+        else{
             return super.onOptionsItemSelected(item);
         }
-
         return true;
     }
 
