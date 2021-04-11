@@ -35,7 +35,7 @@ import java.util.List;
 
 public class FollowingFragment extends Fragment  {
 
-    private static final String TAG = "FollowerFragment";
+    private static final String TAG = "FollowingFragment";
 
     private FirebaseUser ub;
     private FirebaseFirestore db;

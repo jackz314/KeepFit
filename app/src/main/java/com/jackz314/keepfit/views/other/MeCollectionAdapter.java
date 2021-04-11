@@ -48,6 +48,6 @@ public class MeCollectionAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 5;
+        return 6;
     }
 }
