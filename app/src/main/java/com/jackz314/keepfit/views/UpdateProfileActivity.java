@@ -2,6 +2,8 @@ package com.jackz314.keepfit.views;
 
 import android.app.Activity;
 import android.app.DatePickerDialog;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -103,24 +105,14 @@ public class UpdateProfileActivity extends AppCompatActivity {
         // initialise views
         btnSelect = findViewById(R.id.btnChoose);
         imageView = findViewById(R.id.imgView);
-        btnUpload = findViewById(R.id.btnUpload);
 
         btnSelect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v)
             {
-                SelectImage();
+                selectImage();
             }
         });
-
-        btnUpload.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                uploadImage();
-            }
-        });
-        /////
 
 
         Button finishEdit = findViewById(R.id.finish_new_user_btn);
@@ -131,9 +123,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     DocumentSnapshot dataResult = task.getResult();
                     originalName = (String) dataResult.getString("name");
-                    Log.d("Update Profile", "Name: " + originalName);
                     originalBio =(String) dataResult.getString("biography");
-                    Log.d("Update Profile", "Bio: " + originalBio);
                     originalWeight = dataResult.getLong("weight").intValue();
                     originalHeight = dataResult.getLong("height").intValue();
                     originalBirthday = dataResult.getDate("birthday");
@@ -142,6 +132,11 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
 
         finishEdit.setOnClickListener(view -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             mUsernameEditText = findViewById(R.id.editTextUsername);
             String strUsername = mUsernameEditText.getText().toString();
             if (TextUtils.isEmpty(strUsername)) {
@@ -257,7 +252,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
 
     // Select Image method
-    private void SelectImage()
+    private void selectImage()
     {
 
         // Defining Implicit Intent to mobile gallery
@@ -311,6 +306,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
             Log.d("Update Profile", "Link: " + filePath);
         }
+        uploadImage();
     }
 
 
@@ -323,7 +319,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     = storageReference
                     .child(
                             "images/"
-                                    + UUID.randomUUID().toString());
+                                    + mFirebaseUser.getUid());
 
             // adding listeners on upload
             // or failure of image
