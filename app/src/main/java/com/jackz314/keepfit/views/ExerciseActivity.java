@@ -1,7 +1,5 @@
 package com.jackz314.keepfit.views;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -9,9 +7,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.ArrayAdapter;
-import android.widget.Spinner;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
@@ -79,14 +77,17 @@ public class ExerciseActivity extends AppCompatActivity {
             user = new User(); // use defaults to estimate stuff
             user.setHeight(170);
             user.setWeight(65);
-            user.setBirthday(Date.from(LocalDate.of(2000,1,1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
+            user.setBirthday(Date.from(LocalDate.of(2000, 1, 1).atStartOfDay(ZoneId.systemDefault()).toInstant()));
             user.setSex(true);
             exerciseController = new ExerciseController(user, met);
         });
         compositeDisposable.add(disposable);
 
         exerciseType = getIntent().getStringExtra(GlobalConstants.EXERCISE_TYPE);
-        if (exerciseType != null) exerciseType = Utils.toTitleCase(exerciseType);
+        if (exerciseType != null) {
+            ExerciseController.setMostRecentExercise(this, exerciseType);
+            exerciseType = Utils.toTitleCase(exerciseType);
+        }
         b.exerciseTitle.setText(exerciseType);
 
         stopwatch = new StopwatchTextView(b.exerciseTimeText, 50, this);

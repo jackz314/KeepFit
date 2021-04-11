@@ -1,5 +1,6 @@
 package com.jackz314.keepfit.views
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
@@ -7,12 +8,10 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.WindowManager
-import android.widget.ArrayAdapter
-import android.widget.EditText
-import android.widget.Spinner
-import android.widget.Toast
+import android.widget.*
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
@@ -20,6 +19,7 @@ import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
 import com.jackz314.keepfit.GlobalConstants
 import com.jackz314.keepfit.R
+import com.jackz314.keepfit.controllers.ExerciseController
 import com.jackz314.keepfit.databinding.ActivityPromptBinding
 
 class PromptActivity : AppCompatActivity() {
@@ -44,32 +44,65 @@ class PromptActivity : AppCompatActivity() {
                 b.promptExerciseIntensity.visibility = View.GONE
                 b.promptIntensityLabel.visibility = View.GONE
                 b.promptCategoryDropdown.visibility = View.GONE
-                val chipGroup = findViewById<ChipGroup>(R.id.prompt_category_button)
-                val categories = applicationContext.resources.getStringArray(R.array.categories)
-                for (n in categories) {
-                    val chip = Chip(this)
-                    chip.text = (n.toString())
-                    chip.isCheckable = true
-                    chip.isCheckedIconVisible = false
-                    chipGroup.addView(chip)
+
+                val categoryView = findViewById<TextView>(R.id.prompt_category_select);
+
+                categoryView.setOnClickListener {
+                    val builder = AlertDialog.Builder(this@PromptActivity)
+                    val categories = applicationContext.resources.getStringArray(R.array.exercise_categories)
+                    builder.setTitle("Select Categories")
+                    val checked = BooleanArray(categories.size) { false }
+                    builder.setMultiChoiceItems(categories, checked) {  dialog, which, isChecked ->
+
+                    }
+
+                    // Set the positive/yes button click listener
+                    var selectedCategories = ArrayList<String>()
+                    builder.setPositiveButton("OK") { dialog, which ->
+                        for (i in checked.indices) {
+                            val c = checked[i]
+                            if (c) {
+                                selectedCategories.add(categories[i])
+                            }
+                        }
+                        categoryView.text = selectedCategories.joinToString()
+                    }
+                    // Set the neutral/cancel button click listener
+                    builder.setNeutralButton("Cancel") { dialog, which ->
+                        // Do something when click the neutral button
+                    }
+                    val dialog = builder.create()
+                    // Display the alert dialog on interface
+                    dialog.show()
                 }
             }
             GlobalConstants.ACTION_EXERCISE -> {
                 isLivestream = false
                 b.promptTitle.visibility = View.GONE
-                b.promptCategoryButton.visibility = View.GONE
+                b.promptCategorySelect.visibility = View.GONE
                 titleValid = true
                 val spinner: Spinner = findViewById(R.id.prompt_category_dropdown)
                 // Create an ArrayAdapter using the string array and a default spinner layout
                 ArrayAdapter.createFromResource(
                         this,
-                        R.array.categories,
+                        R.array.exercise_categories,
                         android.R.layout.simple_spinner_item
                 ).also { adapter ->
                     // Specify the layout to use when the list of choices appears
                     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                     // Apply the adapter to the spinner
                     spinner.adapter = adapter
+                    b.promptDescription.text = "Track Exercise"
+                    titleValid = true
+                    val exerciseCategoryAdapter: ArrayAdapter<String>
+                    val recentExercise = ExerciseController.getMostRecentExercise(this)
+                    val exerciseArr = resources.getStringArray(R.array.exercise_categories)
+                    if (recentExercise != null) {
+                        val exerciseCategories = exerciseArr.toMutableList().apply { add(0, "$recentExercise • Most Recent") }
+                        exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseCategories)
+                    } else {
+                        exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseArr)
+                    }
                 }
             }
         }
@@ -99,12 +132,13 @@ class PromptActivity : AppCompatActivity() {
         if (isLivestream){
             val intent = Intent(this, StartLivestreamActivity::class.java)
             intent.putExtra(GlobalConstants.MEDIA_TITLE, b.promptTitle.text.toString())
-            val chipGroup = findViewById<ChipGroup>(R.id.prompt_category_button)
-            val selectedChips = chipGroup.children
+            //val chipGroup = findViewById<ChipGroup>(R.id.prompt_category_button)
+            /*val selectedChips = chipGroup.children
                     .filter { (it as Chip).isChecked }
                     .map { (it as Chip).text.toString() }
-            val categoryStr = selectedChips.joinToString();
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, categoryStr)
+            val categoryStr = selectedChips.joinToString();*/
+            val categoryView = findViewById<TextView>(R.id.prompt_category_select);
+            intent.putExtra(GlobalConstants.EXERCISE_TYPE, categoryView.text.toString())
             startActivity(intent)
         } else {
             val intent = Intent(this, ExerciseActivity::class.java)

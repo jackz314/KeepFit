@@ -20,13 +20,123 @@
         <item>Female</item>
     </string-array>
 
-    <string-array name="categories">
-        <item>Strength</item>
-        <item>Stretching</item>
-        <item>Cardio</item>
-        <item>Balance</item>
+    <string-array name="exercise_categories">
+        <item>Aerobics</item>
+        <item>Archery</item>
+        <item>Badminton</item>
+        <item>Baseball</item>
+        <item>Basketball</item>
+        <item>Biathlon</item>
+        <item>Biking</item>
+        <item>Handbiking</item>
+        <item>Mountain biking</item>
+        <item>Road biking</item>
+        <item>Spinning</item>
+        <item>Stationary biking</item>
+        <item>Utility biking</item>
+        <item>Boxing</item>
+        <item>Calisthenics</item>
+        <item>Circuit training</item>
+        <item>Cricket</item>
+        <item>Crossfit</item>
+        <item>Curling</item>
+        <item>Dancing</item>
+        <item>Diving</item>
+        <item>Elevator</item>
+        <item>Elliptical</item>
+        <item>Ergometer</item>
+        <item>Escalator</item>
+        <item>Fencing</item>
+        <item>Football (American)</item>
+        <item>Football (Australian)</item>
+        <item>Football (Soccer)</item>
+        <item>Frisbee</item>
+        <item>Gardening</item>
+        <item>Golf</item>
+        <item>Guided Breathing</item>
+        <item>Gymnastics</item>
+        <item>Handball</item>
+        <item>HIIT</item>
+        <item>Hiking</item>
+        <item>Hockey</item>
+        <item>Horseback riding</item>
+        <item>Housework</item>
+        <item>Ice skating</item>
+        <item>In vehicle</item>
+        <item>Interval Training</item>
+        <item>Jumping rope</item>
+        <item>Kayaking</item>
+        <item>Kettlebell training</item>
+        <item>Kickboxing</item>
+        <item>Kitesurfing</item>
+        <item>Martial arts</item>
+        <item>Meditation</item>
+        <item>Mixed martial arts</item>
+        <item>Other</item>
+        <item>P90X exercises</item>
+        <item>Paragliding</item>
+        <item>Pilates</item>
+        <item>Polo</item>
+        <item>Racquetball</item>
+        <item>Rock climbing</item>
+        <item>Rowing</item>
+        <item>Rowing machine</item>
+        <item>Rugby</item>
+        <item>Running</item>
+        <item>Jogging</item>
+        <item>Running on sand</item>
+        <item>Running (treadmill)</item>
+        <item>Sailing</item>
+        <item>Scuba diving</item>
+        <item>Skateboarding</item>
+        <item>Skating</item>
+        <item>Cross skating</item>
+        <item>Indoor skating</item>
+        <item>Inline skating (rollerblading)</item>
+        <item>Skiing</item>
+        <item>Back-country skiing</item>
+        <item>Cross-country skiing</item>
+        <item>Downhill skiing</item>
+        <item>Kite skiing</item>
+        <item>Roller skiing</item>
+        <item>Sledding</item>
+        <item>Snowboarding</item>
+        <item>Snowmobile</item>
+        <item>Snowshoeing</item>
+        <item>Softball</item>
+        <item>Squash</item>
+        <item>Stair climbing</item>
+        <item>Stair-climbing machine</item>
+        <item>Stand-up paddleboarding</item>
+        <item>Still (not moving)</item>
+        <item>Strength training</item>
+        <item>Surfing</item>
+        <item>Swimming</item>
+        <item>Swimming (open water)</item>
+        <item>Swimming (swimming pool)</item>
+        <item>Table tennis (ping pong)</item>
+        <item>Team sports</item>
+        <item>Tennis</item>
+        <item>Tilting (sudden device gravity change)</item>
+        <item>Treadmill (walking or running)</item>
+        <item>Unknown (unable to detect activity)</item>
+        <item>Volleyball</item>
+        <item>Volleyball (beach)</item>
+        <item>Volleyball (indoor)</item>
+        <item>Wakeboarding</item>
+        <item>Walking</item>
+        <item>Walking (fitness)</item>
+        <item>Nording walking</item>
+        <item>Walking (treadmill)</item>
+        <item>Walking (stroller)</item>
+        <item>Waterpolo</item>
+        <item>Weightlifting</item>
+        <item>Wheelchair</item>
+        <item>Windsurfing</item>
         <item>Yoga</item>
+        <item>Zumba</item>
     </string-array>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_exercise">FullscreenActivity</string>
@@ -41,5 +151,6 @@
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be >5 characters</string>
     <string name="login_failed">"Login failed"</string>
-    <string name="delete_video_confirm">"Are you sure you want to delete this video?</string>
+    <string name="delete_video_confirm">Are you sure you want to delete this video?</string>
+    <string name="delete_history_confirm">Are you sure you want to remove this video from your watch history?</string>
 </resources>

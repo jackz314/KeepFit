@@ -18,6 +18,7 @@ public interface GlobalConstants {
     String ZOOM_USERNAME_KEY = "zoom_username";
     String ZOOM_PASSWORD_KEY = "zoom_pwd";
     String ALGOLIA_SEARCH_KEY = "algolia_search_key";
+    String RECENT_EXERCISE_KEY = "recent_exercise";
 
     // intent stuff
     String MEDIA_TITLE = "media_title";

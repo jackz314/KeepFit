@@ -50,5 +50,10 @@ object UserControllerKt {
         currentUserDoc.collection("liked_videos").document(uid).delete()
     }
 
+    @JvmStatic
+    fun deleteFromHistory(uid: String){
+        currentUserDoc.collection("history").document(uid).delete()
+    }
+
 
 }

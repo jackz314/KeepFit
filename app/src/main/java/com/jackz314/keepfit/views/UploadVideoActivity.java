@@ -1,6 +1,8 @@
 package com.jackz314.keepfit.views;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
@@ -8,8 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -31,6 +35,7 @@ import com.jackz314.keepfit.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,8 +75,14 @@ public class UploadVideoActivity extends AppCompatActivity {
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     EditText editText;
     EditText titleText;
-    EditText categoryText;
     Button btn;
+    EditText categoryText;
+    boolean[] selectedCategory;
+    ArrayList<Integer> categoryList = new ArrayList<>();
+
+
+
+
 
     StorageReference storageReference;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -87,6 +98,80 @@ public class UploadVideoActivity extends AppCompatActivity {
         btn = findViewById(R.id.btn_video_upload);
 
         storageReference = FirebaseStorage.getInstance().getReference();
+
+        List<String> cgs = Arrays.asList(getResources().getStringArray(R.array.exercise_categories));
+
+        String[] categoryArray = new String[cgs.size()];
+        for(int j = 0 ; j < categoryArray.length ; j++){
+            categoryArray[j] = cgs.get(j);
+        }
+
+
+        selectedCategory = new boolean[categoryArray.length];
+
+        categoryText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(
+                        UploadVideoActivity.this
+                );
+
+                builder.setTitle("Select Category");
+                builder.setCancelable(false);
+
+                builder.setMultiChoiceItems(categoryArray, selectedCategory, new DialogInterface.OnMultiChoiceClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int i, boolean b) {
+                        if (b) {
+                            categoryList.add(i);
+                            Collections.sort(categoryList);
+                        } else {
+                            categoryList.remove(i);
+                        }
+                    }
+                });
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (int j = 0; j < categoryList.size(); j++) {
+                            stringBuilder.append(categoryArray[categoryList.get(j)]);
+                            if (j != categoryList.size() - 1) {
+                                stringBuilder.append(", ");
+                            }
+                        }
+
+                        categoryText.setText(stringBuilder.toString());
+                    }
+                });
+
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        dialogInterface.dismiss();
+                    }
+                });
+
+                builder.setNeutralButton("Clear All", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        for (int j = 0; j < selectedCategory.length; j++) {
+                            //Remove all selection
+                            selectedCategory[j] = false;
+                            categoryList.clear();
+                            categoryText.setText("");
+                        }
+                    }
+                });
+
+                builder.show();
+
+            }
+
+
+
+        });
 
         btn.setEnabled(false);
         editText.setOnClickListener(view -> selectVideo());

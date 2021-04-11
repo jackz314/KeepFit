@@ -1,13 +1,12 @@
 package com.jackz314.keepfit.views.other;
 
-import android.os.Bundle;
-
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import com.jackz314.keepfit.views.FollowersFragment;
 import com.jackz314.keepfit.views.FollowingFragment;
+import com.jackz314.keepfit.views.HistoryFragment;
 import com.jackz314.keepfit.views.LikedVideosFragment;
 import com.jackz314.keepfit.views.UserInfoFragment;
 import com.jackz314.keepfit.views.VideosFragment;
@@ -31,9 +30,12 @@ public class MeCollectionAdapter extends FragmentStateAdapter {
                 fragment = new VideosFragment();
                 break;
             case 2:
-                fragment = new LikedVideosFragment();
+                fragment = new HistoryFragment();
                 break;
             case 3:
+                fragment = new LikedVideosFragment();
+                break;
+            case 4:
                 fragment = new FollowersFragment();
                 break;
             default:
@@ -46,6 +48,6 @@ public class MeCollectionAdapter extends FragmentStateAdapter {
 
     @Override
     public int getItemCount() {
-        return 5;
+        return 6;
     }
 }
