@@ -15,8 +15,6 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
@@ -102,7 +100,7 @@ public class ExerciseTest {
 
         // enter prompt info
         ViewInteraction appCompatEditText = onView(
-                allOf(withId(R.id.prompt_category),
+                allOf(withId(R.id.prompt_category_dropdown),
                         childAtPosition(
                                 allOf(withId(R.id.container),
                                         childAtPosition(

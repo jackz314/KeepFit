@@ -4,10 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
-import android.view.inputmethod.EditorInfo
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
@@ -15,6 +14,10 @@ import android.widget.Toast
 import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.view.children
+import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.jackz314.keepfit.GlobalConstants
 import com.jackz314.keepfit.R
 import com.jackz314.keepfit.databinding.ActivityPromptBinding
@@ -26,6 +29,8 @@ class PromptActivity : AppCompatActivity() {
     private var titleValid = false
     private var categoryValid = false
 
+    private val TAG = "PromptActivity"
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -35,15 +40,26 @@ class PromptActivity : AppCompatActivity() {
         when (intent.action) {
             GlobalConstants.ACTION_LIVESTREAM -> {
                 isLivestream = true
-                if(b.promptTitle.requestFocus()) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
+                if (b.promptTitle.requestFocus()) window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE)
                 b.promptExerciseIntensity.visibility = View.GONE
                 b.promptIntensityLabel.visibility = View.GONE
+                b.promptCategoryDropdown.visibility = View.GONE
+                val chipGroup = findViewById<ChipGroup>(R.id.prompt_category_button)
+                val categories = applicationContext.resources.getStringArray(R.array.categories)
+                for (n in categories) {
+                    val chip = Chip(this)
+                    chip.text = (n.toString())
+                    chip.isCheckable = true
+                    chip.isCheckedIconVisible = false
+                    chipGroup.addView(chip)
+                }
             }
             GlobalConstants.ACTION_EXERCISE -> {
                 isLivestream = false
                 b.promptTitle.visibility = View.GONE
+                b.promptCategoryButton.visibility = View.GONE
                 titleValid = true
-                val spinner: Spinner = findViewById(R.id.prompt_category)
+                val spinner: Spinner = findViewById(R.id.prompt_category_dropdown)
                 // Create an ArrayAdapter using the string array and a default spinner layout
                 ArrayAdapter.createFromResource(
                         this,
@@ -83,11 +99,16 @@ class PromptActivity : AppCompatActivity() {
         if (isLivestream){
             val intent = Intent(this, StartLivestreamActivity::class.java)
             intent.putExtra(GlobalConstants.MEDIA_TITLE, b.promptTitle.text.toString())
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.getSelectedItem().toString())
+            val chipGroup = findViewById<ChipGroup>(R.id.prompt_category_button)
+            val selectedChips = chipGroup.children
+                    .filter { (it as Chip).isChecked }
+                    .map { (it as Chip).text.toString() }
+            val categoryStr = selectedChips.joinToString();
+            intent.putExtra(GlobalConstants.EXERCISE_TYPE, categoryStr)
             startActivity(intent)
         } else {
             val intent = Intent(this, ExerciseActivity::class.java)
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategory.getSelectedItem().toString())
+            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.getSelectedItem().toString())
             intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
             startActivity(intent)
         }
