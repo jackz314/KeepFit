@@ -129,6 +129,12 @@ public class UserInfoFragment extends Fragment {
                 b.meCaloriesText.setText(String.format(Locale.getDefault(), "Calories: %.3f", todayCal));
                 b.meExerciseTimeText.setText("Exercise: " + UtilsKt.formatDurationTextString(todayExTime / DateUtils.SECOND_IN_MILLIS));
             }));
+
+            b.calendarBtn.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), CalendarActivity.class);
+                intent.putExtra(GlobalConstants.CALENDAR_DATE, System.currentTimeMillis());
+                startActivity(intent);
+            });
         }
 
 

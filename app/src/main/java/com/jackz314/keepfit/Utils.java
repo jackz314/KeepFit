@@ -3,11 +3,12 @@ package com.jackz314.keepfit;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.TextUtils;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
+import android.graphics.drawable.shapes.OvalShape;
 import android.text.format.DateUtils;
 import android.util.Base64;
 import android.util.Log;
-import android.util.Patterns;
 
 import androidx.core.util.PatternsCompat;
 import androidx.preference.PreferenceManager;
@@ -20,14 +21,12 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.functions.FirebaseFunctions;
 import com.google.firebase.functions.HttpsCallableResult;
 
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONObject;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -335,9 +334,17 @@ public class Utils {
                 istest = false;
             }
 
-            isRunningTest = new AtomicBoolean (istest);
+            isRunningTest = new AtomicBoolean(istest);
         }
 
         return isRunningTest.get();
+    }
+
+    public static Drawable generateCircleDrawable(final int color) {
+        ShapeDrawable drawable = new ShapeDrawable(new OvalShape());
+        drawable.getPaint().setColor(color);
+        drawable.setIntrinsicHeight(40);
+        drawable.setIntrinsicWidth(40);
+        return drawable;
     }
 }

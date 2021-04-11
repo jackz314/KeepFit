@@ -8,6 +8,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.*
 import com.google.firebase.storage.FirebaseStorage
 import com.jackz314.keepfit.controllers.UserControllerKt
+import com.prolificinteractive.materialcalendarview.CalendarDay
 import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.CompletableEmitter
 import us.zoom.sdk.ZoomApiError
@@ -16,6 +17,8 @@ import us.zoom.sdk.ZoomSDK
 import us.zoom.sdk.ZoomSDKAuthenticationListener
 import java.net.URL
 import java.time.Duration
+import java.time.Instant
+import java.time.ZoneId
 import java.util.*
 import java.util.concurrent.Executor
 import javax.security.auth.login.LoginException
@@ -252,5 +255,11 @@ object UtilsKt {
         Tasks.await(batch.commit())
 
         return querySnapshot.documents
+    }
+
+    @JvmStatic
+    fun millisToCalendarDate(millis: Long): CalendarDay {
+        val date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
+        return CalendarDay.from(date.year, date.monthValue, date.dayOfMonth)
     }
 }

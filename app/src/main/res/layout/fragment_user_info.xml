@@ -114,7 +114,7 @@
             android:textAppearance="@style/TextAppearance.AppCompat.Display1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/today_text" />
+            app:layout_constraintTop_toBottomOf="@+id/calendar_btn" />
 
         <TextView
             android:id="@+id/me_calories_text"
@@ -169,6 +169,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/exercise_log_text"
             tools:listitem="@layout/exercise_item" />
+
+        <ImageButton
+            android:id="@+id/calendar_btn"
+            style="@android:style/Widget.Material.ImageButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:src="@drawable/ic_baseline_calendar_today_24"
+            app:layout_constraintBottom_toBottomOf="@+id/today_text"
+            app:layout_constraintStart_toEndOf="@+id/today_text"
+            app:layout_constraintTop_toTopOf="@+id/today_text" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

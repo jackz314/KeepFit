@@ -13,13 +13,11 @@ import android.provider.OpenableColumns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,10 +25,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-
-import com.google.firebase.storage.UploadTask;
 import com.jackz314.keepfit.R;
 
 import java.util.ArrayList;
@@ -228,7 +223,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(getApplicationContext(), data);
         String result = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-        Long durationNumber = (long) (Long.parseLong(result) / 1000);
+        Long durationNumber = Long.parseLong(result) / 1000;
 
 
         retriever.release();
@@ -270,7 +265,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             media.put("is_livestream", false);
             media.put("link", link);
             media.put("likes", 0);
-            media.put("duration", (Long) durationLong);
+            media.put("duration", durationLong);
             media.put("start_time", timestamp);
             media.put("title", titleTmp);
             media.put("view_count", 0);
