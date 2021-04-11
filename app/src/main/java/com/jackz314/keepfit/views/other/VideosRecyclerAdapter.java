@@ -1,6 +1,7 @@
 package com.jackz314.keepfit.views.other;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -19,16 +20,21 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
+import com.jackz314.keepfit.views.SearchActivity;
 import com.jackz314.keepfit.views.VideosFragment;
 
 
 import java.util.HashSet;
 import java.util.List;
+
+import co.lujun.androidtagview.TagContainerLayout;
+import co.lujun.androidtagview.TagView;
 
 public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAdapter.ViewHolder> {
 
@@ -143,15 +149,31 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
 
         List<String> categories = media.getCategories();
 
-        String categoryTextString = "";
-        for(int i = 0; i < categories.size() ; ++i){
-            categoryTextString += categories.get(i);
-            if(i < categories.size()-1){
-                categoryTextString += ", ";
-            }
-        }
+        holder.categoryText.setTags(categories);
 
-        holder.categoryText.setText(categoryTextString);
+        holder.categoryText.setOnTagClickListener(new TagView.OnTagClickListener() {
+            @Override
+            public void onTagClick(int position, String text) {
+                Intent intent = new Intent(mInflater.getContext(), SearchActivity.class);
+                intent.putExtra(GlobalConstants.SEARCH_QUERY, text);
+                mInflater.getContext().startActivity(intent);
+            }
+
+            @Override
+            public void onTagLongClick(int position, String text) {
+
+            }
+
+            @Override
+            public void onSelectedTagDrag(int position, String text) {
+
+            }
+
+            @Override
+            public void onTagCrossClick(int position) {
+
+            }
+        });
 
 
     }
@@ -170,7 +192,7 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
         TextView titleText;
         TextView detailText;
         TextView durationText;
-        TextView categoryText;
+        TagContainerLayout categoryText;
         ImageView image;
         ImageButton deleteButton;
 
