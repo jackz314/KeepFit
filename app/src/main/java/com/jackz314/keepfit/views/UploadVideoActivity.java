@@ -99,7 +99,7 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         storageReference = FirebaseStorage.getInstance().getReference();
 
-        List<String> cgs = Arrays.asList(getResources().getStringArray(R.array.categories));
+        List<String> cgs = Arrays.asList(getResources().getStringArray(R.array.exercise_categories));
 
         String[] categoryArray = new String[cgs.size()];
         for(int j = 0 ; j < categoryArray.length ; j++){
