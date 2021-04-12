@@ -1,10 +1,14 @@
 package com.jackz314.keepfit.views;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -22,6 +26,7 @@ import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.controllers.SearchController;
+import com.jackz314.keepfit.controllers.SearchHistoryController;
 import com.jackz314.keepfit.databinding.ActivitySearchBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
@@ -114,8 +119,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         db = FirebaseFirestore.getInstance();
 
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         editsearch = findViewById(R.id.search);
         editsearch.setOnQueryTextListener(this);
+        editsearch.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         String searchQuery = getIntent().getStringExtra(GlobalConstants.SEARCH_QUERY);
         if(searchQuery != null && !searchQuery.trim().isEmpty()){
             editsearch.setQuery(searchQuery, true);
@@ -141,6 +148,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             b.searchRecycler.setVisibility(View.INVISIBLE);
             return true;
         }
+
         processSearch(query);
         Log.d(TAG, query);
         if(b.searchRecycler.getVisibility() == View.INVISIBLE){
@@ -165,17 +173,31 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.d(TAG, "onNewIntent: got new intent");
-        if (editsearch != null) {
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())){
+            String historyClick = intent.getStringExtra(SearchManager.QUERY);
+            if(historyClick != null){
+                editsearch.setQuery(historyClick,false);
+                //Tried to show keyboard
+//                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
+            }
+        }
+        else if (editsearch != null) {
             String searchQuery = intent.getStringExtra(GlobalConstants.SEARCH_QUERY);
+
             if(searchQuery != null && !searchQuery.trim().isEmpty()){
                 editsearch.setQuery(searchQuery, true);
             }
+
         }
     }
 
     private void processSearch(String query) {
 
         // TODO: 3/19/21 Insert searching capabilities on search submit query
+        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
+                SearchHistoryController.AUTHORITY, SearchHistoryController.MODE);
+        suggestions.saveRecentQuery(query, null);
 
         if (index == null) {
             Log.w(TAG, "processSearch: couldn't search because search service is unavailable");

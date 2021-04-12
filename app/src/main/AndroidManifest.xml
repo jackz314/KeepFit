@@ -55,7 +55,18 @@
             android:name=".views.SearchActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.KeepFit.NoBar"
-            android:windowSoftInputMode="adjustNothing" />
+            android:windowSoftInputMode="adjustNothing"
+            >
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data android:name="android.app.searchable"
+                android:resource="@xml/searchable"/>
+        </activity>
+
+        <provider android:name=".controllers.SearchHistoryController"
+            android:authorities="com.jackz314.keepfit.controllers.SearchHistoryController" />
+
         <activity
             android:name=".views.UploadVideoActivity"
             android:usesCleartextTraffic="true" />
