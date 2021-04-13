@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.View;
@@ -153,8 +154,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         processSearch(query);
         Log.d(TAG, query);
         if(b.searchRecycler.getVisibility() == View.INVISIBLE){
-           b.emptyResultsText.setVisibility(View.GONE);
-            b.searchRecycler.setVisibility(View.VISIBLE);//
+            b.emptyResultsText.setVisibility(View.GONE);
+            b.searchRecycler.setVisibility(View.VISIBLE);
         }
 
 
@@ -179,7 +180,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             if (historyClick != null && editSearch != null) {
                 editSearch.setQuery(historyClick, false);
                 onQueryTextSubmit(historyClick);
-                editSearch.clearFocus();
+                new Handler().postDelayed(() -> {
+                    editSearch.clearFocus();
+                    b.searchRecycler.requestFocus();
+                }, 500);
                 //Tried to show keyboard
 //                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);

@@ -236,9 +236,15 @@ public class UserInfoFragment extends Fragment {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         }else if (item.getItemId() == R.id.clear_search_history_btn){
-            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this.getContext(),
-                    SearchHistoryController.AUTHORITY, SearchHistoryController.MODE);
-            suggestions.clearHistory();
+            new AlertDialog.Builder(requireContext())
+                    .setMessage(R.string.clear_search_log_confirm_msg)
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
+                        SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this.getContext(),
+                                SearchHistoryController.AUTHORITY, SearchHistoryController.MODE);
+                        suggestions.clearHistory();
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
         }
         return super.onOptionsItemSelected(item);
     }
