@@ -10,6 +10,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Spinner;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,8 +35,9 @@ import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+// Patrick: used as a listener to detect when a new category has been selected (filtering)
 class categoryVariable {
-    private String category = "Blank";
+    private String category = "All";
     private ChangeListener listener;
 
     public String getCategory() {
@@ -58,7 +62,7 @@ class categoryVariable {
     }
 }
 
-public class FeedFragment extends Fragment {
+public class FeedFragment extends Fragment implements AdapterView.OnItemSelectedListener {
 
     private static final String TAG = "FeedFragment";
 
@@ -105,43 +109,42 @@ public class FeedFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        registration = db.collection("media").orderBy("start_time", Query.Direction.DESCENDING)
+        category.setListener(() -> {
+            if (category.getCategory() == "All") {
+                registration = db.collection("media").orderBy("start_time", Query.Direction.DESCENDING)
 
 //                .whereEqualTo("state", "CA")
-                .addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-
-                    procES.execute(() -> {
-                        mediaList.clear();
-                        for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                            mediaList.add(new Media(queryDocumentSnapshot));
-                        }
-
-                        // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
-                        requireActivity().runOnUiThread(() -> {
-
-                            if (b != null) {
-                                if (!mediaList.isEmpty()) {
-                                    b.emptyFeedText.setVisibility(View.GONE);
-                                } else {
-                                    b.emptyFeedText.setVisibility(View.VISIBLE);
-                                    b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                                }
+                        .addSnapshotListener((value, e) -> {
+                            if (e != null || value == null) {
+                                Log.w(TAG, "Listen failed.", e);
+                                return;
                             }
 
-                            feedRecyclerAdapter.notifyDataChanged();
-                        });
-                        Log.d(TAG, "media collection update: " + mediaList);
-                    });
-                });
+                            procES.execute(() -> {
+                                mediaList.clear();
+                                for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
+                                    mediaList.add(new Media(queryDocumentSnapshot));
+                                }
 
-        category.setListener(new categoryVariable.ChangeListener() {
-            @Override
-            public void onChange() {
-                registration.remove();
+                                // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
+                                requireActivity().runOnUiThread(() -> {
+
+                                    if (b != null) {
+                                        if (!mediaList.isEmpty()) {
+                                            b.emptyFeedText.setVisibility(View.GONE);
+                                        } else {
+                                            b.emptyFeedText.setVisibility(View.VISIBLE);
+                                            b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+                                        }
+                                    }
+
+                                    feedRecyclerAdapter.notifyDataChanged();
+                                });
+                                Log.d(TAG, "media collection update: " + mediaList);
+                            });
+                        });
+            }
+            else {
                 registration = db.collection("media").whereArrayContains("categories", category.getCategory())
 
 //                .whereEqualTo("state", "CA")
@@ -206,6 +209,26 @@ public class FeedFragment extends Fragment {
             ((MenuBuilder) menu).setOptionalIconsVisible(true);
         }
         super.onCreateOptionsMenu(menu, inflater);
+
+        // Patrick: Added spinner to menu for filtering functionality
+        MenuItem menuItem = menu.findItem(R.id.categories_spinner);
+        Spinner spinner = (Spinner)menuItem.getActionView();
+
+        String exercise_categories[] = getResources().getStringArray(R.array.exercise_categories);
+
+        int n = exercise_categories.length;
+        String newarr[] = new String[n + 1];
+
+        for (int i = 1; i < n; i++)
+            newarr[i] = exercise_categories[i];
+
+        newarr[0] = "All";
+
+        ArrayAdapter<String>adapter = new ArrayAdapter<String>(getActivity().getApplicationContext()
+                , R.layout.spinner_category_item, newarr);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(this);
     }
 
     @Override
@@ -213,26 +236,22 @@ public class FeedFragment extends Fragment {
         if (item.getItemId() == R.id.app_bar_search) {
             Intent intent = new Intent(getContext(), SearchActivity.class);
             startActivity(intent);
-        }
-        else if (item.getItemId() == R.id.strength_filter_btn) {
-            category.setCategory("Strength");
-        }
-        else if (item.getItemId() == R.id.stretching_filter_btn) {
-            category.setCategory("Stretching");
-        }
-        else if (item.getItemId() == R.id.cardio_filter_btn) {
-            category.setCategory("Cardio");
-        }
-        else if (item.getItemId() == R.id.balance_filter_btn) {
-            category.setCategory("Balance");
-        }
-        else if (item.getItemId() == R.id.yoga_filter_btn) {
-            category.setCategory("Yoga");
-        }
-        else{
+        } else{
             return super.onOptionsItemSelected(item);
         }
         return true;
+    }
+
+    // Patrick: function determines what happens when an category is selected
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
+        category.setCategory((String)parent.getItemAtPosition(position));
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> arg0)
+    {
+
     }
 
     @Override
