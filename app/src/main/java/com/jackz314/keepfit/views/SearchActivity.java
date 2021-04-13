@@ -136,7 +136,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     public static boolean isValidQuery(String query){
         query = stripQuery(query);
-        return !query.isEmpty() && query.matches("[a-zA-Z0-9]*");
+        return !query.isEmpty() && query.matches("[a-zA-Z0-9 ]*");
     }
 
 
@@ -154,7 +154,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         Log.d(TAG, query);
         if(b.searchRecycler.getVisibility() == View.INVISIBLE){
            b.emptyResultsText.setVisibility(View.GONE);
-            b.searchRecycler.setVisibility(View.VISIBLE);
+            b.searchRecycler.setVisibility(View.VISIBLE);//
         }
 
 
