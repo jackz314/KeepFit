@@ -9,6 +9,7 @@ import androidx.preference.PreferenceManager;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.GlobalConstants;
+import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.models.Exercise;
 import com.jackz314.keepfit.models.User;
 
@@ -20,6 +21,8 @@ import java.util.stream.Collectors;
 
 public class ExerciseController {
     private static final String TAG = "ExerciseController";
+
+    private static String[] exerciseCategories;
 
     private User user;
     private double bmr;
@@ -130,5 +133,11 @@ public class ExerciseController {
     public static String getMostRecentExercise(Context context) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         return prefs.getString(GlobalConstants.RECENT_EXERCISE_KEY, null);
+    }
+
+    public static String[] getExerciseCategoryList(Context context) {
+        if (exerciseCategories == null)
+            exerciseCategories = context.getResources().getStringArray(R.array.exercise_categories);
+        return exerciseCategories;
     }
 }

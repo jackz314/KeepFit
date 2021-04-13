@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -22,6 +23,7 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.controllers.ExerciseController;
 import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
@@ -31,32 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-
-class categoryVariable {
-    private String category = "Blank";
-    private ChangeListener listener;
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-        if (listener != null) listener.onChange();
-    }
-
-    public ChangeListener getListener() {
-        return listener;
-    }
-
-    public void setListener(ChangeListener listener) {
-        this.listener = listener;
-    }
-
-    public interface ChangeListener {
-        void onChange();
-    }
-}
 
 public class FeedFragment extends Fragment {
 
@@ -72,10 +48,7 @@ public class FeedFragment extends Fragment {
 
     private final Executor procES = Executors.newSingleThreadExecutor();
 
-
     private ListenerRegistration registration;
-
-    private categoryVariable category = new categoryVariable();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -105,76 +78,41 @@ public class FeedFragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
-        registration = db.collection("media").orderBy("start_time", Query.Direction.DESCENDING)
+        setupFeedListener(null);
+    }
 
-//                .whereEqualTo("state", "CA")
-                .addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
+    private void setupFeedListener(String category) {
+        Query feedQuery = db.collection("media").orderBy("start_time", Query.Direction.DESCENDING);
+        if (category != null) feedQuery = feedQuery.whereArrayContains("categories", category);
+        if (registration != null) registration.remove();
+        registration = feedQuery.addSnapshotListener((value, e) -> {
+            if (e != null || value == null) {
+                Log.w(TAG, "Listen failed.", e);
+                return;
+            }
+
+            procES.execute(() -> {
+                mediaList.clear();
+                for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
+                    mediaList.add(new Media(queryDocumentSnapshot));
+                }
+
+                // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
+                FeedFragment.this.requireActivity().runOnUiThread(() -> {
+
+                    if (b != null) {
+                        if (!mediaList.isEmpty()) {
+                            b.emptyFeedText.setVisibility(View.GONE);
+                        } else {
+                            b.emptyFeedText.setVisibility(View.VISIBLE);
+                            b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+                        }
                     }
 
-                    procES.execute(() -> {
-                        mediaList.clear();
-                        for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                            mediaList.add(new Media(queryDocumentSnapshot));
-                        }
-
-                        // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
-                        requireActivity().runOnUiThread(() -> {
-
-                            if (b != null) {
-                                if (!mediaList.isEmpty()) {
-                                    b.emptyFeedText.setVisibility(View.GONE);
-                                } else {
-                                    b.emptyFeedText.setVisibility(View.VISIBLE);
-                                    b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                                }
-                            }
-
-                            feedRecyclerAdapter.notifyDataChanged();
-                        });
-                        Log.d(TAG, "media collection update: " + mediaList);
-                    });
+                    feedRecyclerAdapter.notifyDataChanged();
                 });
-
-        category.setListener(new categoryVariable.ChangeListener() {
-            @Override
-            public void onChange() {
-                registration.remove();
-                registration = db.collection("media").whereArrayContains("categories", category.getCategory())
-
-//                .whereEqualTo("state", "CA")
-                        .addSnapshotListener((value, e) -> {
-                            if (e != null || value == null) {
-                                Log.w(TAG, "Listen failed.", e);
-                                return;
-                            }
-
-                            procES.execute(() -> {
-                                mediaList.clear();
-                                for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                                    mediaList.add(new Media(queryDocumentSnapshot));
-                                }
-
-                                // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
-                                requireActivity().runOnUiThread(() -> {
-
-                                    if (b != null) {
-                                        if (!mediaList.isEmpty()) {
-                                            b.emptyFeedText.setVisibility(View.GONE);
-                                        } else {
-                                            b.emptyFeedText.setVisibility(View.VISIBLE);
-                                            b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                                        }
-                                    }
-
-                                    feedRecyclerAdapter.notifyDataChanged();
-                                });
-                                Log.d(TAG, "media collection update: " + mediaList);
-                            });
-                        });
-            }
+                Log.d(TAG, "media collection update: " + mediaList);
+            });
         });
     }
 
@@ -182,7 +120,7 @@ public class FeedFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         setHasOptionsMenu(true);
-        if (b == null){ // only inflate for the first time being created
+        if (b == null) { // only inflate for the first time being created
             b = FragmentFeedBinding.inflate(inflater, container, false);
 
             if (!mediaList.isEmpty() && b.emptyFeedText.getVisibility() == View.VISIBLE) {
@@ -205,6 +143,11 @@ public class FeedFragment extends Fragment {
         if (menu instanceof MenuBuilder) {
             ((MenuBuilder) menu).setOptionalIconsVisible(true);
         }
+        SubMenu categoryMenu = menu.findItem(R.id.filter_menu).getSubMenu();
+        categoryMenu.add("All");
+        for (String category : ExerciseController.getExerciseCategoryList(getContext()))
+            categoryMenu.add(category);
+
         super.onCreateOptionsMenu(menu, inflater);
     }
 
@@ -213,26 +156,12 @@ public class FeedFragment extends Fragment {
         if (item.getItemId() == R.id.app_bar_search) {
             Intent intent = new Intent(getContext(), SearchActivity.class);
             startActivity(intent);
+        } else { // filtering categories
+            String category = item.getTitle().toString();
+            if (category.equals("All")) category = null;
+            setupFeedListener(category);
         }
-        else if (item.getItemId() == R.id.strength_filter_btn) {
-            category.setCategory("Strength");
-        }
-        else if (item.getItemId() == R.id.stretching_filter_btn) {
-            category.setCategory("Stretching");
-        }
-        else if (item.getItemId() == R.id.cardio_filter_btn) {
-            category.setCategory("Cardio");
-        }
-        else if (item.getItemId() == R.id.balance_filter_btn) {
-            category.setCategory("Balance");
-        }
-        else if (item.getItemId() == R.id.yoga_filter_btn) {
-            category.setCategory("Yoga");
-        }
-        else{
-            return super.onOptionsItemSelected(item);
-        }
-        return true;
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

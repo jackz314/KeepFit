@@ -9,30 +9,11 @@
         android:title="Search"
         />
 
-    <item android:id="@+id/filter_btn"
-          android:title="Filter By">
-        
+    <item
+        android:id="@+id/filter_menu"
+        android:title="Filter By">
         <menu>
-            <item
-                android:id="@+id/strength_filter_btn"
-                android:title="Strength"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/stretching_filter_btn"
-                android:title="Stretching"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/cardio_filter_btn"
-                android:title="Cardio"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/balance_filter_btn"
-                android:title="Balance"
-                app:showAsAction="never" />
-            <item
-                android:id="@+id/yoga_filter_btn"
-                android:title="Yoga"
-                app:showAsAction="never" />
+            <!--            filled dynamically-->
         </menu>
     </item>
 </menu>
