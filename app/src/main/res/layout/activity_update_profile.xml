@@ -143,8 +143,8 @@
         android:text="Profile Picture:"
         android:textAlignment="viewStart"
         android:textSize="18sp"
-        app:layout_constraintTop_toBottomOf="@+id/textView6"
-        tools:layout_editor_absoluteX="19dp" />
+        app:layout_constraintStart_toStartOf="@+id/textView6"
+        app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
     <!--Button for uploading image-->
 

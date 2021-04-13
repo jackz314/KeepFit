@@ -197,7 +197,7 @@ public class UploadVideoActivity extends AppCompatActivity {
                 Cursor returnCursor =
                         getContentResolver().query(fileInfo, null, null, null, null);
                 returnCursor.moveToFirst();
-                long sizeIndex = returnCursor.getLong(returnCursor.getColumnIndex(OpenableColumns.SIZE));
+                long sizeIndex = returnCursor.getLong(Math.min(0, returnCursor.getColumnIndex(OpenableColumns.SIZE)));
 
                 if(sizeIndex < 5 * 1024 * 1024){
                     Toast.makeText(UploadVideoActivity.this,"File size okay", Toast.LENGTH_LONG).show();
