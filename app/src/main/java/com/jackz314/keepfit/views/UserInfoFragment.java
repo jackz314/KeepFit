@@ -3,6 +3,7 @@ package com.jackz314.keepfit.views;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.SearchRecentSuggestions;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -31,6 +32,7 @@ import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.ExerciseController;
+import com.jackz314.keepfit.controllers.SearchHistoryController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentUserInfoBinding;
 import com.jackz314.keepfit.models.Exercise;
@@ -233,6 +235,10 @@ public class UserInfoFragment extends Fragment {
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> clearExerciseLog())
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
+        }else if (item.getItemId() == R.id.clear_search_history_btn){
+            SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this.getContext(),
+                    SearchHistoryController.AUTHORITY, SearchHistoryController.MODE);
+            suggestions.clearHistory();
         }
         return super.onOptionsItemSelected(item);
     }
