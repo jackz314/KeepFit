@@ -8,7 +8,6 @@ import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -19,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Client;
 import com.algolia.search.saas.Query;
-//import com.google.firebase.database.snapshot.Index;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
@@ -43,10 +41,12 @@ import java.util.concurrent.Executors;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
+//import com.google.firebase.database.snapshot.Index;
+
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private static final String TAG = "SearchActivity";
-    private SearchView editsearch;
+    private SearchView editSearch;
     private final List<SearchResult> mList = new ArrayList<>();
     private final Executor procES = Executors.newSingleThreadExecutor();
     private SearchRecyclerAdapter searchRecyclerAdapter;
@@ -120,13 +120,14 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         db = FirebaseFirestore.getInstance();
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        editsearch = findViewById(R.id.search);
-        editsearch.setOnQueryTextListener(this);
-        editsearch.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        editSearch = findViewById(R.id.search);
+        editSearch.setOnQueryTextListener(this);
+        editSearch.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         String searchQuery = getIntent().getStringExtra(GlobalConstants.SEARCH_QUERY);
-        if(searchQuery != null && !searchQuery.trim().isEmpty()){
-            editsearch.setQuery(searchQuery, true);
-        } else if(editsearch.requestFocus()) getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            editSearch.setQuery(searchQuery, true);
+        } else if (editSearch.requestFocus())
+            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
     public static String stripQuery(String query){
@@ -173,20 +174,21 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         Log.d(TAG, "onNewIntent: got new intent");
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())){
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             String historyClick = intent.getStringExtra(SearchManager.QUERY);
-            if(historyClick != null){
-                editsearch.setQuery(historyClick,false);
+            if (historyClick != null && editSearch != null) {
+                editSearch.setQuery(historyClick, false);
+                onQueryTextSubmit(historyClick);
+                editSearch.clearFocus();
                 //Tried to show keyboard
 //                InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 //                imm.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT,0);
             }
-        }
-        else if (editsearch != null) {
+        } else if (editSearch != null) {
             String searchQuery = intent.getStringExtra(GlobalConstants.SEARCH_QUERY);
 
-            if(searchQuery != null && !searchQuery.trim().isEmpty()){
-                editsearch.setQuery(searchQuery, true);
+            if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+                editSearch.setQuery(searchQuery, true);
             }
 
         }
