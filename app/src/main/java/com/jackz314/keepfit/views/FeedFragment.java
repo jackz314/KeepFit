@@ -157,7 +157,7 @@ public class FeedFragment extends Fragment {
         if (item.getItemId() == R.id.app_bar_search) {
             Intent intent = new Intent(getContext(), SearchActivity.class);
             startActivity(intent);
-        } else { // filtering categories
+        } else if (item.getItemId() != R.id.filter_menu) { // filtering categories
             String category = item.getTitle().toString();
             if (category.equals("All")) category = null;
             setupFeedListener(category);
