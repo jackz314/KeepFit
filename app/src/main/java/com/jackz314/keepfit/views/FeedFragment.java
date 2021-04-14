@@ -82,7 +82,8 @@ public class FeedFragment extends Fragment {
     }
 
     private void setupFeedListener(String category) {
-        Query feedQuery = db.collection("media").orderBy("start_time", Query.Direction.DESCENDING);
+        Query feedQuery = db.collection("media").orderBy("likes", Query.Direction.DESCENDING)
+                .orderBy("start_time", Query.Direction.DESCENDING);
         if (category != null) feedQuery = feedQuery.whereArrayContains("categories", category);
         if (registration != null) registration.remove();
         registration = feedQuery.addSnapshotListener((value, e) -> {
