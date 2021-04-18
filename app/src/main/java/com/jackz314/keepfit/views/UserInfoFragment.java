@@ -196,12 +196,14 @@ public class UserInfoFragment extends Fragment {
     // setOptionalIconsVisible bug, see https://stackoverflow.com/q/41150995/8170714
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        super.onCreateOptionsMenu(menu, inflater);
+        requireActivity().invalidateOptionsMenu();
         inflater.inflate(R.menu.menu_user_info_fragment, menu);
         if (menu instanceof MenuBuilder) {
             ((MenuBuilder) menu).setOptionalIconsVisible(true);
         }
         clearExerciseItem = menu.findItem(R.id.clear_exercise_log_btn);
-        super.onCreateOptionsMenu(menu, inflater);
     }
 
     @Override
