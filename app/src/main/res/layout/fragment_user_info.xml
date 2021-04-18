@@ -15,8 +15,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/user_profile_picture"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_gravity="center_horizontal"
             android:layout_margin="16dp"
             android:layout_marginTop="16dp"
@@ -30,7 +30,6 @@
             android:id="@+id/user_name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
             android:drawableEnd="@drawable/ic_baseline_female_24"
             android:drawablePadding="4dp"
             android:text="Hi! User"
@@ -43,7 +42,6 @@
             android:id="@+id/user_email_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:text="user@example.com"
             android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
             app:layout_constraintEnd_toEndOf="parent"
@@ -111,7 +109,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Exercise: 2 hr 15 min"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/calendar_btn" />
@@ -121,7 +120,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Calories: 2896"
-            android:textAppearance="@style/TextAppearance.AppCompat.Display1"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textSize="24sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/me_exercise_time_text" />
@@ -130,7 +130,7 @@
             android:id="@+id/today_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:text="Today"
             android:textAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintEnd_toEndOf="parent"
@@ -142,9 +142,10 @@
             android:id="@+id/exercise_log_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:text="Exercise Log"
+            android:text="Exercises"
+            android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/me_calories_text" />
 

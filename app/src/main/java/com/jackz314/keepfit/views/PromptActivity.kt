@@ -1,11 +1,9 @@
 package com.jackz314.keepfit.views
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
@@ -13,10 +11,6 @@ import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.view.children
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
 import com.jackz314.keepfit.GlobalConstants
 import com.jackz314.keepfit.R
 import com.jackz314.keepfit.controllers.ExerciseController
@@ -45,14 +39,14 @@ class PromptActivity : AppCompatActivity() {
                 b.promptIntensityLabel.visibility = View.GONE
                 b.promptCategoryDropdown.visibility = View.GONE
 
-                val categoryView = findViewById<TextView>(R.id.prompt_category_select);
+                val categoryView = findViewById<TextView>(R.id.prompt_category_select)
 
                 categoryView.setOnClickListener {
                     val builder = AlertDialog.Builder(this@PromptActivity)
                     val categories = applicationContext.resources.getStringArray(R.array.exercise_categories)
                     builder.setTitle("Select Categories")
                     val checked = BooleanArray(categories.size) { false }
-                    builder.setMultiChoiceItems(categories, checked) {  dialog, which, isChecked ->
+                    builder.setMultiChoiceItems(categories, checked) { dialog, which, isChecked ->
 
                     }
 
@@ -81,29 +75,18 @@ class PromptActivity : AppCompatActivity() {
                 b.promptTitle.visibility = View.GONE
                 b.promptCategorySelect.visibility = View.GONE
                 titleValid = true
-                val spinner: Spinner = findViewById(R.id.prompt_category_dropdown)
-                // Create an ArrayAdapter using the string array and a default spinner layout
-                ArrayAdapter.createFromResource(
-                        this,
-                        R.array.exercise_categories,
-                        android.R.layout.simple_spinner_item
-                ).also { adapter ->
-                    // Specify the layout to use when the list of choices appears
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    // Apply the adapter to the spinner
-                    spinner.adapter = adapter
-                    b.promptDescription.text = "Track Exercise"
-                    titleValid = true
-                    val exerciseCategoryAdapter: ArrayAdapter<String>
-                    val recentExercise = ExerciseController.getMostRecentExercise(this)
-                    val exerciseArr = resources.getStringArray(R.array.exercise_categories)
-                    if (recentExercise != null) {
-                        val exerciseCategories = exerciseArr.toMutableList().apply { add(0, "$recentExercise • Most Recent") }
-                        exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseCategories)
-                    } else {
-                        exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseArr)
-                    }
+                b.promptDescription.text = "Track Exercise"
+                titleValid = true
+                val exerciseCategoryAdapter: ArrayAdapter<String>
+                val recentExercise = ExerciseController.getMostRecentExercise(this)
+                val exerciseArr = resources.getStringArray(R.array.exercise_categories)
+                if (recentExercise != null) {
+                    val exerciseCategories = exerciseArr.toMutableList().apply { add(0, "$recentExercise • Most Recent") }
+                    exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseCategories)
+                } else {
+                    exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseArr)
                 }
+                b.promptCategoryDropdown.adapter = exerciseCategoryAdapter
             }
         }
 
@@ -137,12 +120,12 @@ class PromptActivity : AppCompatActivity() {
                     .filter { (it as Chip).isChecked }
                     .map { (it as Chip).text.toString() }
             val categoryStr = selectedChips.joinToString();*/
-            val categoryView = findViewById<TextView>(R.id.prompt_category_select);
+            val categoryView = findViewById<TextView>(R.id.prompt_category_select)
             intent.putExtra(GlobalConstants.EXERCISE_TYPE, categoryView.text.toString())
             startActivity(intent)
         } else {
             val intent = Intent(this, ExerciseActivity::class.java)
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.getSelectedItem().toString())
+            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.selectedItem.toString())
             intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
             startActivity(intent)
         }
