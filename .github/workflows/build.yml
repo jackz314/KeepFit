@@ -9,12 +9,12 @@ on:
     paths-ignore:
       - '**/*.txt'
       - '**/*.md'
-    branches: [ master ]
+    branches: [ master, ci ]
   pull_request:
     paths-ignore:
       - '**/*.txt'
       - '**/*.md'
-    branches: [ master ]
+    branches: [ master, ci ]
   workflow_dispatch:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
