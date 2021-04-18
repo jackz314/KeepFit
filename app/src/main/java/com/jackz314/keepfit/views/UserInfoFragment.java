@@ -204,7 +204,6 @@ public class UserInfoFragment extends Fragment {
             ((MenuBuilder) menu).setOptionalIconsVisible(true);
         }
         clearExerciseItem = menu.findItem(R.id.clear_exercise_log_btn);
-        //testing
     }
 
     @Override
