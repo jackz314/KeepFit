@@ -19,7 +19,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Client;
 import com.algolia.search.saas.Query;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
@@ -52,7 +51,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private final Executor procES = Executors.newSingleThreadExecutor();
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private LivestreamController livestreamController;
-    private FirebaseFirestore db;
     private ActivitySearchBinding b;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
@@ -117,8 +115,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 layoutManager.getOrientation());
         b.searchRecycler.addItemDecoration(dividerItemDecoration);
         b.searchRecycler.setAdapter(searchRecyclerAdapter);
-
-        db = FirebaseFirestore.getInstance();
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         editSearch = findViewById(R.id.search);

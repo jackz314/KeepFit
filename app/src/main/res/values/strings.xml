@@ -8,6 +8,7 @@
     <string name="delete_account_confirm_msg">Are you sure you want to delete your account from KeepFit? This action will permanently remove all your data on KeepFit and cannot be reversed!</string>
     <string name="clear_exercise_log_confirm_msg">Are you sure you want to delete all of your past exercises from KeepFit? This action cannot be reversed!</string>
     <string name="clear_search_log_confirm_msg">Are you sure you want to delete all of your past searches? This action cannot be reversed!</string>
+    <string name="delete_scheduled_exercise_confirm_msg">Are you sure you want to remove this scheduled exercise?</string>
 
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">3367689143342688</string>

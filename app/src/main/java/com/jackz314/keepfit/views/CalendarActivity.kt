@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.Query
 import com.jackz314.keepfit.GlobalConstants
+import com.jackz314.keepfit.ScheduledExerciseActivity
 import com.jackz314.keepfit.UtilsKt
 import com.jackz314.keepfit.controllers.UserControllerKt
 import com.jackz314.keepfit.databinding.ActivityCalendarBinding
@@ -25,7 +26,7 @@ private const val TAG = "CalendarActivity"
 class CalendarActivity : AppCompatActivity() {
     private lateinit var b: ActivityCalendarBinding
     private val exerciseList = mutableListOf<Exercise>()
-    private val selectedDayExerciseList = mutableListOf<Exercise>()
+    private val selectedDayExerciseHistoryList = mutableListOf<Exercise>()
     private val eventDecorator = EventDecorator(Color.RED)
     private lateinit var exerciseRecyclerAdapter: ExerciseRecyclerAdapter
 
@@ -40,7 +41,7 @@ class CalendarActivity : AppCompatActivity() {
         val dateMilli = intent.getLongExtra(GlobalConstants.CALENDAR_DATE, System.currentTimeMillis())
         b.calendarView.selectedDate = UtilsKt.millisToCalendarDate(dateMilli)
 
-        exerciseRecyclerAdapter = ExerciseRecyclerAdapter(this, selectedDayExerciseList)
+        exerciseRecyclerAdapter = ExerciseRecyclerAdapter(this, selectedDayExerciseHistoryList)
         exerciseRecyclerAdapter.setClickListener { view: View?, position: Int ->
             val exercise = exerciseList[position]
             val intent = Intent(this, ViewExerciseActivity::class.java)
@@ -55,6 +56,8 @@ class CalendarActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(b.exerciseLogRecycler.context,
                 layoutManager.orientation)
         b.exerciseLogRecycler.addItemDecoration(dividerItemDecoration)
+
+        b.scheduledAddBtn.setOnClickListener { startActivity(Intent(this, ScheduledExerciseActivity::class.java)) }
 
         UserControllerKt.currentUserDoc.collection("exercises").orderBy("starting_time", Query.Direction.ASCENDING).addSnapshotListener { value, e ->
             if (e != null || value == null) {
@@ -78,18 +81,20 @@ class CalendarActivity : AppCompatActivity() {
     }
 
     private fun updateSelectedDay(selectedDay: CalendarDay) {
-        selectedDayExerciseList.clear()
+        selectedDayExerciseHistoryList.clear()
         for (exercise in exerciseList) {
             val day = UtilsKt.millisToCalendarDate(exercise.startingTime.time)
             if (selectedDay == day) {
-                selectedDayExerciseList.add(exercise)
+                selectedDayExerciseHistoryList.add(exercise)
             }
         }
         exerciseRecyclerAdapter.notifyDataSetChanged()
-        if (selectedDayExerciseList.isEmpty()) {
+        if (selectedDayExerciseHistoryList.isEmpty()) {
             b.noExerciseText.visibility = View.VISIBLE
         } else {
             b.noExerciseText.visibility = View.GONE
         }
     }
+
+
 }
