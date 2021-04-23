@@ -2,16 +2,24 @@ package com.jackz314.keepfit.models;
 
 import com.google.firebase.firestore.DocumentId;
 
+import java.io.Serializable;
 import java.util.Date;
 
-public class ScheduledExercise {
+public class ScheduledExercise implements Serializable {
     @DocumentId
     public String uid;
     private Date time;
-    private String category;
-    private int intensity;
+    private String category = "";
+    private int intensity = 1;
 
     public ScheduledExercise() {
+    }
+
+    public ScheduledExercise(ScheduledExercise exercise) {
+        uid = exercise.uid;
+        time = new Date(exercise.time.getTime());
+        category = exercise.category;
+        intensity = exercise.intensity;
     }
 
     public ScheduledExercise(Date time, String category, int intensity) {

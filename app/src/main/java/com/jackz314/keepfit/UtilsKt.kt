@@ -1,6 +1,9 @@
 package com.jackz314.keepfit
 
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.widget.EditText
 import androidx.annotation.WorkerThread
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
@@ -258,8 +261,37 @@ object UtilsKt {
     }
 
     @JvmStatic
-    fun millisToCalendarDate(millis: Long): CalendarDay {
+    fun millisToCalendarDay(millis: Long): CalendarDay {
         val date = Instant.ofEpochMilli(millis).atZone(ZoneId.systemDefault())
         return CalendarDay.from(date.year, date.monthValue, date.dayOfMonth)
+    }
+
+    @JvmStatic
+    fun calendarDayToDate(day: CalendarDay?): Date {
+        if (day == null) return Date()
+        val calendar = Calendar.getInstance()
+        calendar.set(day.year, day.month - 1, day.day)
+        return calendar.time
+    }
+
+    @JvmStatic
+    fun nowOrFuture(date: Date?): Date {
+        val now = Date()
+        return if (date == null || date.before(now)) now else date
+    }
+
+    /**
+     * Extension function to simplify setting an afterTextChanged action to EditText components.
+     */
+    fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
+        this.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(editable: Editable?) {
+                afterTextChanged.invoke(editable.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+        })
     }
 }

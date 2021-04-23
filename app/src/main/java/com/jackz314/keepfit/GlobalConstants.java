@@ -29,6 +29,8 @@ public interface GlobalConstants {
     String SEARCH_QUERY = "SEARCH_QUERY";
     String USER_PROFILE = "user_profile";
     String CALENDAR_DATE = "calendar_date";
+    String SCHEDULED_EXERCISE = "scheduled_exercise";
+    String SCHEDULE_PRESET_DATE = "scheduled_preset_date";
 
     // actions
     String ACTION_EXERCISE = "action_exercise";

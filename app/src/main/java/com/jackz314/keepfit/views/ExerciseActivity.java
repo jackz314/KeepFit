@@ -62,10 +62,7 @@ public class ExerciseActivity extends AppCompatActivity {
 
         int intensity = getIntent().getIntExtra(GlobalConstants.EXERCISE_INTENSITY, 2);
         float met = ExerciseController.getMETofIntensity(intensity);
-        String intensityStr;
-        if (intensity == 1) intensityStr = "Light";
-        else if (intensity == 2) intensityStr = "Moderate";
-        else intensityStr = "Vigorous";
+        String intensityStr = ExerciseController.getStrOfIntensity(intensity);
         b.exerciseIntensity.setText(intensityStr + " Intensity");
 
         Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {

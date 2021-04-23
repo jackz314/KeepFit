@@ -146,7 +146,7 @@ public class FeedFragment extends Fragment {
         }
         SubMenu categoryMenu = menu.findItem(R.id.filter_menu).getSubMenu();
         categoryMenu.add("All");
-        for (String category : ExerciseController.getExerciseCategoryList(getContext()))
+        for (String category : ExerciseController.getExerciseCategoryArray(getContext()))
             categoryMenu.add(category);
 
         super.onCreateOptionsMenu(menu, inflater);

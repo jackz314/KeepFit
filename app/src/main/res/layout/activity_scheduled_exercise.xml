@@ -6,25 +6,91 @@
     android:layout_height="match_parent"
     tools:context=".ScheduledExerciseActivity">
 
-    <TextView
-        android:id="@+id/schedule_exercise_category"
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/schedule_exercise_intensity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
         android:layout_marginTop="16dp"
-        android:text="Running"
-        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="32sp"
+        app:checkedChip="@id/prompt_intensity_medium"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/schedule_exercise_time"
+        app:selectionRequired="true"
+        app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/prompt_intensity_low"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Light" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/prompt_intensity_medium"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Moderate"
+            app:closeIconVisible="false" />
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/prompt_intensity_high"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Vigorous" />
+    </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        android:id="@+id/schedule_exercise_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:text="(tap to set time)"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/schedule_exercise_at"
+        app:layout_constraintTop_toTopOf="@+id/schedule_exercise_date" />
 
     <TextView
         android:id="@+id/schedule_exercise_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="14:36"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:text="July 6"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-        app:layout_constraintStart_toStartOf="@+id/schedule_exercise_category"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toStartOf="@+id/schedule_exercise_at"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/schedule_exercise_category" />
+
+    <TextView
+        android:id="@+id/schedule_exercise_at"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="at"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toStartOf="@+id/schedule_exercise_time"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/schedule_exercise_date"
+        app:layout_constraintTop_toTopOf="@+id/schedule_exercise_date" />
+
+    <Spinner
+        android:id="@+id/schedule_exercise_category"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:entries="@array/exercise_categories"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

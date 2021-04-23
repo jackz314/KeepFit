@@ -11,7 +11,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.KeepFit">
-        <activity android:name=".ScheduledExerciseActivity"></activity>
+        <activity
+            android:name=".ScheduledExerciseActivity"
+            android:label="Schedule Exercise" />
         <activity android:name=".views.CalendarActivity" />
         <activity
             android:name=".views.ViewExerciseActivity"

@@ -6,7 +6,7 @@ import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.controllers.ExerciseController;
 import com.jackz314.keepfit.controllers.SchedulingController;
 import com.jackz314.keepfit.models.ScheduledExercise;
 
@@ -43,7 +44,7 @@ public class ScheduledExerciseRecyclerAdapter extends RecyclerView.Adapter<Sched
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.exercise_item, parent, false);
+        View view = mInflater.inflate(R.layout.scheduled_exercise_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -53,9 +54,9 @@ public class ScheduledExerciseRecyclerAdapter extends RecyclerView.Adapter<Sched
         ScheduledExercise exercise = mData.get(position);
         holder.categoryText.setText(exercise.getCategory());
         holder.detailText.setText(DateUtils.formatDateTime(mContext, exercise.getTime().getTime(),
-                DateUtils.FORMAT_NO_NOON | DateUtils.FORMAT_NO_MIDNIGHT |
-                        DateUtils.FORMAT_NO_MONTH_DAY | DateUtils.FORMAT_NO_YEAR |
-                        DateUtils.FORMAT_SHOW_TIME));
+//                DateUtils.FORMAT_NO_NOON | DateUtils.FORMAT_NO_MIDNIGHT |
+//                        DateUtils.FORMAT_NO_MONTH_DAY | DateUtils.FORMAT_NO_YEAR |
+                DateUtils.FORMAT_SHOW_TIME) + " (" + ExerciseController.getStrOfIntensity(exercise.getIntensity()) + " Intensity)");
         holder.deleteBtn.setOnClickListener(v -> {
             new AlertDialog.Builder(mContext)
                     .setMessage(R.string.delete_scheduled_exercise_confirm_msg)
@@ -92,7 +93,7 @@ public class ScheduledExerciseRecyclerAdapter extends RecyclerView.Adapter<Sched
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView categoryText;
         TextView detailText;
-        Button deleteBtn;
+        ImageButton deleteBtn;
 
         ViewHolder(View itemView) {
             super(itemView);

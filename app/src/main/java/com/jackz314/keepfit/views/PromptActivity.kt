@@ -2,8 +2,6 @@ package com.jackz314.keepfit.views
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
@@ -79,12 +77,12 @@ class PromptActivity : AppCompatActivity() {
                 titleValid = true
                 val exerciseCategoryAdapter: ArrayAdapter<String>
                 val recentExercise = ExerciseController.getMostRecentExercise(this)
-                val exerciseArr = resources.getStringArray(R.array.exercise_categories)
-                if (recentExercise != null) {
+                val exerciseArr = ExerciseController.getExerciseCategoryArray(this)
+                exerciseCategoryAdapter = if (recentExercise != null) {
                     val exerciseCategories = exerciseArr.toMutableList().apply { add(0, "$recentExercise • Most Recent") }
-                    exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseCategories)
+                    ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseCategories)
                 } else {
-                    exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseArr)
+                    ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseArr)
                 }
                 b.promptCategoryDropdown.adapter = exerciseCategoryAdapter
             }
@@ -97,22 +95,20 @@ class PromptActivity : AppCompatActivity() {
         }
     }
 
-    private fun validate(str: String): Boolean{
+    private fun validate(str: String): Boolean {
         return str.trim().isNotEmpty()
 //        return str.matches("[0-9a-zA-Z?!.,]+".toRegex())
     }
 
-    private fun getIntensityValue(@IdRes id: Int): Int{
-        return when (id) {
-            R.id.prompt_intensity_low -> 1
-            R.id.prompt_intensity_medium -> 2
-            R.id.prompt_intensity_high -> 3
-            else -> 2
-        }
+    private fun getIntensityValue(@IdRes id: Int) = when (id) {
+        R.id.prompt_intensity_low -> 1
+        R.id.prompt_intensity_medium -> 2
+        R.id.prompt_intensity_high -> 3
+        else -> 2
     }
 
     private fun start() {
-        if (isLivestream){
+        if (isLivestream) {
             val intent = Intent(this, StartLivestreamActivity::class.java)
             intent.putExtra(GlobalConstants.MEDIA_TITLE, b.promptTitle.text.toString())
             //val chipGroup = findViewById<ChipGroup>(R.id.prompt_category_button)
@@ -135,19 +131,4 @@ class PromptActivity : AppCompatActivity() {
     private fun showLoginFailed(@StringRes errorString: Int) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
-}
-
-/**
- * Extension function to simplify setting an afterTextChanged action to EditText components.
- */
-fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
-    this.addTextChangedListener(object : TextWatcher {
-        override fun afterTextChanged(editable: Editable?) {
-            afterTextChanged.invoke(editable.toString())
-        }
-
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-    })
 }
