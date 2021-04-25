@@ -122,9 +122,7 @@ class PromptActivity : AppCompatActivity() {
         } else {
               //check if the exercise is sit up to start that activity
             val exerc = b.promptCategoryDropdown.selectedItem.toString();
-            Log.d("Prompt Activity", exerc);
             if (exerc.contains("Sit Ups")) {
-                Log.d("Prompt Activity", "Sit Up Activity");
                 val intent = Intent(this, SitUpCountActivity::class.java)
                 intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.selectedItem.toString())
                 intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
