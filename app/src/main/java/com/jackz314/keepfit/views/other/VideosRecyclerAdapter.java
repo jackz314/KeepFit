@@ -28,6 +28,7 @@ import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.SearchActivity;
 import com.jackz314.keepfit.views.VideosFragment;
+import com.like.LikeButton;
 
 
 import java.util.HashSet;
@@ -79,7 +80,7 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.video_item, parent, false);
+        View view = mInflater.inflate(R.layout.condensed_video_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -131,6 +132,8 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
                     .show();
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
         });
+        holder.pfp.setVisibility(View.GONE);
+        holder.likeButton.setVisibility(View.GONE);
 
 
 
@@ -195,15 +198,19 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
         TagContainerLayout categoryText;
         ImageView image;
         ImageButton deleteButton;
+        ImageView pfp;
+        LikeButton likeButton;
 
         ViewHolder(View itemView) {
             super(itemView);
-            titleText = itemView.findViewById(R.id.feed_title_text);
-            detailText = itemView.findViewById(R.id.feed_detail_text);
-            durationText = itemView.findViewById(R.id.feed_duration_text);
-            categoryText = itemView.findViewById(R.id.feed_category_text);
-            image = itemView.findViewById(R.id.feed_image);
+            titleText = itemView.findViewById(R.id.title_text);
+            detailText = itemView.findViewById(R.id.detail_text);
+            durationText = itemView.findViewById(R.id.duration_text);
+            categoryText = itemView.findViewById(R.id.category_text);
+            image = itemView.findViewById(R.id.thumbnail_image);
             deleteButton = itemView.findViewById(R.id.delete_video);
+            pfp = itemView.findViewById(R.id.profile_pic);
+            likeButton = itemView.findViewById(R.id.like_button);
             itemView.setOnClickListener(this);
         }
 

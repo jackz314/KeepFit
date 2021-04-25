@@ -19,6 +19,7 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.api.ResourceDescriptor;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
@@ -26,7 +27,9 @@ import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
+import com.jackz314.keepfit.views.FeedFragment;
 import com.jackz314.keepfit.views.HistoryFragment;
+import com.jackz314.keepfit.views.LikedVideosFragment;
 import com.jackz314.keepfit.views.SearchActivity;
 import com.jackz314.keepfit.views.UserProfileActivity;
 import com.like.LikeButton;
@@ -88,7 +91,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = mInflater.inflate(R.layout.history_item, parent, false);
+        View view = mInflater.inflate(R.layout.condensed_video_item, parent, false);
         return new ViewHolder(view);
     }
 
@@ -148,6 +151,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
                 UserControllerKt.unlikeVideo(media.getUid());
             }
         });
+
         holder.deleteButton.setOnClickListener(v -> {
             new AlertDialog.Builder(con)
                     .setMessage(R.string.delete_history_confirm)
@@ -156,6 +160,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
                     .show();
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
         });
+        holder.deleteButton.setImageResource(R.drawable.ic_delete_hist);
 
         //use ref directly, similar speed
 //        media.getCreatorRef().get().addOnSuccessListener(snapshot -> {
@@ -167,7 +172,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
     }
 
     private void populateCreatorInfo(ViewHolder holder, Media media, User creator) {
-        holder.detailText.setText(media.getDetailString());
+        holder.detailText.setText(media.getProfileString());
 
         List<String> categories = media.getCategories().stream().map(String::trim).collect(Collectors.toList());
 
@@ -243,14 +248,14 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
 
         ViewHolder(View itemView) {
             super(itemView);
-            titleText = itemView.findViewById(R.id.history_title_text);
-            detailText = itemView.findViewById(R.id.history_detail_text);
-            durationText = itemView.findViewById(R.id.hist_duration_text);
-            categoryText = itemView.findViewById(R.id.hist_category_text);
-            profilePic = itemView.findViewById(R.id.history_item_pfp);
-            likeButton = itemView.findViewById(R.id.history_like_button);
-            image = itemView.findViewById(R.id.history_video_image);
-            deleteButton = itemView.findViewById(R.id.delete_hist_video);
+            titleText = itemView.findViewById(R.id.title_text);
+            detailText = itemView.findViewById(R.id.detail_text);
+            durationText = itemView.findViewById(R.id.duration_text);
+            categoryText = itemView.findViewById(R.id.category_text);
+            profilePic = itemView.findViewById(R.id.profile_pic);
+            likeButton = itemView.findViewById(R.id.like_button);
+            image = itemView.findViewById(R.id.thumbnail_image);
+            deleteButton = itemView.findViewById(R.id.delete_video);
             itemView.setOnClickListener(this);
         }
 

@@ -9,9 +9,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
@@ -32,7 +32,6 @@ import com.like.LikeButton;
 import com.like.OnLikeListener;
 
 import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -104,7 +103,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         switch (viewTy)
         {
             case USER:return new UserViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item,parent,false));
-            default:return new MediaViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_item,parent,false));
+            default:return new MediaViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.condensed_video_item,parent,false));
         }
     }
 
@@ -165,17 +164,19 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         boolean isMedia = true;
         Media media = null;
         LikeButton likeButton;
+        ImageButton deleteButton;
 
 
         MediaViewHolder(View itemView) {
             super(itemView);
-            titleText = itemView.findViewById(R.id.feed_title_text);
-            detailText = itemView.findViewById(R.id.feed_detail_text);
-            durationText = itemView.findViewById(R.id.feed_duration_text);
-            profilePic = itemView.findViewById(R.id.feed_profile_pic);
-            categoryText = itemView.findViewById(R.id.feed_category_text);
-            image = itemView.findViewById(R.id.feed_image);
-            likeButton = itemView.findViewById(R.id.feed_like_button);
+            titleText = itemView.findViewById(R.id.title_text);
+            detailText = itemView.findViewById(R.id.detail_text);
+            durationText = itemView.findViewById(R.id.duration_text);
+            profilePic = itemView.findViewById(R.id.profile_pic);
+            categoryText = itemView.findViewById(R.id.category_text);
+            image = itemView.findViewById(R.id.thumbnail_image);
+            likeButton = itemView.findViewById(R.id.like_button);
+            deleteButton = itemView.findViewById((R.id.delete_video));
             itemView.setOnClickListener(this);
         }
 
@@ -185,7 +186,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         }
 
         private void populateCreatorInfo(User creator) {
-            this.detailText.setText(media.getDetailString());
+            this.detailText.setText(media.getProfileString());
 
             List<String> categories = media.getCategories().stream().map(String::trim).collect(Collectors.toList());
 
@@ -251,6 +252,8 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 durationText.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
             }
 
+
+
             String thumbnail;
             if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
             else thumbnail = media.getLink();
@@ -277,20 +280,26 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             } else {
                 populateCreatorInfo(creator);
             }
-            likeButton.setLiked(media.getLiked());
+
+            if(likeButton != null) {
 
 
-            likeButton.setOnLikeListener(new OnLikeListener() {
-                @Override
-                public void liked(LikeButton likeButton) {
-                    UserControllerKt.likeVideo(media.getUid());
-                }
+                likeButton.setLiked(media.getLiked());
 
-                @Override
-                public void unLiked(LikeButton likeButton) {
-                    UserControllerKt.unlikeVideo(media.getUid());
-                }
-            });
+
+                likeButton.setOnLikeListener(new OnLikeListener() {
+                    @Override
+                    public void liked(LikeButton likeButton) {
+                        UserControllerKt.likeVideo(media.getUid());
+                    }
+
+                    @Override
+                    public void unLiked(LikeButton likeButton) {
+                        UserControllerKt.unlikeVideo(media.getUid());
+                    }
+                });
+            }
+            deleteButton.setVisibility(View.GONE);
         }
 
     }
@@ -302,12 +311,14 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         boolean isMedia = false;
         User user = null;
 
+
         UserViewHolder(View itemView){
             super(itemView);
             userName = itemView.findViewById(R.id.user_name_text);
             userEmail = itemView.findViewById(R.id.user_email_text);
             profilePic = itemView.findViewById(R.id.search_profile_pic);
             bio = itemView.findViewById(R.id.biography);
+
             itemView.setOnClickListener(this);
         }
         @Override
@@ -317,11 +328,18 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
         public void Bind(User user) {
             this.user = user;
-            Glide.with(profilePic)
+            Glide.with(mInflater.getContext().getApplicationContext())
                     .load(user.getProfilePic())
                     .fitCenter()
-                    .placeholder(R.drawable.ic_thumb_placeholder)
+                    .placeholder(R.drawable.ic_account_circle_24)
                     .into(profilePic);
+
+            profilePic.setOnClickListener(v -> {
+                Intent in = new Intent(v.getContext(), UserProfileActivity.class);
+                in.putExtra(GlobalConstants.USER_PROFILE, user);
+                v.getContext().startActivity(in);
+//            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
+            });
             userName.setText(user.getName());
             userEmail.setText(user.getEmail());
             if(user.getBiography().isEmpty()){

@@ -23,7 +23,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
+import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.views.other.FeedRecyclerAdapter;
+import com.jackz314.keepfit.views.other.SearchRecyclerAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,10 +39,10 @@ public class LikedVideosFragment extends Fragment {
 
     private FirebaseUser ub;
     private FirebaseFirestore db;
-    private FeedRecyclerAdapter feedRecyclerAdapter;
+    private SearchRecyclerAdapter searchRecyclerAdapter;
     private FragmentFeedBinding b;
 
-    private final List<Media> likedVideosList = new ArrayList<>();
+    private final List<SearchResult> likedVideosList = new ArrayList<>();
 
     private final Executor procES = Executors.newSingleThreadExecutor();
 
@@ -48,11 +50,11 @@ public class LikedVideosFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        feedRecyclerAdapter = new FeedRecyclerAdapter(getContext(), likedVideosList);
-        feedRecyclerAdapter.setClickListener((view, position) -> {
+        searchRecyclerAdapter = new SearchRecyclerAdapter(getContext(), likedVideosList);
+        searchRecyclerAdapter.setClickListener((view, position) -> {
             // TODO: 3/6/21 replace with activity intent
 
-            Media media = likedVideosList.get(position);
+            Media media = likedVideosList.get(position).getMedia();
             Intent intent = new Intent(requireActivity(), VideoActivity.class);
 
             intent.putExtra("uri", media.getLink());
@@ -72,7 +74,7 @@ public class LikedVideosFragment extends Fragment {
             b = FragmentFeedBinding.inflate(inflater, container, false);
 
             b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-            b.feedRecycler.setAdapter(feedRecyclerAdapter);
+            b.feedRecycler.setAdapter(searchRecyclerAdapter);
 
             UserControllerKt.getCurrentUserDoc()
                     .collection("liked_videos").orderBy("liked_time", Query.Direction.DESCENDING)
@@ -92,7 +94,7 @@ public class LikedVideosFragment extends Fragment {
                                         doc.getReference().delete();
                                         continue;
                                     }
-                                    likedVideosList.add(media);
+                                    likedVideosList.add(new SearchResult(media));
                                 }
                             } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
                                 executionException.printStackTrace();
@@ -108,7 +110,7 @@ public class LikedVideosFragment extends Fragment {
                                         b.emptyFeedText.setText("No Liked Videos ¯\\_(ツ)_/¯");
                                     }
                                 }
-                                feedRecyclerAdapter.notifyDataChanged();
+                                searchRecyclerAdapter.notifyDataChanged();
                             });
                         });
                     });
