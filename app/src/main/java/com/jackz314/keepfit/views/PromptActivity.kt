@@ -120,10 +120,22 @@ class PromptActivity : AppCompatActivity() {
             intent.putExtra(GlobalConstants.EXERCISE_TYPE, categoryView.text.toString())
             startActivity(intent)
         } else {
-            val intent = Intent(this, ExerciseActivity::class.java)
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.selectedItem.toString())
-            intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
-            startActivity(intent)
+              //check if the exercise is sit up to start that activity
+            val exerc = b.promptCategoryDropdown.selectedItem.toString();
+            Log.d("Prompt Activity", exerc);
+            if (exerc.contains("Sit Ups")) {
+                Log.d("Prompt Activity", "Sit Up Activity");
+                val intent = Intent(this, SitUpCountActivity::class.java)
+                intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.selectedItem.toString())
+                intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
+                startActivity(intent)
+            } else {
+                val intent = Intent(this, ExerciseActivity::class.java)
+                intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.selectedItem.toString())
+                intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
+                startActivity(intent)
+            }
+            
         }
         finish()
     }
