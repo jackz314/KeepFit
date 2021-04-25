@@ -1,6 +1,7 @@
 package com.jackz314.keepfit.views.other;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,12 +18,17 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
+import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.models.Comment;
 import com.jackz314.keepfit.models.Media;
+import com.jackz314.keepfit.models.User;
+import com.jackz314.keepfit.views.UserProfileActivity;
 import com.jackz314.keepfit.views.VideoActivity;
 import com.jackz314.keepfit.views.VideosFragment;
 
@@ -40,6 +46,8 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
     private VideosRecyclerAdapter.ItemClickListener mClickListener;
 
     private VideoActivity videoActivity;
+
+
 
     public CommentRecyclerAdapter(Context context, List<Comment> data, VideoActivity videoActivity){
         this.mInflater = LayoutInflater.from(context);
@@ -59,6 +67,7 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
     public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
         Comment comment = mData.get(position);
         String username = "";
+
         DocumentReference docRef = db.collection("users").document(comment.getUid());
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -85,6 +94,32 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
 
         holder.mText.setText(comment.getText());
         holder.mUploadTime.setText(convertStringToDate(comment.getUploadTime()));
+
+
+
+        holder.mProfilePic.setOnClickListener(v -> {
+            Intent in = new Intent(v.getContext(), UserProfileActivity.class);
+            DocumentReference docRef2 = db.collection("users").document(comment.getUid());
+            docRef2.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            User creator = new User(document);
+                            in.putExtra(GlobalConstants.USER_PROFILE, creator);
+                            v.getContext().startActivity(in);
+                        } else {
+                            Log.d(TAG, "No such document");
+                        }
+                    } else {
+                        Log.d(TAG, "get failed with ", task.getException());
+                    }
+                }
+            });
+
+
+        });
 
         holder.deleteButton.setOnClickListener(v -> {
             new AlertDialog.Builder(videoActivity)
