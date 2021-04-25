@@ -2,6 +2,7 @@ package com.jackz314.keepfit.views;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -21,6 +22,7 @@ import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -88,7 +90,6 @@ public class VideoActivity extends AppCompatActivity{
 
     private VideoController mVideoController;
     private FirebaseUser ub;
-    private MediaController mc;
 
     private RecyclerView commentRecycler;
 
@@ -99,7 +100,6 @@ public class VideoActivity extends AppCompatActivity{
 
     Button uploadBtn;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    StorageReference storageReference;
     EditText editText;
     TextView emptyText;
     TextView offCommentText;
@@ -146,12 +146,27 @@ public class VideoActivity extends AppCompatActivity{
 
         mVideoController.updateVideoStatus();
 
-
-
-
         mVideoView = videoView;
         Uri uri = Uri.parse(value);
         mVideoView.setVideoURI(uri);
+
+        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
+                    @Override
+                    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
+
+                        mMediaController = new BackPressingMediaController(VideoActivity.this, VideoActivity.this);
+                        mVideoView.setMediaController(mMediaController);
+                        mMediaController.setAnchorView(mVideoView);
+
+                    }
+                });
+            }
+        });
+
+        mVideoView.start();
 
         mVideoView.setOnErrorListener((mp, what, extra) -> {
             Log.d(TAG, "onCreate: couldn't play video with video view, using backup");
@@ -210,10 +225,10 @@ public class VideoActivity extends AppCompatActivity{
 
 
 
-        mMediaController = new BackPressingMediaController(this, VideoActivity.this);
-        mVideoView.setMediaController(mMediaController);
-        mMediaController.setAnchorView(mVideoView);
-        mVideoView.start();
+//        mMediaController = new BackPressingMediaController(this, VideoActivity.this);
+//        mVideoView.setMediaController(mMediaController);
+//        mMediaController.setAnchorView(mVideoView);
+//        mVideoView.start();
 
 
         uploadBtn.setOnClickListener(view -> {
@@ -268,10 +283,8 @@ public class VideoActivity extends AppCompatActivity{
             Date c1date = c1.getUploadTime();
             Date c2date = c2.getUploadTime();
 
-            //ascending order
             //return c1date.compareTo(c2date);
 
-            //descending order
             return c2date.compareTo(c1date);
         }};
 
@@ -339,7 +352,11 @@ public class VideoActivity extends AppCompatActivity{
 
             AlertDialog alertDialog = new AlertDialog.Builder(VideoActivity.this)
                     .setMessage("Cannot delete others comments!")
-                    .setPositiveButton(android.R.string.ok, null).create();
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                    {@Override
+                        public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }}).create();
             alertDialog.show();
         }
         loadComments(mediaID);
@@ -349,6 +366,24 @@ public class VideoActivity extends AppCompatActivity{
         editText.setVisibility(visibility);
         uploadBtn.setVisibility(visibility);
         prof_img.setVisibility(visibility);
+    }
+
+    @Override
+    protected void onResume() {
+        mVideoView.resume();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mVideoView.pause();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mVideoView.stopPlayback();
+        super.onDestroy();
     }
 
 }
