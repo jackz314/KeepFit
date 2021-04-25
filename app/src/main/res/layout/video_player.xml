@@ -5,7 +5,7 @@
     android:id="@+id/relative_parent"
     android:background="#000000">
     <VideoView
-        android:id="@+id/video_view"
+        android:id="@+id/video_view2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
