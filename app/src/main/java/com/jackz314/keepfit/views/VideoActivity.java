@@ -150,23 +150,11 @@ public class VideoActivity extends AppCompatActivity{
         Uri uri = Uri.parse(value);
         mVideoView.setVideoURI(uri);
 
-        mVideoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.setOnVideoSizeChangedListener(new MediaPlayer.OnVideoSizeChangedListener() {
-                    @Override
-                    public void onVideoSizeChanged(MediaPlayer mp, int width, int height) {
-
-                        mMediaController = new BackPressingMediaController(VideoActivity.this, VideoActivity.this);
-                        mVideoView.setMediaController(mMediaController);
-                        mMediaController.setAnchorView(mVideoView);
-
-                    }
-                });
-            }
-        });
-
+        mMediaController = new BackPressingMediaController(VideoActivity.this, VideoActivity.this);
+        mVideoView.setMediaController(mMediaController);
+        mMediaController.setAnchorView(mVideoView);
         mVideoView.start();
+
 
         mVideoView.setOnErrorListener((mp, what, extra) -> {
             Log.d(TAG, "onCreate: couldn't play video with video view, using backup");
@@ -225,10 +213,7 @@ public class VideoActivity extends AppCompatActivity{
 
 
 
-//        mMediaController = new BackPressingMediaController(this, VideoActivity.this);
-//        mVideoView.setMediaController(mMediaController);
-//        mMediaController.setAnchorView(mVideoView);
-//        mVideoView.start();
+
 
 
         uploadBtn.setOnClickListener(view -> {
@@ -377,6 +362,7 @@ public class VideoActivity extends AppCompatActivity{
     @Override
     protected void onPause() {
         mVideoView.pause();
+        mMediaController.hide();
         super.onPause();
     }
 
@@ -384,6 +370,13 @@ public class VideoActivity extends AppCompatActivity{
     protected void onDestroy() {
         mVideoView.stopPlayback();
         super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        mMediaController.hide();
+        super.onStop();
+
     }
 
 }
