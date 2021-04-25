@@ -270,6 +270,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             media.put("title", titleTmp);
             media.put("view_count", 0);
             media.put("thumbnail", "");
+            media.put("is_commentable", true);
 
             DocumentReference mediaRef = db.collection("media").document();
             mediaRef.set(media);

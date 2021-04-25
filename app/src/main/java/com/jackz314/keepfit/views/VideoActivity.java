@@ -18,6 +18,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
@@ -73,6 +74,8 @@ import java.util.stream.Collectors;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static com.google.firebase.Timestamp.now;
 
 public class VideoActivity extends AppCompatActivity{
@@ -98,6 +101,9 @@ public class VideoActivity extends AppCompatActivity{
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     StorageReference storageReference;
     EditText editText;
+    TextView emptyText;
+    TextView offCommentText;
+    CircleImageView prof_img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +118,13 @@ public class VideoActivity extends AppCompatActivity{
 
         uploadBtn = findViewById(R.id.comment_upload_btn);
         editText = findViewById(R.id.comment_text_input);
+        emptyText = findViewById(R.id.empty_comment_text);
+        prof_img = findViewById(R.id.comment_profile_pic);
+
+        offCommentText = findViewById(R.id.unavailable_comment_text);
+        offCommentText.setVisibility(INVISIBLE);
+        emptyText.setVisibility(INVISIBLE);
+        setUploadCommentVisibility(INVISIBLE);
 
         Intent intent = getIntent();
         String value = intent.getStringExtra("uri");
@@ -133,7 +146,8 @@ public class VideoActivity extends AppCompatActivity{
 
         mVideoController.updateVideoStatus();
 
-        loadComments(mediaID);
+
+
 
         mVideoView = videoView;
         Uri uri = Uri.parse(value);
@@ -147,7 +161,6 @@ public class VideoActivity extends AppCompatActivity{
             return true;
         });
 
-        CircleImageView prof_img = findViewById(R.id.comment_profile_pic);
         ub = FirebaseAuth.getInstance().getCurrentUser();
         db.collection("users").document(ub.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -168,6 +181,33 @@ public class VideoActivity extends AppCompatActivity{
                 }
             }
         });
+
+        DocumentReference docRef = db.collection("media").document(mediaID);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        if(document.getBoolean("is_commentable")){
+                            loadComments(mediaID);
+                            emptyText.setVisibility(INVISIBLE);
+                            setUploadCommentVisibility(VISIBLE);
+                        }
+                        else{
+                            emptyText.setVisibility(INVISIBLE);
+                            offCommentText.setVisibility(VISIBLE);
+                            setUploadCommentVisibility(INVISIBLE);
+                        }
+                    } else {
+                        Log.d(TAG, "No Comment");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
+
 
 
         mMediaController = new BackPressingMediaController(this, VideoActivity.this);
@@ -191,6 +231,7 @@ public class VideoActivity extends AppCompatActivity{
         if(!commentList.isEmpty())
             commentList.clear();
 
+
         db.collection("comments").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -205,6 +246,12 @@ public class VideoActivity extends AppCompatActivity{
                 commentList.sort(CommentDateComparator);
                 commentRecyclerAdapter = new CommentRecyclerAdapter(VideoActivity.this, commentList, VideoActivity.this);
                 commentRecycler.setAdapter(commentRecyclerAdapter);
+                if(!commentList.isEmpty()){
+                    emptyText.setVisibility(INVISIBLE);
+                }
+                else{
+                    emptyText.setVisibility(VISIBLE);
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -297,4 +344,11 @@ public class VideoActivity extends AppCompatActivity{
         }
         loadComments(mediaID);
     }
+
+    private void setUploadCommentVisibility(int visibility){
+        editText.setVisibility(visibility);
+        uploadBtn.setVisibility(visibility);
+        prof_img.setVisibility(visibility);
+    }
+
 }

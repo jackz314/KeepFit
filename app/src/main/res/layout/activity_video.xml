@@ -83,6 +83,26 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:listitem="@layout/comment_item" />
 
+        <TextView
+            android:id="@+id/empty_comment_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No comments yet!"
+            app:layout_constraintBottom_toBottomOf="@+id/comment_recycler"
+            app:layout_constraintEnd_toEndOf="@+id/comment_recycler"
+            app:layout_constraintStart_toStartOf="@+id/comment_recycler"
+            app:layout_constraintTop_toTopOf="@+id/comment_recycler" />
+
+        <TextView
+            android:id="@+id/unavailable_comment_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comments are turned off"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/comment_recycler" />
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 
