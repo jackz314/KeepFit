@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.KeepFit">
         <activity
+            android:name=".views.SitUpCountActivity"
+            android:label="Sit Up Count"></activity>
+        <activity
             android:name=".ScheduledExerciseActivity"
             android:label="Schedule Exercise" />
         <activity android:name=".views.CalendarActivity" />
