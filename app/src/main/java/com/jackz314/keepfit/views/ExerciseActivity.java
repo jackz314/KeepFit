@@ -15,8 +15,10 @@ import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.ExerciseController;
+import com.jackz314.keepfit.controllers.SchedulingController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivityExerciseBinding;
+import com.jackz314.keepfit.models.ScheduledExercise;
 import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.other.StopwatchTextView;
 
@@ -51,6 +53,11 @@ public class ExerciseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         b = ActivityExerciseBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
+
+        if (getIntent().hasExtra(GlobalConstants.SCHEDULED_EXERCISE)) {
+            ScheduledExercise scheduledExercise = (ScheduledExercise) getIntent().getSerializableExtra(GlobalConstants.SCHEDULED_EXERCISE);
+            SchedulingController.cancelScheduledExercise(this, scheduledExercise);
+        }
 
         // set transparent status bar and navigation
         Window w = getWindow();

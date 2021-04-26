@@ -30,6 +30,7 @@ import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
 import com.jackz314.keepfit.Utils;
+import com.jackz314.keepfit.controllers.SchedulingController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivityMainBinding;
 import com.jackz314.keepfit.views.other.KeepStateNavigator;
@@ -74,6 +75,7 @@ class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         TestIdlingResource.increment();
         FirebaseApp.initializeApp(this);
+        SchedulingController.createNotificationChannels(this);
         checkAndRequireGooglePlayService();
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {

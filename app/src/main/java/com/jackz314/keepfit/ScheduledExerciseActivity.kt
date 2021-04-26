@@ -59,7 +59,7 @@ class ScheduledExerciseActivity : AppCompatActivity() {
             timeSet = true
             setDateText(newSchedule.time)
             setSaveItemStatus(!newSchedule.time.equals(originalSchedule?.time))
-        }, time.hour, time.minute, true).show()
+        }, time.hour, time.minute, false).show()
     }
 
     private fun setExerciseDate() {
@@ -110,14 +110,15 @@ class ScheduledExerciseActivity : AppCompatActivity() {
         if (item.itemId == R.id.schedule_save_item) {
             newSchedule.intensity = getIntensityValue(b.scheduleExerciseIntensity.checkedChipId)
             newSchedule.category = ExerciseController.getExerciseCategoryArray(this)[b.scheduleExerciseCategory.selectedItemPosition]
-            if (!SchedulingController.scheduleExercise(newSchedule)) {
+            if (!SchedulingController.scheduleExercise(this, newSchedule)) {
                 Toast.makeText(this, "Cannot schedule exercise in the past :(", Toast.LENGTH_SHORT).show()
             } else {
+                if (originalSchedule != null) SchedulingController.cancelScheduledExercise(this, originalSchedule!!)
                 Toast.makeText(this, "Exercise scheduled!", Toast.LENGTH_SHORT).show()
                 finish()
             }
         } else if (item.itemId == R.id.schedule_delete_item) {
-            SchedulingController.deleteScheduledExercise(originalSchedule!!.uid)
+            SchedulingController.cancelScheduledExercise(this, originalSchedule!!)
             finish()
         }
 
