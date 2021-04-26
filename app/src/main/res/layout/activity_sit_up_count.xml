@@ -42,7 +42,7 @@
         android:layout_marginTop="28dp"
         android:text="Count: "
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="30sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/exercise_time_text" />
@@ -51,12 +51,11 @@
         android:id="@+id/sit_up_count"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="88dp"
+        android:layout_marginTop="40dp"
         android:text="0"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
-        android:textSize="80sp"
+        android:textSize="110sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/sit_up_count_text" />
 
