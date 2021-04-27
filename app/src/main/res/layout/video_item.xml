@@ -109,5 +109,15 @@
         app:layout_constraintVertical_bias="0.756"
         app:srcCompat="@drawable/ic_baseline_delete_forever_24" />
 
+    <ImageButton
+        android:id="@+id/options_button"
+        android:layout_width="51dp"
+        android:layout_height="47dp"
+        android:background="@null"
+        app:layout_constraintBottom_toBottomOf="@+id/delete_video"
+        app:layout_constraintStart_toEndOf="@+id/delete_video"
+        app:layout_constraintTop_toTopOf="@+id/delete_video"
+        app:srcCompat="@drawable/ic_baseline_more_vert_24" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

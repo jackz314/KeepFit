@@ -1,6 +1,8 @@
 package com.jackz314.keepfit.views.other;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -131,6 +133,21 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
                     .show();
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
         });
+        holder.optionsButton.setOnClickListener(v -> {
+            boolean[] itemChecked = new boolean[1];
+            itemChecked[0] = media.isCommentable();
+            new AlertDialog.Builder(frag.getContext())
+                    .setMultiChoiceItems(new String[]{"Enable Comments"}, itemChecked, new DialogInterface.OnMultiChoiceClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i, boolean b) {
+                            frag.setIsCommentable(media.getUid(), media.getCreatorRef().getId(), media.getLink(), b);
+                            media.setCommentable(b);
+                        }
+                    })
+                    .setPositiveButton(android.R.string.ok, null)
+                    .create()
+                    .show();
+        });
 
 
 
@@ -195,6 +212,8 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
         TagContainerLayout categoryText;
         ImageView image;
         ImageButton deleteButton;
+        ImageButton optionsButton;
+
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -204,6 +223,7 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
             categoryText = itemView.findViewById(R.id.feed_category_text);
             image = itemView.findViewById(R.id.feed_image);
             deleteButton = itemView.findViewById(R.id.delete_video);
+            optionsButton = itemView.findViewById((R.id.options_button));
             itemView.setOnClickListener(this);
         }
 
