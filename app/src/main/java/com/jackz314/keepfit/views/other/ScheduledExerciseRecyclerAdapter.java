@@ -57,11 +57,11 @@ public class ScheduledExerciseRecyclerAdapter extends RecyclerView.Adapter<Sched
 //                DateUtils.FORMAT_NO_NOON | DateUtils.FORMAT_NO_MIDNIGHT |
 //                        DateUtils.FORMAT_NO_MONTH_DAY | DateUtils.FORMAT_NO_YEAR |
                 DateUtils.FORMAT_SHOW_TIME) + " (" + ExerciseController.getStrOfIntensity(exercise.getIntensity()) + " Intensity)");
-        holder.deleteBtn.setOnClickListener(v -> {
+        holder.cancelBtn.setOnClickListener(v -> {
             new AlertDialog.Builder(mContext)
                     .setMessage(R.string.delete_scheduled_exercise_confirm_msg)
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) ->
-                            SchedulingController.deleteScheduledExercise(exercise.uid))
+                            SchedulingController.cancelScheduledExercise(mContext, exercise))
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         });
@@ -93,13 +93,13 @@ public class ScheduledExerciseRecyclerAdapter extends RecyclerView.Adapter<Sched
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView categoryText;
         TextView detailText;
-        ImageButton deleteBtn;
+        ImageButton cancelBtn;
 
         ViewHolder(View itemView) {
             super(itemView);
             categoryText = itemView.findViewById(R.id.scheduled_category);
             detailText = itemView.findViewById(R.id.scheduled_detail_text);
-            deleteBtn = itemView.findViewById(R.id.scheduled_delete_btn);
+            cancelBtn = itemView.findViewById(R.id.scheduled_cancel_btn);
             itemView.setOnClickListener(this);
         }
 

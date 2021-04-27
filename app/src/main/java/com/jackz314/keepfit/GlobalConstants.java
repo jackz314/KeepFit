@@ -1,8 +1,10 @@
 package com.jackz314.keepfit;
 
 public interface GlobalConstants {
-    int RC_SIGN_IN = 100;
-    int RC_REAUTH_DELETE = 200;
+    int RC_SIGN_IN = 1087;
+    int RC_REAUTH_DELETE = 2019;
+    int RC_TRIGGER_REMINDER = 3012;
+    int RC_CANCEL_REMINDER = 3013;
 
     String PRIVACY_POLICY_URL = "https://www.usc.edu/pages/usc-privacy-notice/";
     String TOS_URL = "https://www.usc.edu/pages/usc-privacy-notice/";
@@ -31,8 +33,13 @@ public interface GlobalConstants {
     String CALENDAR_DATE = "calendar_date";
     String SCHEDULED_EXERCISE = "scheduled_exercise";
     String SCHEDULE_PRESET_DATE = "scheduled_preset_date";
+    String ACTION_TRIGGER_REMINDER = "trigger_reminder";
+    String ACTION_CANCEL_REMINDER = "cancel_reminder";
 
     // actions
     String ACTION_EXERCISE = "action_exercise";
     String ACTION_LIVESTREAM = "action_live";
+
+    //notifications
+    String REMINDER_NOTIF_CHANNEL_ID = "reminder_notif_channel";
 }

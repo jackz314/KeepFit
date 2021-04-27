@@ -4,6 +4,7 @@ import com.google.firebase.firestore.DocumentId;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Objects;
 
 public class ScheduledExercise implements Serializable {
     @DocumentId
@@ -50,5 +51,30 @@ public class ScheduledExercise implements Serializable {
 
     public void setIntensity(int intensity) {
         this.intensity = intensity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ScheduledExercise that = (ScheduledExercise) o;
+        return intensity == that.intensity &&
+                Objects.equals(time, that.time) &&
+                Objects.equals(category, that.category);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(time, category, intensity);
+    }
+
+    @Override
+    public String toString() {
+        return "ScheduledExercise{" +
+                "uid='" + uid + '\'' +
+                ", time=" + time +
+                ", category='" + category + '\'' +
+                ", intensity=" + intensity +
+                '}';
     }
 }

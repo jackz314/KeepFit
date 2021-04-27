@@ -1,24 +1,25 @@
 package com.jackz314.keepfit.views;
 
-import android.graphics.Color;
 import android.os.Bundle;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.ExerciseController;
-import com.jackz314.keepfit.controllers.SchedulingController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivityExerciseBinding;
-import com.jackz314.keepfit.models.ScheduledExercise;
+import com.jackz314.keepfit.databinding.ActivitySitUpCountBinding;
 import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.other.StopwatchTextView;
 
@@ -31,11 +32,10 @@ import java.util.concurrent.TimeUnit;
 import io.reactivex.rxjava3.disposables.CompositeDisposable;
 import io.reactivex.rxjava3.disposables.Disposable;
 
-public class ExerciseActivity extends AppCompatActivity {
+public class SitUpCountActivity extends AppCompatActivity {
+    private static final String TAG = "SitUpCountActivity";
 
-    private static final String TAG = "ExerciseActivity";
-
-    private ActivityExerciseBinding b;
+    private ActivitySitUpCountBinding b;
 
     private StopwatchTextView stopwatch;
 
@@ -51,23 +51,12 @@ public class ExerciseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        b = ActivityExerciseBinding.inflate(getLayoutInflater());
+        b = ActivitySitUpCountBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
 
-        if (getIntent().hasExtra(GlobalConstants.SCHEDULED_EXERCISE)) {
-            ScheduledExercise scheduledExercise = (ScheduledExercise) getIntent().getSerializableExtra(GlobalConstants.SCHEDULED_EXERCISE);
-            SchedulingController.cancelScheduledExercise(this, scheduledExercise);
-        }
-
-        // set transparent status bar and navigation
-        Window w = getWindow();
-        w.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-        w.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-        w.getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-        w.setStatusBarColor(Color.TRANSPARENT);
-        w.setNavigationBarColor(Color.TRANSPARENT);
 
         int intensity = getIntent().getIntExtra(GlobalConstants.EXERCISE_INTENSITY, 2);
+        Log.e(TAG, "Intensity " + intensity);
         float met = ExerciseController.getMETofIntensity(intensity);
         String intensityStr = ExerciseController.getStrOfIntensity(intensity);
         b.exerciseIntensity.setText(intensityStr + " Intensity");
@@ -94,12 +83,21 @@ public class ExerciseActivity extends AppCompatActivity {
         }
         b.exerciseTitle.setText(exerciseType);
 
+        //sit up frequency based on intensity
+        int sitUpInterval;
+        if (intensity == 1) {
+            sitUpInterval = 3500;
+        } else if (intensity == 2) {
+            sitUpInterval = 2000;
+        } else {
+            sitUpInterval = 1000;
+        }
         stopwatch = new StopwatchTextView(b.exerciseTimeText, 50, this);
         stopwatch.setOnTimeUpdateListener(elapsedTime -> {
             if (exerciseController != null) {
-                runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
+                runOnUiThread(() -> b.sitUpCount.setText(String.valueOf((int)elapsedTime/sitUpInterval)));
             }
-        }, 100); // update every second
+        }, 10);
         stopwatch.start();
 
         b.exercisePauseResumeBtn.setOnClickListener(v -> {
@@ -142,4 +140,5 @@ public class ExerciseActivity extends AppCompatActivity {
         compositeDisposable.clear();
         super.onDestroy();
     }
+
 }
