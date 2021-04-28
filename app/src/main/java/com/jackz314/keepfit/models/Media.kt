@@ -20,6 +20,7 @@ class Media(doc: DocumentSnapshot): Serializable {
 
     @PropertyName("is_livestream")
     var isLivestream = false
+    var isCommentable = false;
     var link: String? = null
     var categories: List<String>? = null
 
@@ -41,6 +42,7 @@ class Media(doc: DocumentSnapshot): Serializable {
         } else {
             uid = doc.id
             isLivestream = doc.getBoolean("is_livestream") == true
+            isCommentable = doc.getBoolean("is_commentable") == true;
             link = doc.getString("link")
             categories = doc.get("categories") as List<String>
             startTime = doc.getDate("start_time")
