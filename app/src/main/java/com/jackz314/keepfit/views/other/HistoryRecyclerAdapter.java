@@ -161,6 +161,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
         });
         holder.deleteButton.setImageResource(R.drawable.ic_delete_hist);
+        holder.itemView.findViewById(R.id.options_button).setVisibility(View.GONE);
 
         //use ref directly, similar speed
 //        media.getCreatorRef().get().addOnSuccessListener(snapshot -> {

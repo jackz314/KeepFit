@@ -99,6 +99,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         holder.profilePic.setVisibility(View.GONE);
         holder.deleteButton.setVisibility(View.GONE);
         holder.likeButton.setVisibility(View.GONE);
+        holder.itemView.findViewById(R.id.options_button).setVisibility(View.GONE);
 
         //use ref directly, similar speed
 //        media.getCreatorRef().get().addOnSuccessListener(snapshot -> {

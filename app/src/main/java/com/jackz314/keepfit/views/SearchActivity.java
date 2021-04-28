@@ -9,6 +9,7 @@ import android.provider.SearchRecentSuggestions;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.CompoundButton;
 import android.widget.SearchView;
 import android.widget.Toast;
 
@@ -19,6 +20,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Client;
 import com.algolia.search.saas.Query;
+import com.google.android.material.chip.Chip;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
@@ -34,6 +36,7 @@ import com.jackz314.keepfit.views.other.SearchRecyclerAdapter;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -47,11 +50,14 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private static final String TAG = "SearchActivity";
     private SearchView editSearch;
-    private final List<SearchResult> mList = new ArrayList<>();
+    private List<SearchResult> mList = new ArrayList<>();
+    private List<SearchResult> fullmList =  new ArrayList<>();
     private final Executor procES = Executors.newSingleThreadExecutor();
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private LivestreamController livestreamController;
     private ActivitySearchBinding b;
+    private Chip user_chip;
+    private Chip video_chip;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private com.algolia.search.saas.Index index;
@@ -85,7 +91,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         }
 
         searchRecyclerAdapter.setClickListener((view, position) -> {
-            // TODO: 3/6/21 replace with activity intent
             SearchResult searchResult = mList.get(position);
             if (searchResult.isUser()) {
                 //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
@@ -118,6 +123,38 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         editSearch = findViewById(R.id.search);
+
+
+        user_chip = findViewById(R.id.user_chip);
+        video_chip = findViewById(R.id.video_chip);
+        //Interface\
+        CompoundButton.OnCheckedChangeListener filt = new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) { //if checked a chip
+                    if (buttonView == (CompoundButton) user_chip) { // if user chip is checked, need to uncheck videochip
+                        if (video_chip.isChecked()) {
+                            video_chip.setChecked(false);
+                        }
+                        if(!mList.isEmpty())
+                            filter(1);
+                    }
+                    else if(buttonView == (CompoundButton)video_chip){//if video chip is checked, need to uncheck user chip
+                        if(user_chip.isChecked()){
+                            user_chip.setChecked(false);
+                        }
+                        if(!mList.isEmpty())
+                            filter(2);
+                    }
+                }
+                else // if unchecked chip, other one is already unchecked, just filter 0
+                    filter(0);
+            }
+
+        };
+        user_chip.setOnCheckedChangeListener(filt);
+        video_chip.setOnCheckedChangeListener(filt);
+
         editSearch.setOnQueryTextListener(this);
         editSearch.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
         String searchQuery = getIntent().getStringExtra(GlobalConstants.SEARCH_QUERY);
@@ -134,6 +171,44 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     public static boolean isValidQuery(String query){
         query = stripQuery(query);
         return !query.isEmpty() && query.matches("[a-zA-Z0-9 ]*");
+    }
+
+    private void filter(int mode){
+        if (mode == 1){ // filter by users
+            mList.clear();
+            mList.addAll(fullmList);
+            for (Iterator<SearchResult> iter = mList.listIterator(); iter.hasNext(); ) {
+                SearchResult searchResult = iter.next();
+                if (!searchResult.isUser()) {
+                    Log.d(TAG,"tries to remove video");
+                    iter.remove();
+                }
+            }
+        }
+        else if(mode == 2){ //filter by videos
+            mList.clear();
+            mList.addAll(fullmList);
+            for (Iterator<SearchResult> iter = mList.listIterator(); iter.hasNext(); ) {
+                SearchResult searchResult = iter.next();
+                if (searchResult.isUser()) {
+                    Log.d(TAG,"tries to remove user");
+                    iter.remove();
+                }
+            }
+        }
+        else{ // use both
+            mList.clear();
+            mList.addAll(fullmList);
+        }
+        if(mList.isEmpty()){
+            b.emptyResultsText.setVisibility(View.VISIBLE);
+            b.emptyResultsText.setText("No Filtered Results");
+        }
+        else{
+            b.emptyResultsText.setVisibility(View.GONE);
+            b.searchRecycler.setVisibility(View.VISIBLE);
+        }
+        searchRecyclerAdapter.notifyDataChanged();
     }
 
 
@@ -196,7 +271,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private void processSearch(String query) {
 
-        // TODO: 3/19/21 Insert searching capabilities on search submit query
         SearchRecentSuggestions suggestions = new SearchRecentSuggestions(this,
                 SearchHistoryController.AUTHORITY, SearchHistoryController.MODE);
         suggestions.saveRecentQuery(query, null);
@@ -215,14 +289,23 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 this.runOnUiThread(() -> {
                     mList.clear();
                     mList.addAll(searchResults);
+                    fullmList.clear();
+                    fullmList.addAll(mList);
                     if (b != null) {
                         if (!mList.isEmpty()){
                             b.emptyResultsText.setVisibility(View.GONE);
+                            if(user_chip.isChecked()){
+                                filter(1);
+                            }
+                            else if(video_chip.isChecked()){
+                                filter(2);
+                            }
                         } else {
                             b.emptyResultsText.setVisibility(View.VISIBLE);
                             b.emptyResultsText.setText("No Results");
                         }
                     }
+
                     searchRecyclerAdapter.notifyDataSetChanged();
                 });
             } catch (AlgoliaException e) {

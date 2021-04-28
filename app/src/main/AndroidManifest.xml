@@ -70,7 +70,7 @@
             android:name=".views.SearchActivity"
             android:launchMode="singleTop"
             android:theme="@style/Theme.KeepFit.NoBar"
-            android:windowSoftInputMode="adjustNothing">
+            android:windowSoftInputMode="stateAlwaysHidden|adjustNothing">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>

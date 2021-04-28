@@ -11,9 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.gms.tasks.Tasks;
+import com.google.api.Distribution;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -21,6 +23,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
+import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentHistoryBinding;
 import com.jackz314.keepfit.models.Media;
@@ -75,7 +78,13 @@ public class HistoryFragment extends Fragment {
         if (b == null){ // only inflate for the first time being created
             b = FragmentHistoryBinding.inflate(inflater, container, false);
 
-            b.historyRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+            b.historyRecycler.setLayoutManager(layoutManager);
+
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(b.historyRecycler.getContext(),
+                    layoutManager.getOrientation());
+            b.historyRecycler.addItemDecoration(dividerItemDecoration);
+
             b.historyRecycler.setAdapter(historyRecyclerAdapter);
 
             ub = FirebaseAuth.getInstance().getCurrentUser();
@@ -112,7 +121,7 @@ public class HistoryFragment extends Fragment {
                                         b.emptyHistoryText.setVisibility(View.GONE);
                                     } else {
                                         b.emptyHistoryText.setVisibility(View.VISIBLE);
-                                        b.emptyHistoryText.setText("No Watched Videos ¯\\_(ツ)_/¯");
+                                        b.emptyHistoryText.setText(R.string.empty_watch_history_list);
                                     }
                                 }
                                 historyRecyclerAdapter.notifyDataChanged();
@@ -124,7 +133,4 @@ public class HistoryFragment extends Fragment {
         return b.getRoot();
     }
 
-    public void deleteHistoryVideo(String mediaID) {
-        UserControllerKt.getCurrentUserDoc().collection("history").document(mediaID).delete();
-    }
 }

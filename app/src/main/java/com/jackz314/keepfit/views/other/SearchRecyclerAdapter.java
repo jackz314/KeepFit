@@ -165,6 +165,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         Media media = null;
         LikeButton likeButton;
         ImageButton deleteButton;
+        ImageButton options;
 
 
         MediaViewHolder(View itemView) {
@@ -177,6 +178,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             image = itemView.findViewById(R.id.thumbnail_image);
             likeButton = itemView.findViewById(R.id.like_button);
             deleteButton = itemView.findViewById((R.id.delete_video));
+            options = itemView.findViewById(R.id.options_button);
             itemView.setOnClickListener(this);
         }
 
@@ -252,8 +254,6 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 durationText.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
             }
 
-
-
             String thumbnail;
             if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
             else thumbnail = media.getLink();
@@ -300,6 +300,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 });
             }
             deleteButton.setVisibility(View.GONE);
+            options.setVisibility(View.GONE);
         }
 
     }

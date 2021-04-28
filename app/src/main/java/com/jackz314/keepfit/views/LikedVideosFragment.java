@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.gms.tasks.Tasks;
@@ -22,6 +23,7 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
+import com.jackz314.keepfit.databinding.FragmentLikedVideosBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.views.other.FeedRecyclerAdapter;
@@ -40,7 +42,7 @@ public class LikedVideosFragment extends Fragment {
     private FirebaseUser ub;
     private FirebaseFirestore db;
     private SearchRecyclerAdapter searchRecyclerAdapter;
-    private FragmentFeedBinding b;
+    private FragmentLikedVideosBinding b;
 
     private final List<SearchResult> likedVideosList = new ArrayList<>();
 
@@ -71,9 +73,15 @@ public class LikedVideosFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         if (b == null){ // only inflate for the first time being created
-            b = FragmentFeedBinding.inflate(inflater, container, false);
+            b = FragmentLikedVideosBinding.inflate(inflater, container, false);
 
-            b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+            b.feedRecycler.setLayoutManager(layoutManager);
+
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(b.feedRecycler.getContext(),
+                    layoutManager.getOrientation());
+            b.feedRecycler.addItemDecoration(dividerItemDecoration);
+            b.feedRecycler.setAdapter(searchRecyclerAdapter);
             b.feedRecycler.setAdapter(searchRecyclerAdapter);
 
             UserControllerKt.getCurrentUserDoc()

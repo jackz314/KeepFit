@@ -145,4 +145,7 @@
     <string name="login_failed">"Login failed"</string>
     <string name="delete_video_confirm">Are you sure you want to delete this video?</string>
     <string name="delete_history_confirm">Are you sure you want to remove this video from your watch history?</string>
+    <string name="empty_watch_history_list">No Watched Videos ¯\_(ツ)_/¯</string>
+    <string name="empty_videos_list">No Uploaded Videos ¯\_(ツ)_/¯</string>
+
 </resources>
