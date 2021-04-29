@@ -150,10 +150,14 @@ public class VideoActivity extends AppCompatActivity{
         Uri uri = Uri.parse(value);
         mVideoView.setVideoURI(uri);
 
+
         mMediaController = new BackPressingMediaController(VideoActivity.this, VideoActivity.this);
         mVideoView.setMediaController(mMediaController);
+        mMediaController.setPadding(0,0,0, 200);
         mMediaController.setAnchorView(mVideoView);
         mVideoView.start();
+
+
 
 
         mVideoView.setOnErrorListener((mp, what, extra) -> {
