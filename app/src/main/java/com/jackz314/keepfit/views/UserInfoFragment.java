@@ -1,7 +1,10 @@
 package com.jackz314.keepfit.views;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
 import android.text.format.DateUtils;
@@ -12,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
@@ -40,9 +45,12 @@ import com.jackz314.keepfit.views.other.ExerciseRecyclerAdapter;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -137,6 +145,37 @@ public class UserInfoFragment extends Fragment {
                 intent.putExtra(GlobalConstants.CALENDAR_DATE, System.currentTimeMillis());
                 startActivity(intent);
             });
+
+            SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+            Date c = Calendar.getInstance().getTime();
+            SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
+            String date = df.format(c);
+            String str = sharedPref.getString("LAST_LAUNCH_DATE", null);
+            if (!str.equals(date))
+            {
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString("LAST_LAUNCH_DATE", date);
+                editor.apply();
+                String recentExercise = ExerciseController.getMostRecentExercise(getContext());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                builder.setTitle("Today's recommended workout")
+                    .setMessage(recentExercise)
+                    .setPositiveButton("GO", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            Intent intent = new Intent(getContext(), SearchActivity.class);
+                            intent.putExtra(GlobalConstants.SEARCH_QUERY, recentExercise);
+                            getContext().startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // User cancelled the dialog
+                        }
+                    })
+                    .create()
+                    .show();
+            }
         }
 
 
