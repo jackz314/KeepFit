@@ -150,7 +150,7 @@ public class UserInfoFragment extends Fragment {
             Date c = Calendar.getInstance().getTime();
             SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
             String date = df.format(c);
-            String str = sharedPref.getString("LAST_LAUNCH_DATE", null);
+            String str = sharedPref.getString("LAST_LAUNCH_DATE", "");
             if (!str.equals(date))
             {
                 SharedPreferences.Editor editor = sharedPref.edit();
