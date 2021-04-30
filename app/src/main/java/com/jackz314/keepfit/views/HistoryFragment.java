@@ -73,8 +73,8 @@ public class HistoryFragment extends Fragment {
     }
 
     private  void setUpItemListeners() {
-        for (int index = 0; index  < watchedList.size(); index++) {
-            int finalIndex = index;
+        for (int i = 0; i  < watchedList.size(); i++) {
+            int index = i;
             db.collection("media").document(watchedList.get(index).getUid()).addSnapshotListener((value, e) -> {
                 if (e != null || value == null) {
                     Log.w(TAG, "Listen failed.", e);
@@ -82,7 +82,7 @@ public class HistoryFragment extends Fragment {
                 }
 
                 procES.execute(() -> {
-                    watchedList.set(finalIndex, new Media(value));
+                    watchedList.set(index, new Media(value));
                     HistoryFragment.this.requireActivity().runOnUiThread(() -> {
 
                         if (b != null) {
@@ -93,6 +93,7 @@ public class HistoryFragment extends Fragment {
                                 b.emptyHistoryText.setText("Nothing to show here ¯\\_(ツ)_/¯");
                             }
                         }
+                        historyRecyclerAdapter.notifyItemChanged(index);
                         historyRecyclerAdapter.notifyDataChanged();
                     });
                     Log.d(TAG, "media collection update: " + watchedList);
@@ -139,7 +140,8 @@ public class HistoryFragment extends Fragment {
                                     }
                                     watchedList.add(media);
                                 }
-                               setUpItemListeners();
+                                setUpItemListeners();
+
                             } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
                                 executionException.printStackTrace();
                             }

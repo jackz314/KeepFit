@@ -94,16 +94,26 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
         if (video == "liked") {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 Media media = mData.get(i);
-                media.setLiked(likedVideos.contains(media.getUid()));
+                boolean isLiked =likedVideos.contains(media.getUid());
+
+                if (media.getLiked() != isLiked) {
+                    media.setLiked(isLiked);
+                    notifyItemChanged(i);
+                }
             }
         }
         else {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 Media media = mData.get(i);
-                media.setDisliked(dislikedVideos.contains(media.getUid()));
+
+                boolean isDisliked = dislikedVideos.contains(media.getUid());
+
+                if (media.getDisliked() != isDisliked) {
+                    media.setDisliked(isDisliked);
+                    notifyItemChanged(i);
+                }
             }
         }
-        notifyDataSetChanged();
     }
 
     public void notifyDataChanged(){

@@ -341,9 +341,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                                     b.emptyResultsText.setText("Nothing to show here ¯\\_(ツ)_/¯");
                                 }
                             }
+                            searchRecyclerAdapter.notifyItemChanged(index);
                             searchRecyclerAdapter.notifyDataChanged();
                         });
-                        Log.d(TAG, "media collection update: " + mList);
+                        //Log.d(TAG, "media collection update: " + mList);
                     });
                 });
             }

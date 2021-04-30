@@ -103,20 +103,33 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         if (video == "liked" ) {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 SearchResult res = mData.get(i);
+
                 if(!res.isUser()) {
-                    res.getMedia().setLiked(likedVideos.contains(res.getMedia().getUid()));
+                    boolean isLiked = likedVideos.contains(res.getMedia().getUid());
+
+                    if (res.getMedia().getLiked() != isLiked) {
+                        res.getMedia().setLiked(isLiked);
+
+                        notifyDataSetChanged();
+                    }
                 }
             }
         }
         else {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 SearchResult res = mData.get(i);
+
                 if(!res.isUser()) {
-                    res.getMedia().setDisliked(dislikedVideos.contains(res.getMedia().getUid()));
+                    boolean isDisliked = dislikedVideos.contains(res.getMedia().getUid());
+
+                    if (res.getMedia().getDisliked() != isDisliked) {
+                        res.getMedia().setDisliked(isDisliked);
+
+                        notifyDataSetChanged();
+                    }
                 }
             }
         }
-        notifyDataSetChanged();
     }
 
     public void notifyDataChanged(){
