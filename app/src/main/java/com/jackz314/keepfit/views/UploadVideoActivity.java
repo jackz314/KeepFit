@@ -78,9 +78,6 @@ public class UploadVideoActivity extends AppCompatActivity {
     ArrayList<Integer> categoryList = new ArrayList<>();
 
 
-
-
-
     StorageReference storageReference;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 

@@ -81,6 +81,7 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
                                 .fitCenter()
                                 .placeholder(R.drawable.ic_account_circle_24)
                                 .into(holder.mProfilePic);
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         holder.uid = document.getString("user");
                     } else {
                         Log.d(TAG, "No such document");
@@ -186,4 +187,5 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
         void onItemClick(View view, int position);
     }
 }
+
 
