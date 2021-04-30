@@ -131,7 +131,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         //Interface\
         CompoundButton.OnCheckedChangeListener filt = new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { // this method is for when a search is already processed
                 if (isChecked) { //if checked a chip
                     if (buttonView == (CompoundButton) user_chip) { // if user chip is checked, need to uncheck videochip
                         if (video_chip.isChecked()) {
@@ -199,7 +199,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         }
         else{ // use both
             mList.clear();
-            mList.addAll(fullmList);
+            mList.addAll(fullmList); //must clear and add full list in case it was filtered previously
         }
         if(mList.isEmpty()){
             b.emptyResultsText.setVisibility(View.VISIBLE);
@@ -296,7 +296,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     if (b != null) {
                         if (!mList.isEmpty()){
                             b.emptyResultsText.setVisibility(View.GONE);
-                            if(user_chip.isChecked()){
+                            if(user_chip.isChecked()){ // checks if a chip is already clicked to filter before displaying full results
                                 filter(1);
                             }
                             else if(video_chip.isChecked()){
