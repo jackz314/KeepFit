@@ -11,9 +11,10 @@
         android:id="@+id/title_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Video Title"
+        android:layout_marginStart="2dp"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="3dp"
+        android:text="Video Title"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         app:layout_constrainedWidth="true"
         app:layout_constraintBottom_toTopOf="@id/category_text"
@@ -95,19 +96,18 @@
 
     <co.lujun.androidtagview.TagContainerLayout
         android:id="@+id/category_text"
-        android:layout_width="154dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="3dp"
-        android:layout_marginBottom="3dp"
         android:layout_marginEnd="8dp"
+        android:layout_marginBottom="3dp"
         app:container_background_color="@android:color/transparent"
         app:container_border_width="0dp"
         app:layout_constraintBottom_toTopOf="@id/detail_text"
-        app:layout_constraintStart_toStartOf="@id/title_text"
         app:layout_constraintEnd_toStartOf="@id/like_button"
+        app:layout_constraintStart_toStartOf="@id/title_text"
         app:tag_clickable="true"
-        app:tag_vertical_padding="4dp"
-        tools:layout_editor_absoluteX="203dp" />
+        app:tag_text_size="12sp"
+        app:tag_vertical_padding="4dp" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_pic"
