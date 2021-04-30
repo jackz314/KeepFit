@@ -95,12 +95,34 @@ public class ExerciseActivity extends AppCompatActivity {
         b.exerciseTitle.setText(exerciseType);
 
         stopwatch = new StopwatchTextView(b.exerciseTimeText, 50, this);
-        stopwatch.setOnTimeUpdateListener(elapsedTime -> {
-            if (exerciseController != null) {
-                runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
+
+        if (exerciseType.contains("Sit Ups")) {
+            int sitUpInterval;
+            if (intensity == 1) {
+                sitUpInterval = 3500;
+            } else if (intensity == 2) {
+                sitUpInterval = 2000;
+            } else {
+                sitUpInterval = 1000;
             }
-        }, 100); // update every second
-        stopwatch.start();
+            stopwatch = new StopwatchTextView(b.exerciseTimeText, 50, this);
+            stopwatch.setOnTimeUpdateListener(elapsedTime -> {
+                if (exerciseController != null) {
+                    runOnUiThread(() -> b.sitUpCount.setText(String.valueOf((int)elapsedTime/sitUpInterval)));
+                    runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
+                }
+            }, 10);
+            stopwatch.start();
+        } else {
+            b.sitUpCountText.setText("");
+            b.sitUpCount.setText("");
+            stopwatch.setOnTimeUpdateListener(elapsedTime -> {
+                if (exerciseController != null) {
+                    runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
+                }
+            }, 100); // update every second
+            stopwatch.start();
+        }
 
         b.exercisePauseResumeBtn.setOnClickListener(v -> {
             if (stopwatch.getState() == StopwatchTextView.TimerState.PAUSED) {
