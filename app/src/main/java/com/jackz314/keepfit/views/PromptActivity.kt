@@ -145,7 +145,13 @@ class PromptActivity : AppCompatActivity() {
                 intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.selectedItem.toString())
                 intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
                 startActivity(intent)
-            } else {
+            } else if (exerc.contains("Most Recent")) {
+                val intent = Intent(this, ExerciseActivity::class.java)
+                intent.putExtra(GlobalConstants.EXERCISE_TYPE, ExerciseController.getMostRecentExercise(this))
+                intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
+                startActivity(intent)
+            }
+            else {
                 val intent = Intent(this, ExerciseActivity::class.java)
                 intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.selectedItem.toString())
                 intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
