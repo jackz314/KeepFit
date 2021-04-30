@@ -99,6 +99,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         holder.profilePic.setVisibility(View.GONE);
         holder.deleteButton.setVisibility(View.GONE);
         holder.likeButton.setVisibility(View.GONE);
+        holder.dislikeButton.setVisibility(View.GONE);
         holder.itemView.findViewById(R.id.options_button).setVisibility(View.GONE);
 
         //use ref directly, similar speed
@@ -175,6 +176,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         ImageView profilePic;
         ImageButton deleteButton;
         LikeButton likeButton;
+        LikeButton dislikeButton;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -186,6 +188,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
             profilePic = itemView.findViewById(R.id.profile_pic);
             deleteButton = itemView.findViewById(R.id.delete_video);
             likeButton = itemView.findViewById(R.id.like_button);
+            dislikeButton = itemView.findViewById(R.id.dislike_button);
             itemView.setOnClickListener(this);
         }
 

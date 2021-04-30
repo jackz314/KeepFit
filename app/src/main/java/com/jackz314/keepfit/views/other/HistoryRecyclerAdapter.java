@@ -167,6 +167,9 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
         holder.likeButton.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
+                if(holder.dislikeButton.isLiked()) {
+                    holder.dislikeButton.callOnClick();
+                }
                 UserControllerKt.likeVideo(media.getUid());
                 VideoController.likeVideo(media.getUid());
             }
@@ -180,6 +183,9 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
         holder.dislikeButton.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
+                if (holder.likeButton.isLiked()) {
+                    holder.likeButton.callOnClick();
+                }
                 UserControllerKt.dislikeVideo(media.getUid());
                 VideoController.dislikeVideo(media.getUid());
             }

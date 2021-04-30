@@ -318,6 +318,9 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 likeButton.setOnLikeListener(new OnLikeListener() {
                     @Override
                     public void liked(LikeButton likeButton) {
+                        if(dislikeButton.isLiked()) {
+                            dislikeButton.callOnClick();
+                        }
                         UserControllerKt.likeVideo(media.getUid());
                         VideoController.likeVideo(media.getUid());
                     }
@@ -334,13 +337,16 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
                 dislikeButton.setOnLikeListener(new OnLikeListener() {
                     @Override
-                    public void liked(LikeButton likeButton) {
+                    public void liked(LikeButton dislikeButton) {
+                        if(likeButton.isLiked()) {
+                            likeButton.callOnClick();
+                        }
                         UserControllerKt.dislikeVideo(media.getUid());
                         VideoController.dislikeVideo(media.getUid());
                     }
 
                     @Override
-                    public void unLiked(LikeButton likeButton) {
+                    public void unLiked(LikeButton dislikeButton) {
                         UserControllerKt.undislikeVideo(media.getUid());
                         VideoController.undislikeVideo(media.getUid());
                     }

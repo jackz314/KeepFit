@@ -158,6 +158,9 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         holder.likeButton.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
+                if(holder.dislikeButton.isLiked()) {
+                    holder.dislikeButton.callOnClick();
+                }
                 UserControllerKt.likeVideo(media.getUid());
                 VideoController.likeVideo(media.getUid());
             }
@@ -173,6 +176,9 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         holder.dislikeButton.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton dislikeButton) {
+                if(holder.likeButton.isLiked()) {
+                    holder.likeButton.callOnClick();
+                }
                 UserControllerKt.dislikeVideo(media.getUid());
                 VideoController.dislikeVideo(media.getUid());
             }
