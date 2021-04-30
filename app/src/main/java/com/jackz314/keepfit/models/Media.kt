@@ -33,8 +33,11 @@ class Media(doc: DocumentSnapshot): Serializable {
     @PropertyName("view_count")
     var viewCount: Int = 0
     var likes: Int = 0
+    var dislikes: Int = 0
+
     @Exclude
     var liked = false
+    var disliked = false
 
     init {
         if (!doc.exists()){
@@ -51,6 +54,7 @@ class Media(doc: DocumentSnapshot): Serializable {
             title = doc.getString("title")
             viewCount = doc.getLong("view_count")?.toInt()?:0
             likes = doc.getLong("likes")?.toInt()?:0
+            dislikes = doc.getLong("dislikes")?.toInt()?:0
             creatorRef = doc.getDocumentReference("creator")
             val task = creatorRef!!.get()
             task.addOnCompleteListener { task ->
@@ -82,11 +86,11 @@ class Media(doc: DocumentSnapshot): Serializable {
             relativeTimeSpanString
         }
         if (isLivestream) return "${creator.name} · ${viewCount} watching · Started $startTimeStr"
-        else return "${creator.name} · ${viewCount} views · ${likes} likes · $startTimeStr"
+        else return "${creator.name} · ${viewCount} views · ${likes} likes · ${dislikes} dislikes · $startTimeStr"
     }
     fun getProfileString():String{
         if (isLivestream) return "${viewCount} watching · Started ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
-        else return "${viewCount} views · ${likes} likes · ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
+        else return "${viewCount} views · ${likes} likes · ${dislikes} dislikes · ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
     }
 
     override fun toString(): String {
@@ -96,6 +100,7 @@ class Media(doc: DocumentSnapshot): Serializable {
                 ", isLivestream=" + isLivestream +
                 ", link='" + link + '\'' +
                 ", likes='" + likes + '\'' +
+                ", dislikes='" + dislikes + '\'' +
                 ", startTime=" + startTime +
                 ", thumbnail='" + thumbnail + '\'' +
                 ", title='" + title + '\'' +

@@ -151,7 +151,7 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
         });
         holder.pfp.setVisibility(View.GONE);
         holder.likeButton.setVisibility(View.GONE);
-
+        holder.dislikeButton.setVisibility(View.GONE);
 
 
         //use ref directly, similar speed
@@ -216,6 +216,7 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
         ImageButton deleteButton;
         ImageButton optionsButton;
         LikeButton likeButton;
+        LikeButton dislikeButton;
         ImageView pfp;
 
 
@@ -229,6 +230,7 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
             deleteButton = itemView.findViewById(R.id.delete_video);
             optionsButton = itemView.findViewById((R.id.options_button));
             likeButton = itemView.findViewById(R.id.like_button);
+            dislikeButton = itemView.findViewById(R.id.dislike_button);
             pfp = itemView.findViewById(R.id.profile_pic);
             itemView.setOnClickListener(this);
         }

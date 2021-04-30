@@ -69,7 +69,36 @@ public class HistoryFragment extends Fragment {
 
         });
         fs = FirebaseStorage.getInstance();
+        db = FirebaseFirestore.getInstance();
+    }
 
+    private  void setUpItemListeners() {
+        for (int index = 0; index  < watchedList.size(); index++) {
+            int finalIndex = index;
+            db.collection("media").document(watchedList.get(index).getUid()).addSnapshotListener((value, e) -> {
+                if (e != null || value == null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
+                procES.execute(() -> {
+                    watchedList.set(finalIndex, new Media(value));
+                    HistoryFragment.this.requireActivity().runOnUiThread(() -> {
+
+                        if (b != null) {
+                            if (!watchedList.isEmpty()) {
+                                b.emptyHistoryText.setVisibility(View.GONE);
+                            } else {
+                                b.emptyHistoryText.setVisibility(View.VISIBLE);
+                                b.emptyHistoryText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+                            }
+                        }
+                        historyRecyclerAdapter.notifyDataChanged();
+                    });
+                    Log.d(TAG, "media collection update: " + watchedList);
+                });
+            });
+        }
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -110,6 +139,7 @@ public class HistoryFragment extends Fragment {
                                     }
                                     watchedList.add(media);
                                 }
+                               setUpItemListeners();
                             } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
                                 executionException.printStackTrace();
                             }
@@ -132,5 +162,4 @@ public class HistoryFragment extends Fragment {
 
         return b.getRoot();
     }
-
 }

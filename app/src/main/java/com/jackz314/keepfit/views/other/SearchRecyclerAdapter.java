@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
@@ -22,7 +23,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
+import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
+import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
@@ -32,6 +35,7 @@ import com.like.LikeButton;
 import com.like.OnLikeListener;
 
 import org.jetbrains.annotations.NotNull;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,7 +64,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     final static int USER =1;
     final static int MEDIA=2;
     private final HashSet<String> likedVideos = new HashSet<>();
-
+    private final HashSet<String> dislikedVideos = new HashSet<>();
 
 
     // data is passed into the constructor
@@ -78,22 +82,46 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 likedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus();
+            updateMediaListLikeStatus("liked");
+        }));
+        UserControllerKt.getCurrentUserDoc().collection("disliked_videos").addSnapshotListener(((value, e) -> {
+            if (e != null || value == null) {
+                Log.w(TAG, "Listen failed.", e);
+                return;
+            }
+
+            dislikedVideos.clear();
+            for (QueryDocumentSnapshot doc : value) {
+                dislikedVideos.add(doc.getId());
+            }
+
+            updateMediaListLikeStatus("disliked");
         }));
     }
 
-    private void updateMediaListLikeStatus() {
-        for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
-            SearchResult res = mData.get(i);
-            if(!res.isUser()) {
-                res.getMedia().setLiked(likedVideos.contains(res.getMedia().getUid()));
+    private void updateMediaListLikeStatus(String video) {
+        if (video == "liked" ) {
+            for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
+                SearchResult res = mData.get(i);
+                if(!res.isUser()) {
+                    res.getMedia().setLiked(likedVideos.contains(res.getMedia().getUid()));
+                }
+            }
+        }
+        else {
+            for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
+                SearchResult res = mData.get(i);
+                if(!res.isUser()) {
+                    res.getMedia().setDisliked(dislikedVideos.contains(res.getMedia().getUid()));
+                }
             }
         }
         notifyDataSetChanged();
     }
 
     public void notifyDataChanged(){
-        updateMediaListLikeStatus();
+        updateMediaListLikeStatus("liked");
+        updateMediaListLikeStatus("disliked");
     }
 
     // inflates the row layout from xml when needed
@@ -164,12 +192,14 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         boolean isMedia = true;
         Media media = null;
         LikeButton likeButton;
+        LikeButton dislikeButton;
         ImageButton deleteButton;
         ImageButton options;
 
 
         MediaViewHolder(View itemView) {
             super(itemView);
+           ;
             titleText = itemView.findViewById(R.id.title_text);
             detailText = itemView.findViewById(R.id.detail_text);
             durationText = itemView.findViewById(R.id.duration_text);
@@ -177,6 +207,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             categoryText = itemView.findViewById(R.id.category_text);
             image = itemView.findViewById(R.id.thumbnail_image);
             likeButton = itemView.findViewById(R.id.like_button);
+            dislikeButton = itemView.findViewById(R.id.dislike_button);
             deleteButton = itemView.findViewById((R.id.delete_video));
             options = itemView.findViewById(R.id.options_button);
             itemView.setOnClickListener(this);
@@ -282,20 +313,36 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             }
 
             if(likeButton != null) {
-
-
                 likeButton.setLiked(media.getLiked());
-
 
                 likeButton.setOnLikeListener(new OnLikeListener() {
                     @Override
                     public void liked(LikeButton likeButton) {
                         UserControllerKt.likeVideo(media.getUid());
+                        VideoController.likeVideo(media.getUid());
                     }
 
                     @Override
                     public void unLiked(LikeButton likeButton) {
                         UserControllerKt.unlikeVideo(media.getUid());
+                        VideoController.unlikeVideo(media.getUid());
+                    }
+                });
+            }
+            if(dislikeButton != null) {
+                dislikeButton.setLiked(media.getDisliked());
+
+                dislikeButton.setOnLikeListener(new OnLikeListener() {
+                    @Override
+                    public void liked(LikeButton likeButton) {
+                        UserControllerKt.dislikeVideo(media.getUid());
+                        VideoController.dislikeVideo(media.getUid());
+                    }
+
+                    @Override
+                    public void unLiked(LikeButton likeButton) {
+                        UserControllerKt.undislikeVideo(media.getUid());
+                        VideoController.undislikeVideo(media.getUid());
                     }
                 });
             }

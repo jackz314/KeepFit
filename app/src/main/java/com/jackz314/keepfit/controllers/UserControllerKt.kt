@@ -51,6 +51,16 @@ object UserControllerKt {
     }
 
     @JvmStatic
+    fun dislikeVideo(uid: String) {
+        currentUserDoc.collection("disliked_videos").document(uid).set(hashMapOf("disliked_time" to FieldValue.serverTimestamp()))
+    }
+
+    @JvmStatic
+    fun undislikeVideo(uid: String) {
+        currentUserDoc.collection("disliked_videos").document(uid).delete()
+    }
+
+    @JvmStatic
     fun deleteFromHistory(uid: String){
         currentUserDoc.collection("history").document(uid).delete()
     }
