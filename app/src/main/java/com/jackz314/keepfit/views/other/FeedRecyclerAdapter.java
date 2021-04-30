@@ -21,6 +21,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
+import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
@@ -45,6 +46,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private final HashSet<String> likedVideos = new HashSet<>();
+    private final HashSet<String> dislikedVideos = new HashSet<>();
 
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
 
@@ -64,20 +66,42 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                 likedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus();
+            updateMediaListLikeStatus("liked");
+        }));
+        UserControllerKt.getCurrentUserDoc().collection("disliked_videos").addSnapshotListener(((value, e) -> {
+            if (e != null || value == null) {
+                Log.w(TAG, "Listen failed", e);
+                return;
+            }
+
+            dislikedVideos.clear();
+            for (QueryDocumentSnapshot doc : value) {
+                dislikedVideos.add(doc.getId());
+            }
+
+            updateMediaListLikeStatus("disliked");
         }));
     }
 
-    private void updateMediaListLikeStatus() {
-        for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
-            Media media = mData.get(i);
-            media.setLiked(likedVideos.contains(media.getUid()));
+    private void updateMediaListLikeStatus(String video) {
+        if (video == "liked") {
+            for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
+                Media media = mData.get(i);
+                media.setLiked(likedVideos.contains(media.getUid()));
+            }
+        }
+        else {
+            for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
+                Media media = mData.get(i);
+                media.setDisliked(dislikedVideos.contains(media.getUid()));
+            }
         }
         notifyDataSetChanged();
     }
 
     public void notifyDataChanged(){
-        updateMediaListLikeStatus();
+        updateMediaListLikeStatus("liked");
+        updateMediaListLikeStatus("disliked");
     }
 
     // inflates the row layout from xml when needed
@@ -131,11 +155,12 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
 
 
         holder.likeButton.setLiked(media.getLiked());
-
-
         holder.likeButton.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
+                if(holder.dislikeButton.isLiked()) {
+                    holder.dislikeButton.callOnClick();
+                }
                 UserControllerKt.likeVideo(media.getUid());
                 VideoController.likeVideo(media.getUid());
             }
@@ -147,6 +172,23 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             }
         });
 
+        holder.dislikeButton.setLiked(media.getDisliked());
+        holder.dislikeButton.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton dislikeButton) {
+                if(holder.likeButton.isLiked()) {
+                    holder.likeButton.callOnClick();
+                }
+                UserControllerKt.dislikeVideo(media.getUid());
+                VideoController.dislikeVideo(media.getUid());
+            }
+
+            @Override
+            public void unLiked(LikeButton dislikeButton) {
+                UserControllerKt.undislikeVideo(media.getUid());
+                VideoController.undislikeVideo(media.getUid());
+            }
+        });
         //use ref directly, similar speed
 //        media.getCreatorRef().get().addOnSuccessListener(snapshot -> {
 //            long duration = System.currentTimeMillis() - start;
@@ -229,6 +271,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         ImageView profilePic;
         ImageView image;
         LikeButton likeButton;
+        LikeButton dislikeButton;
 
         ViewHolder(View itemView) {
             super(itemView);
@@ -238,6 +281,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             categoryText = itemView.findViewById(R.id.feed_category_text);
             profilePic = itemView.findViewById(R.id.feed_profile_pic);
             likeButton = itemView.findViewById(R.id.feed_like_button);
+            dislikeButton = itemView.findViewById(R.id.feed_dislike_button);
             image = itemView.findViewById(R.id.feed_image);
             itemView.setOnClickListener(this);
         }

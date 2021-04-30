@@ -81,7 +81,36 @@ public class FeedFragment extends Fragment {
         setupFeedListener(null);
     }
 
+    private  void setUpItemListeners() {
+        for (int index = 0; index  < mediaList.size(); index++) {
+            int finalIndex = index;
+            db.collection("media").document(mediaList.get(index).getUid()).addSnapshotListener((value, e) -> {
+                if (e != null || value == null) {
+                    Log.w(TAG, "Listen failed.", e);
+                    return;
+                }
+
+                procES.execute(() -> {
+                    mediaList.set(finalIndex, new Media(value));
+                    FeedFragment.this.requireActivity().runOnUiThread(() -> {
+
+                        if (b != null) {
+                            if (!mediaList.isEmpty()) {
+                                b.emptyFeedText.setVisibility(View.GONE);
+                            } else {
+                                b.emptyFeedText.setVisibility(View.VISIBLE);
+                                b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+                            }
+                        }
+                        feedRecyclerAdapter.notifyDataChanged();
+                    });
+                });
+            });
+        }
+    }
+
     private void setupFeedListener(String category) {
+        db.collection("media").document();
         Query feedQuery = db.collection("media").orderBy("likes", Query.Direction.DESCENDING)
                 .orderBy("start_time", Query.Direction.DESCENDING);
         if (category != null) feedQuery = feedQuery.whereArrayContains("categories", category);
@@ -97,7 +126,7 @@ public class FeedFragment extends Fragment {
                 for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
                     mediaList.add(new Media(queryDocumentSnapshot));
                 }
-
+                setUpItemListeners();
                 // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
                 FeedFragment.this.requireActivity().runOnUiThread(() -> {
 

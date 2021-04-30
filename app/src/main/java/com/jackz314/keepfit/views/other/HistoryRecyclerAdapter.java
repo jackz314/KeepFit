@@ -25,6 +25,7 @@ import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.UserControllerKt;
+import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.FeedFragment;
@@ -50,6 +51,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
     private final LayoutInflater mInflater;
     private ItemClickListener mClickListener;
     private final HashSet<String> likedVideos = new HashSet<>();
+    private final HashSet<String> dislikedVideos = new HashSet<>();
     private Context con;
 
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
@@ -71,20 +73,42 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
                 likedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus();
+            updateMediaListLikeStatus("liked");
+        }));
+        UserControllerKt.getCurrentUserDoc().collection("disliked_videos").addSnapshotListener(((value, e) -> {
+            if (e != null || value == null) {
+                Log.w(TAG, "Listen failed.", e);
+                return;
+            }
+
+            dislikedVideos.clear();
+            for (QueryDocumentSnapshot doc : value) {
+                dislikedVideos.add(doc.getId());
+            }
+
+            updateMediaListLikeStatus("disliked");
         }));
     }
 
-    private void updateMediaListLikeStatus() {
-        for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
-            Media media = mData.get(i);
-            media.setLiked(likedVideos.contains(media.getUid()));
+    private void updateMediaListLikeStatus(String video) {
+        if (video == "liked") {
+            for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
+                Media media = mData.get(i);
+                media.setLiked(likedVideos.contains(media.getUid()));
+            }
+        }
+        else {
+            for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
+                Media media = mData.get(i);
+                media.setDisliked(dislikedVideos.contains(media.getUid()));
+            }
         }
         notifyDataSetChanged();
     }
 
     public void notifyDataChanged(){
-        updateMediaListLikeStatus();
+        updateMediaListLikeStatus("liked");
+        updateMediaListLikeStatus("disliked");
     }
 
     // inflates the row layout from xml when needed
@@ -138,17 +162,38 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
 
 
         holder.likeButton.setLiked(media.getLiked());
-
+        holder.dislikeButton.setLiked(media.getDisliked());
 
         holder.likeButton.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
+                if(holder.dislikeButton.isLiked()) {
+                    holder.dislikeButton.callOnClick();
+                }
                 UserControllerKt.likeVideo(media.getUid());
+                VideoController.likeVideo(media.getUid());
             }
 
             @Override
             public void unLiked(LikeButton likeButton) {
                 UserControllerKt.unlikeVideo(media.getUid());
+                VideoController.unlikeVideo(media.getUid());
+            }
+        });
+        holder.dislikeButton.setOnLikeListener(new OnLikeListener() {
+            @Override
+            public void liked(LikeButton likeButton) {
+                if (holder.likeButton.isLiked()) {
+                    holder.likeButton.callOnClick();
+                }
+                UserControllerKt.dislikeVideo(media.getUid());
+                VideoController.dislikeVideo(media.getUid());
+            }
+
+            @Override
+            public void unLiked(LikeButton likeButton) {
+                UserControllerKt.undislikeVideo(media.getUid());
+                VideoController.undislikeVideo(media.getUid());
             }
         });
 
@@ -245,6 +290,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
         ImageView profilePic;
         ImageView image;
         LikeButton likeButton;
+        LikeButton dislikeButton;
         ImageButton deleteButton;
 
         ViewHolder(View itemView) {
@@ -255,6 +301,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
             categoryText = itemView.findViewById(R.id.category_text);
             profilePic = itemView.findViewById(R.id.profile_pic);
             likeButton = itemView.findViewById(R.id.like_button);
+            dislikeButton = itemView.findViewById(R.id.dislike_button);
             image = itemView.findViewById(R.id.thumbnail_image);
             deleteButton = itemView.findViewById(R.id.delete_video);
             itemView.setOnClickListener(this);

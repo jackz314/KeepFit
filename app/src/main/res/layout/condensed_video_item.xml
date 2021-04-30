@@ -43,15 +43,26 @@
         android:layout_height="18dp"
         android:layout_marginTop="5dp"
         android:layout_marginEnd = "10dp"
-        app:layout_constraintStart_toEndOf="@id/guideline5"
-        android:layout_marginStart="225dp"
+        app:layout_constraintEnd_toStartOf="@id/dislike_button"
         app:icon_size="25dp"
         app:icon_type="thumb"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         />
-
+    <com.like.LikeButton
+        android:id= "@+id/dislike_button"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="5dp"
+        android:rotation="180"
+        app:icon_size="25dp"
+        app:icon_type="thumb"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
     <TextView
         android:id="@+id/detail_text"
         android:layout_width="wrap_content"
@@ -60,7 +71,7 @@
         android:textSize="12sp"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="3dp"
-        app:layout_constraintStart_toStartOf = "@id/category_text"
+        app:layout_constraintStart_toStartOf = "@id/profile_pic"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:layout_editor_absoluteX="203dp" />
 
@@ -88,10 +99,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="3dp"
         android:layout_marginBottom="3dp"
+        android:layout_marginEnd="8dp"
         app:container_background_color="@android:color/transparent"
         app:container_border_width="0dp"
         app:layout_constraintBottom_toTopOf="@id/detail_text"
         app:layout_constraintStart_toStartOf="@id/title_text"
+        app:layout_constraintEnd_toStartOf="@id/like_button"
         app:tag_clickable="true"
         app:tag_vertical_padding="4dp"
         tools:layout_editor_absoluteX="203dp" />

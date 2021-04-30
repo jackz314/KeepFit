@@ -2,6 +2,7 @@ package com.jackz314.keepfit.controllers;
 
 import android.content.Context;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.models.Media;
@@ -36,4 +37,15 @@ public class VideoController {
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         database.collection("media").document(mediaID).update("likes", FieldValue.increment(-1));
     }
+
+    static public void dislikeVideo(String mediaID){
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database.collection("media").document(mediaID).update("dislikes", FieldValue.increment(1));
+    }
+
+    static public void undislikeVideo(String mediaID){
+        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        database.collection("media").document(mediaID).update("dislikes", FieldValue.increment(-1));
+    }
 }
+
