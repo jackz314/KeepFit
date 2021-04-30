@@ -11,8 +11,11 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -22,14 +25,18 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
+import com.jackz314.keepfit.databinding.FragmentVideosBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.views.other.VideosRecyclerAdapter;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -42,7 +49,7 @@ public class VideosFragment extends Fragment {
     private FirebaseFirestore db;
     private FirebaseStorage fs;
     private VideosRecyclerAdapter videoRecyclerAdapter;
-    private FragmentFeedBinding b;
+    private FragmentVideosBinding b;
 
     private final List<Media> videosList = new ArrayList<>();
     private final List<DocumentReference> videoRefList = new ArrayList<>();
@@ -55,7 +62,6 @@ public class VideosFragment extends Fragment {
 
         videoRecyclerAdapter = new VideosRecyclerAdapter(getContext(), videosList, this);
         videoRecyclerAdapter.setClickListener((view, position) -> {
-            // TODO: 3/6/21 replace with activity intent
 
             Media media = videosList.get(position);
             Log.d(TAG,"Uploaded Video: "+media);
@@ -77,10 +83,15 @@ public class VideosFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
 
         if (b == null){ // only inflate for the first time being created
-            b = FragmentFeedBinding.inflate(inflater, container, false);
+            b = FragmentVideosBinding.inflate(inflater, container, false);
 
-            b.feedRecycler.setLayoutManager(new LinearLayoutManager(getContext()));
-            b.feedRecycler.setAdapter(videoRecyclerAdapter);
+            LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+            b.videosRecycler.setLayoutManager(layoutManager);
+
+            DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(b.videosRecycler.getContext(),
+                    layoutManager.getOrientation());
+            b.videosRecycler.addItemDecoration(dividerItemDecoration);
+            b.videosRecycler.setAdapter(videoRecyclerAdapter);
 
             ub = FirebaseAuth.getInstance().getCurrentUser();
             db = FirebaseFirestore.getInstance();
@@ -119,7 +130,7 @@ public class VideosFragment extends Fragment {
                                         b.emptyFeedText.setVisibility(View.GONE);
                                     } else {
                                         b.emptyFeedText.setVisibility(View.VISIBLE);
-                                        b.emptyFeedText.setText("No Created Videos ¯\\_(ツ)_/¯");
+                                        b.emptyFeedText.setText(R.string.empty_videos_list);
                                     }
                                     videoRecyclerAdapter.notifyDataChanged();
                                 });
@@ -155,6 +166,22 @@ public class VideosFragment extends Fragment {
                 }).addOnFailureListener(exception -> {
                     // Uh-oh, an error occurred!
                     Log.d(TAG, "onFailure: did not delete file");
+                });
+    }
+
+    public void setIsCommentable(String mediaID, String CreatorID, String StorageLink, boolean b) {
+        db.collection("media").document(mediaID).update("is_commentable", b)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully updated!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error updating document", e);
+                    }
                 });
     }
 }

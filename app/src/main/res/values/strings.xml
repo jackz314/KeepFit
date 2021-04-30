@@ -8,6 +8,7 @@
     <string name="delete_account_confirm_msg">Are you sure you want to delete your account from KeepFit? This action will permanently remove all your data on KeepFit and cannot be reversed!</string>
     <string name="clear_exercise_log_confirm_msg">Are you sure you want to delete all of your past exercises from KeepFit? This action cannot be reversed!</string>
     <string name="clear_search_log_confirm_msg">Are you sure you want to delete all of your past searches? This action cannot be reversed!</string>
+    <string name="delete_scheduled_exercise_confirm_msg">Are you sure you want to cancel this scheduled exercise?</string>
 
     <!-- Facebook application ID and custom URL scheme (app ID prefixed by 'fb'). -->
     <string name="facebook_application_id" translatable="false">3367689143342688</string>
@@ -86,14 +87,14 @@
         <item>Running</item>
         <item>Jogging</item>
         <item>Running on sand</item>
-        <item>Running (treadmill)</item>
         <item>Sailing</item>
         <item>Scuba diving</item>
+        <item>Sit Ups</item>
         <item>Skateboarding</item>
         <item>Skating</item>
         <item>Cross skating</item>
         <item>Indoor skating</item>
-        <item>Inline skating (rollerblading)</item>
+        <item>Rollerblading</item>
         <item>Skiing</item>
         <item>Back-country skiing</item>
         <item>Cross-country skiing</item>
@@ -107,29 +108,19 @@
         <item>Softball</item>
         <item>Squash</item>
         <item>Stair climbing</item>
-        <item>Stair-climbing machine</item>
-        <item>Stand-up paddleboarding</item>
+        <item>Paddleboarding</item>
         <item>Still (not moving)</item>
         <item>Strength training</item>
         <item>Surfing</item>
         <item>Swimming</item>
-        <item>Swimming (open water)</item>
-        <item>Swimming (swimming pool)</item>
-        <item>Table tennis (ping pong)</item>
+        <item>Table tennis</item>
         <item>Team sports</item>
         <item>Tennis</item>
-        <item>Tilting (sudden device gravity change)</item>
-        <item>Treadmill (walking or running)</item>
-        <item>Unknown (unable to detect activity)</item>
+        <item>Treadmill</item>
         <item>Volleyball</item>
-        <item>Volleyball (beach)</item>
-        <item>Volleyball (indoor)</item>
         <item>Wakeboarding</item>
         <item>Walking</item>
-        <item>Walking (fitness)</item>
         <item>Nording walking</item>
-        <item>Walking (treadmill)</item>
-        <item>Walking (stroller)</item>
         <item>Waterpolo</item>
         <item>Weightlifting</item>
         <item>Wheelchair</item>
@@ -154,4 +145,7 @@
     <string name="login_failed">"Login failed"</string>
     <string name="delete_video_confirm">Are you sure you want to delete this video?</string>
     <string name="delete_history_confirm">Are you sure you want to remove this video from your watch history?</string>
+    <string name="empty_watch_history_list">No Watched Videos ¯\_(ツ)_/¯</string>
+    <string name="empty_videos_list">No Uploaded Videos ¯\_(ツ)_/¯</string>
+
 </resources>

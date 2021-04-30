@@ -1,4 +1,5 @@
 <resources>
+
     <style name="Widget.Theme.KeepFit.ActionBar.Fullscreen" parent="Widget.AppCompat.ActionBar">
         <item name="android:background">@color/black_overlay</item>
     </style>
@@ -6,5 +7,9 @@
     <style name="Widget.Theme.KeepFit.ButtonBar.Fullscreen" parent="">
         <item name="android:background">@color/black_overlay</item>
         <item name="android:buttonBarStyle">?android:attr/buttonBarStyle</item>
+    </style>
+
+    <style name="DayNightCalendarTextAppearance" parent="TextAppearance.MaterialCalendarWidget.Date">
+        <item name="android:textColor">@color/calendar_text_color</item>
     </style>
 </resources>

@@ -10,8 +10,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -256,10 +258,14 @@ public class UploadVideoActivity extends AppCompatActivity {
                 titleTmp = "Untitled";
             }
 
+            boolean isCommentable = ((CheckBox) findViewById(R.id.comment_checkbox)).isChecked();
+            Log.e(TAG, String.valueOf(isCommentable));
+
             Map<String, Object> media = new HashMap<>();
             media.put("categories", categoryList);
             media.put("creator", uidRef);
             media.put("is_livestream", false);
+            media.put("is_commentable", isCommentable);
             media.put("link", link);
             media.put("likes", 0);
             media.put("duration", durationLong);
@@ -267,7 +273,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             media.put("title", titleTmp);
             media.put("view_count", 0);
             media.put("thumbnail", "");
-
+            
             DocumentReference mediaRef = db.collection("media").document();
             mediaRef.set(media);
             Map<String, Object> refData = new HashMap<>();

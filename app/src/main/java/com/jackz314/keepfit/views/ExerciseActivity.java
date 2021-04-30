@@ -15,8 +15,10 @@ import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.controllers.ExerciseController;
+import com.jackz314.keepfit.controllers.SchedulingController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.ActivityExerciseBinding;
+import com.jackz314.keepfit.models.ScheduledExercise;
 import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.other.StopwatchTextView;
 
@@ -52,6 +54,11 @@ public class ExerciseActivity extends AppCompatActivity {
         b = ActivityExerciseBinding.inflate(getLayoutInflater());
         setContentView(b.getRoot());
 
+        if (getIntent().hasExtra(GlobalConstants.SCHEDULED_EXERCISE)) {
+            ScheduledExercise scheduledExercise = (ScheduledExercise) getIntent().getSerializableExtra(GlobalConstants.SCHEDULED_EXERCISE);
+            SchedulingController.cancelScheduledExercise(this, scheduledExercise);
+        }
+
         // set transparent status bar and navigation
         Window w = getWindow();
         w.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS | WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
@@ -62,10 +69,7 @@ public class ExerciseActivity extends AppCompatActivity {
 
         int intensity = getIntent().getIntExtra(GlobalConstants.EXERCISE_INTENSITY, 2);
         float met = ExerciseController.getMETofIntensity(intensity);
-        String intensityStr;
-        if (intensity == 1) intensityStr = "Light";
-        else if (intensity == 2) intensityStr = "Moderate";
-        else intensityStr = "Vigorous";
+        String intensityStr = ExerciseController.getStrOfIntensity(intensity);
         b.exerciseIntensity.setText(intensityStr + " Intensity");
 
         Disposable disposable = UserControllerKt.getCurrentUser().subscribe(user -> {
@@ -91,12 +95,34 @@ public class ExerciseActivity extends AppCompatActivity {
         b.exerciseTitle.setText(exerciseType);
 
         stopwatch = new StopwatchTextView(b.exerciseTimeText, 50, this);
-        stopwatch.setOnTimeUpdateListener(elapsedTime -> {
-            if (exerciseController != null) {
-                runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
+
+        if (exerciseType.contains("Sit Ups")) {
+            int sitUpInterval;
+            if (intensity == 1) {
+                sitUpInterval = 3500;
+            } else if (intensity == 2) {
+                sitUpInterval = 2000;
+            } else {
+                sitUpInterval = 1000;
             }
-        }, 100); // update every second
-        stopwatch.start();
+            stopwatch = new StopwatchTextView(b.exerciseTimeText, 50, this);
+            stopwatch.setOnTimeUpdateListener(elapsedTime -> {
+                if (exerciseController != null) {
+                    runOnUiThread(() -> b.sitUpCount.setText(String.valueOf((int)elapsedTime/sitUpInterval)));
+                    runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
+                }
+            }, 10);
+            stopwatch.start();
+        } else {
+            b.sitUpCountText.setText("");
+            b.sitUpCount.setText("");
+            stopwatch.setOnTimeUpdateListener(elapsedTime -> {
+                if (exerciseController != null) {
+                    runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
+                }
+            }, 100); // update every second
+            stopwatch.start();
+        }
 
         b.exercisePauseResumeBtn.setOnClickListener(v -> {
             if (stopwatch.getState() == StopwatchTextView.TimerState.PAUSED) {

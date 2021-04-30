@@ -1,11 +1,7 @@
 package com.jackz314.keepfit.views
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.*
@@ -13,14 +9,15 @@ import androidx.annotation.IdRes
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.view.children
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
+import com.google.firebase.FirebaseApp
 import com.jackz314.keepfit.GlobalConstants
 import com.jackz314.keepfit.R
 import com.jackz314.keepfit.controllers.ExerciseController
+import com.jackz314.keepfit.controllers.SchedulingController
 import com.jackz314.keepfit.databinding.ActivityPromptBinding
+import com.jackz314.keepfit.models.ScheduledExercise
+import java.util.*
+import kotlin.collections.ArrayList
 
 class PromptActivity : AppCompatActivity() {
 
@@ -45,19 +42,19 @@ class PromptActivity : AppCompatActivity() {
                 b.promptIntensityLabel.visibility = View.GONE
                 b.promptCategoryDropdown.visibility = View.GONE
 
-                val categoryView = findViewById<TextView>(R.id.prompt_category_select);
+                val categoryView = findViewById<TextView>(R.id.prompt_category_select)
 
                 categoryView.setOnClickListener {
                     val builder = AlertDialog.Builder(this@PromptActivity)
                     val categories = applicationContext.resources.getStringArray(R.array.exercise_categories)
                     builder.setTitle("Select Categories")
                     val checked = BooleanArray(categories.size) { false }
-                    builder.setMultiChoiceItems(categories, checked) {  dialog, which, isChecked ->
+                    builder.setMultiChoiceItems(categories, checked) { dialog, which, isChecked ->
 
                     }
 
                     // Set the positive/yes button click listener
-                    var selectedCategories = ArrayList<String>()
+                    val selectedCategories = ArrayList<String>()
                     builder.setPositiveButton("OK") { dialog, which ->
                         for (i in checked.indices) {
                             val c = checked[i]
@@ -81,28 +78,20 @@ class PromptActivity : AppCompatActivity() {
                 b.promptTitle.visibility = View.GONE
                 b.promptCategorySelect.visibility = View.GONE
                 titleValid = true
-                val spinner: Spinner = findViewById(R.id.prompt_category_dropdown)
-                // Create an ArrayAdapter using the string array and a default spinner layout
-                ArrayAdapter.createFromResource(
-                        this,
-                        R.array.exercise_categories,
-                        android.R.layout.simple_spinner_item
-                ).also { adapter ->
-                    // Specify the layout to use when the list of choices appears
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-                    // Apply the adapter to the spinner
-                    spinner.adapter = adapter
-                    b.promptDescription.text = "Track Exercise"
-                    titleValid = true
-                    val exerciseCategoryAdapter: ArrayAdapter<String>
-                    val recentExercise = ExerciseController.getMostRecentExercise(this)
-                    val exerciseArr = resources.getStringArray(R.array.exercise_categories)
-                    if (recentExercise != null) {
-                        val exerciseCategories = exerciseArr.toMutableList().apply { add(0, "$recentExercise • Most Recent") }
-                        exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseCategories)
-                    } else {
-                        exerciseCategoryAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseArr)
+                b.promptDescription.text = "Track Exercise"
+                titleValid = true
+                val recentExercise = ExerciseController.getMostRecentExercise(this)
+                val exerciseCategories = ExerciseController.getExerciseCategoryArray(this).toMutableList()
+                if (recentExercise != null) exerciseCategories.add(0, "$recentExercise • Most Recent")
+                b.promptCategoryDropdown.adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, exerciseCategories)
+                if (intent.hasExtra(GlobalConstants.SCHEDULED_EXERCISE)) {
+                    if (FirebaseApp.getApps(this).isEmpty()) { // just in case
+                        FirebaseApp.initializeApp(this)
                     }
+                    val scheduledExercise = intent.getSerializableExtra(GlobalConstants.SCHEDULED_EXERCISE) as ScheduledExercise
+                    b.promptExerciseIntensity.check(getIntensityChipId(scheduledExercise.intensity))
+                    val scheduledCategoryIndex = exerciseCategories.indexOf(scheduledExercise.category.trim().capitalize(Locale.getDefault()))
+                    b.promptCategoryDropdown.setSelection(scheduledCategoryIndex)
                 }
             }
         }
@@ -114,22 +103,27 @@ class PromptActivity : AppCompatActivity() {
         }
     }
 
-    private fun validate(str: String): Boolean{
+    private fun validate(str: String): Boolean {
         return str.trim().isNotEmpty()
 //        return str.matches("[0-9a-zA-Z?!.,]+".toRegex())
     }
 
-    private fun getIntensityValue(@IdRes id: Int): Int{
-        return when (id) {
-            R.id.prompt_intensity_low -> 1
-            R.id.prompt_intensity_medium -> 2
-            R.id.prompt_intensity_high -> 3
-            else -> 2
-        }
+    private fun getIntensityValue(@IdRes id: Int) = when (id) {
+        R.id.prompt_intensity_low -> 1
+        R.id.prompt_intensity_medium -> 2
+        R.id.prompt_intensity_high -> 3
+        else -> 2
+    }
+
+    private fun getIntensityChipId(value: Int) = when (value) {
+        1 -> R.id.prompt_intensity_low
+        2 -> R.id.prompt_intensity_medium
+        3 -> R.id.prompt_intensity_high
+        else -> R.id.prompt_intensity_medium
     }
 
     private fun start() {
-        if (isLivestream){
+        if (isLivestream) {
             val intent = Intent(this, StartLivestreamActivity::class.java)
             intent.putExtra(GlobalConstants.MEDIA_TITLE, b.promptTitle.text.toString())
             //val chipGroup = findViewById<ChipGroup>(R.id.prompt_category_button)
@@ -137,14 +131,28 @@ class PromptActivity : AppCompatActivity() {
                     .filter { (it as Chip).isChecked }
                     .map { (it as Chip).text.toString() }
             val categoryStr = selectedChips.joinToString();*/
-            val categoryView = findViewById<TextView>(R.id.prompt_category_select);
+            val categoryView = findViewById<TextView>(R.id.prompt_category_select)
             intent.putExtra(GlobalConstants.EXERCISE_TYPE, categoryView.text.toString())
             startActivity(intent)
         } else {
-            val intent = Intent(this, ExerciseActivity::class.java)
-            intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.getSelectedItem().toString())
-            intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
-            startActivity(intent)
+            if (intent.hasExtra(GlobalConstants.SCHEDULED_EXERCISE)) {
+                SchedulingController.cancelScheduledExercise(this, intent.getSerializableExtra(GlobalConstants.SCHEDULED_EXERCISE) as ScheduledExercise)
+            }
+            //check if the exercise is sit up to start that activity
+            val exerc = b.promptCategoryDropdown.selectedItem.toString()
+            if (exerc.contains("Most Recent")) {
+                val intent = Intent(this, ExerciseActivity::class.java)
+                intent.putExtra(GlobalConstants.EXERCISE_TYPE, ExerciseController.getMostRecentExercise(this))
+                intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
+                startActivity(intent)
+            }
+            else {
+                val intent = Intent(this, ExerciseActivity::class.java)
+                intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.selectedItem.toString())
+                intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
+                startActivity(intent)
+            }
+            
         }
         finish()
     }
@@ -152,19 +160,4 @@ class PromptActivity : AppCompatActivity() {
     private fun showLoginFailed(@StringRes errorString: Int) {
         Toast.makeText(applicationContext, errorString, Toast.LENGTH_SHORT).show()
     }
-}
-
-/**
- * Extension function to simplify setting an afterTextChanged action to EditText components.
- */
-fun EditText.afterTextChanged(afterTextChanged: (String) -> Unit) {
-    this.addTextChangedListener(object : TextWatcher {
-        override fun afterTextChanged(editable: Editable?) {
-            afterTextChanged.invoke(editable.toString())
-        }
-
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
-    })
 }

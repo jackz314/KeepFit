@@ -112,7 +112,13 @@ public class ExerciseController {
         }
     }
 
-    public static List<Exercise> getTodayExercises(List<Exercise> exercises){
+    public static String getStrOfIntensity(int intensity) {
+        if (intensity == 1) return "Light";
+        else if (intensity == 2) return "Moderate";
+        else return "Vigorous";
+    }
+
+    public static List<Exercise> getTodayExercises(List<Exercise> exercises) {
         Date todayStartTime = Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
         return exercises.stream().filter(ex -> ex.getStartingTime().after(todayStartTime)).collect(Collectors.toList());
     }
@@ -135,7 +141,7 @@ public class ExerciseController {
         return prefs.getString(GlobalConstants.RECENT_EXERCISE_KEY, null);
     }
 
-    public static String[] getExerciseCategoryList(Context context) {
+    public static String[] getExerciseCategoryArray(Context context) {
         if (exerciseCategories == null)
             exerciseCategories = context.getResources().getStringArray(R.array.exercise_categories);
         return exerciseCategories;

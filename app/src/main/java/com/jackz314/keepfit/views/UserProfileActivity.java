@@ -126,7 +126,6 @@ public class UserProfileActivity extends AppCompatActivity {
             //Fills list with videos that belong to the user
             populateList(otherUser);
             followerRecyclerAdapter.setClickListener((view, position) -> {
-                // TODO: 3/6/21 replace with activity intent
 
                 Media media = mList.get(position);
                 if(media.isLivestream()) {
@@ -185,7 +184,6 @@ public class UserProfileActivity extends AppCompatActivity {
                             }
                         }
 
-                        // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
                         this.runOnUiThread(() -> {
                             if (b != null) {
                                 if (!mList.isEmpty()){

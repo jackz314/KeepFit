@@ -82,7 +82,9 @@ public class FeedFragment extends Fragment {
     }
 
     private void setupFeedListener(String category) {
-        Query feedQuery = db.collection("media").orderBy("start_time", Query.Direction.DESCENDING);
+        db.collection("media").document();
+        Query feedQuery = db.collection("media").orderBy("likes", Query.Direction.DESCENDING)
+                .orderBy("start_time", Query.Direction.DESCENDING);
         if (category != null) feedQuery = feedQuery.whereArrayContains("categories", category);
         if (registration != null) registration.remove();
         registration = feedQuery.addSnapshotListener((value, e) -> {
@@ -96,7 +98,6 @@ public class FeedFragment extends Fragment {
                 for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
                     mediaList.add(new Media(queryDocumentSnapshot));
                 }
-
                 // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
                 FeedFragment.this.requireActivity().runOnUiThread(() -> {
 
@@ -108,7 +109,6 @@ public class FeedFragment extends Fragment {
                             b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
                         }
                     }
-
                     feedRecyclerAdapter.notifyDataChanged();
                 });
                 Log.d(TAG, "media collection update: " + mediaList);
@@ -145,7 +145,7 @@ public class FeedFragment extends Fragment {
         }
         SubMenu categoryMenu = menu.findItem(R.id.filter_menu).getSubMenu();
         categoryMenu.add("All");
-        for (String category : ExerciseController.getExerciseCategoryList(getContext()))
+        for (String category : ExerciseController.getExerciseCategoryArray(getContext()))
             categoryMenu.add(category);
 
         super.onCreateOptionsMenu(menu, inflater);
@@ -156,7 +156,7 @@ public class FeedFragment extends Fragment {
         if (item.getItemId() == R.id.app_bar_search) {
             Intent intent = new Intent(getContext(), SearchActivity.class);
             startActivity(intent);
-        } else { // filtering categories
+        } else if (item.getItemId() != R.id.filter_menu) { // filtering categories
             String category = item.getTitle().toString();
             if (category.equals("All")) category = null;
             setupFeedListener(category);

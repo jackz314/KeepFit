@@ -11,7 +11,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:iconifiedByDefault="false"
-        android:queryHint="Search for exercise"
+        android:queryHint="Search for exercises"
+        android:paddingBottom="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="@id/guideline2"
         app:layout_constraintTop_toTopOf="parent" >
@@ -25,7 +26,14 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:orientation="vertical"
-        app:layout_constraintGuide_end="342dp" />
+        app:layout_constraintGuide_percent="0.18" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#c0c0c0"
+        app:layout_constraintTop_toTopOf="@id/search_recycler"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/search_recycler"
         android:layout_width="match_parent"
@@ -33,7 +41,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/search" />
+        app:layout_constraintTop_toBottomOf="@+id/guideline4" />
 
     <TextView
         android:id="@+id/empty_results_text"
@@ -47,22 +55,69 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
-        android:id="@+id/imageButton2"
+        android:id="@+id/back_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="28dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="10dp"
         android:background="@null"
         android:onClick="closeSearch"
-        app:layout_constraintBottom_toTopOf="@+id/search_recycler"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
-        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.75"
         app:srcCompat="@drawable/ic_baseline_arrow_back_25" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="parent"
+        app:layout_constraintGuide_begin="90dp"
+        app:layout_constraintTop_toBottomOf="@id/search" />
+
+    <com.google.android.material.chip.ChipGroup
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/chip_group"
+        app:layout_constraintBottom_toTopOf="@id/guideline4"
+        app:layout_constraintStart_toEndOf="@id/filter_text"
+        app:layout_constraintTop_toBottomOf="@id/back_button"
+        android:paddingTop="5dp"
+        android:paddingLeft="15dp"
+        >
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/user_chip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:text="Users"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/video_chip"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:text="Videos"/>
+
+    </com.google.android.material.chip.ChipGroup>
+
+    <TextView
+        android:id="@+id/filter_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Filter: "
+        android:textSize="15dp"
+        app:layout_constraintTop_toTopOf="@id/chip_group"
+        app:layout_constraintBottom_toTopOf="@id/guideline4"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:paddingLeft="20dp"
+        android:paddingTop="5dp"
+        tools:layout_editor_absoluteX="9dp"
+        tools:layout_editor_absoluteY="55dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

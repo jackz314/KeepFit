@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,7 +23,9 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
+import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
+import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
@@ -61,7 +64,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     final static int USER =1;
     final static int MEDIA=2;
     private final HashSet<String> likedVideos = new HashSet<>();
-
+    private final HashSet<String> dislikedVideos = new HashSet<>();
 
 
     // data is passed into the constructor
@@ -79,22 +82,59 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 likedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus();
+            updateMediaListLikeStatus("liked");
+        }));
+        UserControllerKt.getCurrentUserDoc().collection("disliked_videos").addSnapshotListener(((value, e) -> {
+            if (e != null || value == null) {
+                Log.w(TAG, "Listen failed.", e);
+                return;
+            }
+
+            dislikedVideos.clear();
+            for (QueryDocumentSnapshot doc : value) {
+                dislikedVideos.add(doc.getId());
+            }
+
+            updateMediaListLikeStatus("disliked");
         }));
     }
 
-    private void updateMediaListLikeStatus() {
-        for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
-            SearchResult res = mData.get(i);
-            if(!res.isUser()) {
-                res.getMedia().setLiked(likedVideos.contains(res.getMedia().getUid()));
+    private void updateMediaListLikeStatus(String video) {
+        if (video == "liked" ) {
+            for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
+                SearchResult res = mData.get(i);
+
+                if(!res.isUser()) {
+                    boolean isLiked = likedVideos.contains(res.getMedia().getUid());
+
+                    if (res.getMedia().getLiked() != isLiked) {
+                        res.getMedia().setLiked(isLiked);
+
+                        notifyDataSetChanged();
+                    }
+                }
             }
         }
-        notifyDataSetChanged();
+        else {
+            for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
+                SearchResult res = mData.get(i);
+
+                if(!res.isUser()) {
+                    boolean isDisliked = dislikedVideos.contains(res.getMedia().getUid());
+
+                    if (res.getMedia().getDisliked() != isDisliked) {
+                        res.getMedia().setDisliked(isDisliked);
+
+                        notifyDataSetChanged();
+                    }
+                }
+            }
+        }
     }
 
     public void notifyDataChanged(){
-        updateMediaListLikeStatus();
+        updateMediaListLikeStatus("liked");
+        updateMediaListLikeStatus("disliked");
     }
 
     // inflates the row layout from xml when needed
@@ -104,7 +144,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         switch (viewTy)
         {
             case USER:return new UserViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item,parent,false));
-            default:return new MediaViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.feed_item,parent,false));
+            default:return new MediaViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.condensed_video_item,parent,false));
         }
     }
 
@@ -165,17 +205,24 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         boolean isMedia = true;
         Media media = null;
         LikeButton likeButton;
+        LikeButton dislikeButton;
+        ImageButton deleteButton;
+        ImageButton options;
 
 
         MediaViewHolder(View itemView) {
             super(itemView);
-            titleText = itemView.findViewById(R.id.feed_title_text);
-            detailText = itemView.findViewById(R.id.feed_detail_text);
-            durationText = itemView.findViewById(R.id.feed_duration_text);
-            profilePic = itemView.findViewById(R.id.feed_profile_pic);
-            categoryText = itemView.findViewById(R.id.feed_category_text);
-            image = itemView.findViewById(R.id.feed_image);
-            likeButton = itemView.findViewById(R.id.feed_like_button);
+           ;
+            titleText = itemView.findViewById(R.id.title_text);
+            detailText = itemView.findViewById(R.id.detail_text);
+            durationText = itemView.findViewById(R.id.duration_text);
+            profilePic = itemView.findViewById(R.id.profile_pic);
+            categoryText = itemView.findViewById(R.id.category_text);
+            image = itemView.findViewById(R.id.thumbnail_image);
+            likeButton = itemView.findViewById(R.id.like_button);
+            dislikeButton = itemView.findViewById(R.id.dislike_button);
+            deleteButton = itemView.findViewById((R.id.delete_video));
+            options = itemView.findViewById(R.id.options_button);
             itemView.setOnClickListener(this);
         }
 
@@ -185,7 +232,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         }
 
         private void populateCreatorInfo(User creator) {
-            this.detailText.setText(media.getDetailString());
+            this.detailText.setText(media.getProfileString());
 
             List<String> categories = media.getCategories().stream().map(String::trim).collect(Collectors.toList());
 
@@ -277,20 +324,49 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             } else {
                 populateCreatorInfo(creator);
             }
-            likeButton.setLiked(media.getLiked());
 
+            if(likeButton != null) {
+                likeButton.setLiked(media.getLiked());
 
-            likeButton.setOnLikeListener(new OnLikeListener() {
-                @Override
-                public void liked(LikeButton likeButton) {
-                    UserControllerKt.likeVideo(media.getUid());
-                }
+                likeButton.setOnLikeListener(new OnLikeListener() {
+                    @Override
+                    public void liked(LikeButton likeButton) {
+                        if(dislikeButton.isLiked()) {
+                            dislikeButton.callOnClick();
+                        }
+                        UserControllerKt.likeVideo(media.getUid());
+                        VideoController.likeVideo(media.getUid());
+                    }
 
-                @Override
-                public void unLiked(LikeButton likeButton) {
-                    UserControllerKt.unlikeVideo(media.getUid());
-                }
-            });
+                    @Override
+                    public void unLiked(LikeButton likeButton) {
+                        UserControllerKt.unlikeVideo(media.getUid());
+                        VideoController.unlikeVideo(media.getUid());
+                    }
+                });
+            }
+            if(dislikeButton != null) {
+                dislikeButton.setLiked(media.getDisliked());
+
+                dislikeButton.setOnLikeListener(new OnLikeListener() {
+                    @Override
+                    public void liked(LikeButton dislikeButton) {
+                        if(likeButton.isLiked()) {
+                            likeButton.callOnClick();
+                        }
+                        UserControllerKt.dislikeVideo(media.getUid());
+                        VideoController.dislikeVideo(media.getUid());
+                    }
+
+                    @Override
+                    public void unLiked(LikeButton dislikeButton) {
+                        UserControllerKt.undislikeVideo(media.getUid());
+                        VideoController.undislikeVideo(media.getUid());
+                    }
+                });
+            }
+            deleteButton.setVisibility(View.GONE);
+            options.setVisibility(View.GONE);
         }
 
     }
@@ -302,12 +378,14 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         boolean isMedia = false;
         User user = null;
 
+
         UserViewHolder(View itemView){
             super(itemView);
             userName = itemView.findViewById(R.id.user_name_text);
             userEmail = itemView.findViewById(R.id.user_email_text);
             profilePic = itemView.findViewById(R.id.search_profile_pic);
             bio = itemView.findViewById(R.id.biography);
+
             itemView.setOnClickListener(this);
         }
         @Override
@@ -317,11 +395,18 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
         public void Bind(User user) {
             this.user = user;
-            Glide.with(profilePic)
+            Glide.with(mInflater.getContext().getApplicationContext())
                     .load(user.getProfilePic())
                     .fitCenter()
-                    .placeholder(R.drawable.ic_thumb_placeholder)
+                    .placeholder(R.drawable.ic_account_circle_24)
                     .into(profilePic);
+
+            profilePic.setOnClickListener(v -> {
+                Intent in = new Intent(v.getContext(), UserProfileActivity.class);
+                in.putExtra(GlobalConstants.USER_PROFILE, user);
+                v.getContext().startActivity(in);
+//            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
+            });
             userName.setText(user.getName());
             userEmail.setText(user.getEmail());
             if(user.getBiography().isEmpty()){

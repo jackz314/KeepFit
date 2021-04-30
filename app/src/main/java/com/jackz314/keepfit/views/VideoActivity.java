@@ -2,6 +2,7 @@ package com.jackz314.keepfit.views;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -18,8 +19,10 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.MediaController;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
+
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -73,6 +76,8 @@ import java.util.stream.Collectors;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
 import static com.google.firebase.Timestamp.now;
 
 public class VideoActivity extends AppCompatActivity{
@@ -85,7 +90,6 @@ public class VideoActivity extends AppCompatActivity{
 
     private VideoController mVideoController;
     private FirebaseUser ub;
-    private MediaController mc;
 
     private RecyclerView commentRecycler;
 
@@ -96,8 +100,10 @@ public class VideoActivity extends AppCompatActivity{
 
     Button uploadBtn;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    StorageReference storageReference;
     EditText editText;
+    TextView emptyText;
+    TextView offCommentText;
+    CircleImageView prof_img;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,6 +118,13 @@ public class VideoActivity extends AppCompatActivity{
 
         uploadBtn = findViewById(R.id.comment_upload_btn);
         editText = findViewById(R.id.comment_text_input);
+        emptyText = findViewById(R.id.empty_comment_text);
+        prof_img = findViewById(R.id.comment_profile_pic);
+
+        offCommentText = findViewById(R.id.unavailable_comment_text);
+        offCommentText.setVisibility(INVISIBLE);
+        emptyText.setVisibility(INVISIBLE);
+        setUploadCommentVisibility(INVISIBLE);
 
         Intent intent = getIntent();
         String value = intent.getStringExtra("uri");
@@ -133,11 +146,19 @@ public class VideoActivity extends AppCompatActivity{
 
         mVideoController.updateVideoStatus();
 
-        loadComments(mediaID);
-
         mVideoView = videoView;
         Uri uri = Uri.parse(value);
         mVideoView.setVideoURI(uri);
+
+
+        mMediaController = new BackPressingMediaController(VideoActivity.this, VideoActivity.this);
+        mVideoView.setMediaController(mMediaController);
+        mMediaController.setPadding(0,0,0, 200);
+        mMediaController.setAnchorView(mVideoView);
+        mVideoView.start();
+
+
+
 
         mVideoView.setOnErrorListener((mp, what, extra) -> {
             Log.d(TAG, "onCreate: couldn't play video with video view, using backup");
@@ -147,7 +168,6 @@ public class VideoActivity extends AppCompatActivity{
             return true;
         });
 
-        CircleImageView prof_img = findViewById(R.id.comment_profile_pic);
         ub = FirebaseAuth.getInstance().getCurrentUser();
         db.collection("users").document(ub.getUid()).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -169,11 +189,35 @@ public class VideoActivity extends AppCompatActivity{
             }
         });
 
+        DocumentReference docRef = db.collection("media").document(mediaID);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        if(document.getBoolean("is_commentable")){
+                            loadComments(mediaID);
+                            emptyText.setVisibility(INVISIBLE);
+                            setUploadCommentVisibility(VISIBLE);
+                        }
+                        else{
+                            emptyText.setVisibility(INVISIBLE);
+                            offCommentText.setVisibility(VISIBLE);
+                            setUploadCommentVisibility(INVISIBLE);
+                        }
+                    } else {
+                        Log.d(TAG, "No Comment");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
 
-        mMediaController = new BackPressingMediaController(this, VideoActivity.this);
-        mVideoView.setMediaController(mMediaController);
-        mMediaController.setAnchorView(mVideoView);
-        mVideoView.start();
+
+
+
 
 
         uploadBtn.setOnClickListener(view -> {
@@ -191,6 +235,7 @@ public class VideoActivity extends AppCompatActivity{
         if(!commentList.isEmpty())
             commentList.clear();
 
+
         db.collection("comments").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -205,6 +250,12 @@ public class VideoActivity extends AppCompatActivity{
                 commentList.sort(CommentDateComparator);
                 commentRecyclerAdapter = new CommentRecyclerAdapter(VideoActivity.this, commentList, VideoActivity.this);
                 commentRecycler.setAdapter(commentRecyclerAdapter);
+                if(!commentList.isEmpty()){
+                    emptyText.setVisibility(INVISIBLE);
+                }
+                else{
+                    emptyText.setVisibility(VISIBLE);
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -221,10 +272,8 @@ public class VideoActivity extends AppCompatActivity{
             Date c1date = c1.getUploadTime();
             Date c2date = c2.getUploadTime();
 
-            //ascending order
             //return c1date.compareTo(c2date);
 
-            //descending order
             return c2date.compareTo(c1date);
         }};
 
@@ -263,8 +312,8 @@ public class VideoActivity extends AppCompatActivity{
 
         DocumentReference commentRef = db.collection("comments").document();
         commentRef.set(comment).addOnCompleteListener(task -> {
-                    Toast.makeText(getApplicationContext(),"Comment Uploaded!", Toast.LENGTH_LONG).show();
-                });
+            Toast.makeText(getApplicationContext(),"Comment Uploaded!", Toast.LENGTH_LONG).show();
+        });
 
         loadComments(mediaID);
     }
@@ -273,28 +322,65 @@ public class VideoActivity extends AppCompatActivity{
         String curruserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
         if(curruserID.equals(uid)){
             db.collection("comments").document(cid)
-            .delete()
-            .addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Toast.makeText(getApplicationContext(), "Comment Deleted!", Toast.LENGTH_LONG).show();
-                    Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                }
-            })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    Log.w(TAG, "Error deleting document", e);
-                }
-            });
+                    .delete()
+                    .addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Toast.makeText(getApplicationContext(), "Comment Deleted!", Toast.LENGTH_LONG).show();
+                            Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w(TAG, "Error deleting document", e);
+                        }
+                    });
         }
         else {
 
             AlertDialog alertDialog = new AlertDialog.Builder(VideoActivity.this)
                     .setMessage("Cannot delete others comments!")
-                    .setPositiveButton(android.R.string.ok, null).create();
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
+                    {@Override
+                        public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }}).create();
             alertDialog.show();
         }
         loadComments(mediaID);
     }
+
+    private void setUploadCommentVisibility(int visibility){
+        editText.setVisibility(visibility);
+        uploadBtn.setVisibility(visibility);
+        prof_img.setVisibility(visibility);
+    }
+
+    @Override
+    protected void onResume() {
+        mVideoView.resume();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        mVideoView.pause();
+        mMediaController.hide();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mVideoView.stopPlayback();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onStop() {
+        mMediaController.hide();
+        super.onStop();
+
+    }
+
 }
