@@ -163,8 +163,8 @@ public class UserInfoFragment extends Fragment {
                     .setMessage(recentExercise)
                     .setPositiveButton("GO", new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {
-                            Intent intent = new Intent(getContext(), SearchActivity.class);
-                            intent.putExtra(GlobalConstants.SEARCH_QUERY, recentExercise);
+                            Intent intent = new Intent(getContext(), PromptActivity.class);
+                            intent.setAction(GlobalConstants.ACTION_EXERCISE);
                             getContext().startActivity(intent);
                         }
                     })
