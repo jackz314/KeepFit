@@ -3,6 +3,7 @@ package com.jackz314.keepfit
 import android.app.DatePickerDialog
 import android.app.TimePickerDialog
 import android.os.Bundle
+import android.text.format.DateFormat
 import android.text.format.DateUtils
 import android.view.Menu
 import android.view.MenuItem
@@ -59,7 +60,7 @@ class ScheduledExerciseActivity : AppCompatActivity() {
             timeSet = true
             setDateText(newSchedule.time)
             setSaveItemStatus(!newSchedule.time.equals(originalSchedule?.time))
-        }, time.hour, time.minute, false).show()
+        }, time.hour, time.minute, DateFormat.is24HourFormat(this)).show()
     }
 
     private fun setExerciseDate() {

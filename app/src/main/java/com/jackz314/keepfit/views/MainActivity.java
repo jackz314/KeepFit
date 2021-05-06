@@ -1,6 +1,7 @@
 package com.jackz314.keepfit.views;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -17,6 +18,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -186,6 +188,12 @@ class MainActivity extends AppCompatActivity {
         setContentView(rootView);
 
         initializeZoomSdk(this);
+        if (SchedulingController.getIntentForDailyNotification(this, PendingIntent.FLAG_NO_CREATE) == null) { // alarm manager not scheduled
+            long lastDailyNotifScheduledTime = PreferenceManager.getDefaultSharedPreferences(this).getLong(GlobalConstants.DAILY_NOTIF_SCHEDULED_TIME, 0);
+            if (lastDailyNotifScheduledTime != 0L) { // has previous daily notif time
+                SchedulingController.scheduleDailyNotifications(this, lastDailyNotifScheduledTime); // schedule again
+            }
+        }
 
         b.mainActionBtn.setSpeedDialMenuAdapter(speedDialMenuAdapter);
 

@@ -1,12 +1,14 @@
 package com.jackz314.keepfit.views;
 
 import android.annotation.SuppressLint;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
+import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.ExerciseController;
+import com.jackz314.keepfit.controllers.SchedulingController;
 import com.jackz314.keepfit.controllers.SearchHistoryController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentUserInfoBinding;
@@ -47,7 +49,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -277,7 +281,7 @@ public class UserInfoFragment extends Fragment {
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> clearExerciseLog())
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
-        }else if (item.getItemId() == R.id.clear_search_history_btn){
+        } else if (item.getItemId() == R.id.clear_search_history_btn) {
             new AlertDialog.Builder(requireContext())
                     .setMessage(R.string.clear_search_log_confirm_msg)
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
@@ -286,6 +290,28 @@ public class UserInfoFragment extends Fragment {
                         suggestions.clearHistory();
                     })
                     .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        } else if (item.getItemId() == R.id.daily_notif_btn) {
+            new AlertDialog.Builder(requireContext())
+                    .setMessage(R.string.daily_notif_setting_msg)
+                    .setPositiveButton("Yes", (dialogInterface, i) -> {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+                        long lastDailyNotifScheduledTime = prefs.getLong(GlobalConstants.DAILY_NOTIF_SCHEDULED_TIME, 0);
+                        if (lastDailyNotifScheduledTime == 0)
+                            lastDailyNotifScheduledTime = System.currentTimeMillis();
+                        ZonedDateTime time = Instant.ofEpochMilli(lastDailyNotifScheduledTime).atZone(ZoneId.systemDefault());
+                        new TimePickerDialog(requireContext(), (view, hour, minute) -> {
+                            Instant scheduleTime = time.with(LocalTime.of(hour, minute)).toInstant();
+                            long scheduledMillis = scheduleTime.toEpochMilli();
+                            SchedulingController.scheduleDailyNotifications(requireContext(), scheduledMillis);
+                            Toast.makeText(requireContext(), "Daily notifications scheduled at " +
+                                    DateUtils.formatDateTime(requireContext(), scheduledMillis, DateUtils.FORMAT_SHOW_TIME), Toast.LENGTH_SHORT).show();
+                        }, time.getHour(), time.getMinute(), DateFormat.is24HourFormat(requireContext())).show();
+                    }).setNegativeButton("No", (dialog, which) -> {
+                SchedulingController.cancelDailyNotifications(requireContext());
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+                prefs.edit().putLong(GlobalConstants.DAILY_NOTIF_SCHEDULED_TIME, 0).apply();
+            })
                     .show();
         }
         return super.onOptionsItemSelected(item);

@@ -13,6 +13,10 @@
         android:title="Edit Profile"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/daily_notif_btn"
+        android:icon="@drawable/ic_baseline_edit_notifications_24"
+        android:title="Daily Notification Settings" />
+    <item
         android:id="@+id/clear_exercise_log_btn"
         android:icon="@drawable/ic_baseline_clear_all_24"
         android:title="Clear Exercise Log"
