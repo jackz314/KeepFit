@@ -129,6 +129,7 @@ object UtilsKt {
                 "categories" to categories,
                 "creator" to UserControllerKt.currentUserDoc,
                 "is_livestream" to true,
+                "likes" to 0,
                 "link" to link,
                 "start_time" to FieldValue.serverTimestamp(),
                 "thumbnail" to thumbnail,
