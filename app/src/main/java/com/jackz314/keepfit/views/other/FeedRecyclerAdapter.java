@@ -66,7 +66,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                 likedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus("liked");
+            updateMediaListLikeStatus(true);
         }));
         UserControllerKt.getCurrentUserDoc().collection("disliked_videos").addSnapshotListener(((value, e) -> {
             if (e != null || value == null) {
@@ -79,12 +79,12 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                 dislikedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus("disliked");
+            updateMediaListLikeStatus(false);
         }));
     }
 
-    private void updateMediaListLikeStatus(String video) {
-        if (video == "liked") {
+    private void updateMediaListLikeStatus(boolean liked) {
+        if (liked) {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 Media media = mData.get(i);
                 media.setLiked(likedVideos.contains(media.getUid()));
@@ -100,8 +100,8 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     }
 
     public void notifyDataChanged(){
-        updateMediaListLikeStatus("liked");
-        updateMediaListLikeStatus("disliked");
+        updateMediaListLikeStatus(true);
+        updateMediaListLikeStatus(false);
     }
 
     // inflates the row layout from xml when needed

@@ -82,7 +82,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 likedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus("liked");
+            updateMediaListLikeStatus(true);
         }));
         UserControllerKt.getCurrentUserDoc().collection("disliked_videos").addSnapshotListener(((value, e) -> {
             if (e != null || value == null) {
@@ -95,12 +95,12 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 dislikedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus("disliked");
+            updateMediaListLikeStatus(false);
         }));
     }
 
-    private void updateMediaListLikeStatus(String video) {
-        if (video == "liked" ) {
+    private void updateMediaListLikeStatus(boolean liked) {
+        if (liked) {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 SearchResult res = mData.get(i);
 
@@ -133,8 +133,8 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     }
 
     public void notifyDataChanged(){
-        updateMediaListLikeStatus("liked");
-        updateMediaListLikeStatus("disliked");
+        updateMediaListLikeStatus(true);
+        updateMediaListLikeStatus(false);
     }
 
     // inflates the row layout from xml when needed
