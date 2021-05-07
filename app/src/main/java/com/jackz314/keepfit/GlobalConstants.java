@@ -1,5 +1,7 @@
 package com.jackz314.keepfit;
 
+import org.jetbrains.annotations.NotNull;
+
 public interface GlobalConstants {
     int RC_SIGN_IN = 1087;
     int RC_REAUTH_DELETE = 2019;
@@ -39,6 +41,7 @@ public interface GlobalConstants {
     String ACTION_TRIGGER_REMINDER = "trigger_reminder";
     String ACTION_CANCEL_REMINDER = "cancel_reminder";
     String ACTION_DAILY_NOTIF = "daily_notif";
+    String MAX_PARTICIPANTS = "max_participants";
 
     // actions
     String ACTION_EXERCISE = "action_exercise";

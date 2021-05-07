@@ -45,6 +45,21 @@
         app:layout_constraintStart_toStartOf="@+id/prompt_title"
         app:layout_constraintTop_toBottomOf="@+id/prompt_title" />
 
+    <EditText
+        android:id="@+id/prompt_max_participants"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:ems="10"
+        android:focusable="true"
+        android:hint="Max Participants (1-100)"
+        android:inputType="number"
+        app:layout_constraintEnd_toEndOf="@+id/prompt_category_select"
+        app:layout_constraintStart_toStartOf="@+id/prompt_category_select"
+        app:layout_constraintTop_toBottomOf="@+id/prompt_category_select" />
+
     <Button
         android:id="@+id/prompt_start_btn"
         android:layout_width="wrap_content"

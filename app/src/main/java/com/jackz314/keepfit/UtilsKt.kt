@@ -120,7 +120,7 @@ object UtilsKt {
     }
 
     @JvmStatic
-    fun createLivestream(link: String, title: String, exerciseCategories: String, thumbnail: String = "") {
+    fun createLivestream(link: String, title: String, exerciseCategories: String, maxParticipants: String, thumbnail: String = "") {
         if (link.trim().isEmpty() || !isValidUrl(link)) return
         val categories = exerciseCategories.split(",").map { it.trim().capitalize(Locale.getDefault()) }
         Log.d(TAG, "createLivestream: link: $link, categories: $categories, title: $title, thumbnail: $thumbnail")
@@ -134,7 +134,8 @@ object UtilsKt {
                 "start_time" to FieldValue.serverTimestamp(),
                 "thumbnail" to thumbnail,
                 "title" to title,
-                "view_count" to 0
+                "view_count" to 0,
+                "max_participants" to maxParticipants.toInt()
         )
         val livestreamDoc = db.collection("media").document(Utils.getMD5(link))
         livestreamDoc.set(docData)

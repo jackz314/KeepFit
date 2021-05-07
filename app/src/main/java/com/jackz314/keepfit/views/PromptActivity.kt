@@ -80,6 +80,7 @@ class PromptActivity : AppCompatActivity() {
                 titleValid = true
                 b.promptDescription.text = "Track Exercise"
                 titleValid = true
+                b.promptMaxParticipants.visibility = View.GONE
                 val recentExercise = ExerciseController.getMostRecentExercise(this)
                 val exerciseCategories = ExerciseController.getExerciseCategoryArray(this).toMutableList()
                 if (recentExercise != null) exerciseCategories.add(0, "$recentExercise • Most Recent")
@@ -133,6 +134,17 @@ class PromptActivity : AppCompatActivity() {
             val categoryStr = selectedChips.joinToString();*/
             val categoryView = findViewById<TextView>(R.id.prompt_category_select)
             intent.putExtra(GlobalConstants.EXERCISE_TYPE, categoryView.text.toString())
+            var maxParticipants = b.promptMaxParticipants.text.toString()
+            if (maxParticipants.isEmpty()) {
+                maxParticipants = "100"
+            }
+            else if (maxParticipants.toInt() >= 100) {
+                maxParticipants = "100"
+            }
+            else if (maxParticipants.toInt() == 0) {
+                maxParticipants = "1"
+            }
+            intent.putExtra(GlobalConstants.MAX_PARTICIPANTS, maxParticipants)
             startActivity(intent)
         } else {
             if (intent.hasExtra(GlobalConstants.SCHEDULED_EXERCISE)) {
