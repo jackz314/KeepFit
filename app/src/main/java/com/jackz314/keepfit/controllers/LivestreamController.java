@@ -6,12 +6,16 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.models.Media;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import us.zoom.sdk.InviteOptions;
 import us.zoom.sdk.JoinMeetingOptions;
@@ -22,7 +26,6 @@ import us.zoom.sdk.MeetingService;
 import us.zoom.sdk.MeetingServiceListener;
 import us.zoom.sdk.MeetingStatus;
 import us.zoom.sdk.MeetingViewsOptions;
-import us.zoom.sdk.StartMeetingOptions;
 import us.zoom.sdk.ZoomApiError;
 import us.zoom.sdk.ZoomSDK;
 
@@ -35,6 +38,8 @@ public class LivestreamController implements MeetingServiceListener {
     private final Context context;
     private final FirebaseFirestore db;
     private Media livestream;
+    private int currParticipants;
+    private int maxParticipants;
 
     public LivestreamController(Context context) {
         this.context = context;
@@ -55,6 +60,21 @@ public class LivestreamController implements MeetingServiceListener {
         MeetingService meetingService = sdk.getMeetingService();
         if (meetingService == null) {
             Toast.makeText(context, "Zoom SDK unavailable. Try again later!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DocumentReference mediaDoc = db.collection("media").document(Utils.getMD5(livestream.getLink()));
+        mediaDoc.get()
+                .addOnCompleteListener(task -> {
+                    DocumentSnapshot dataResult = task.getResult();
+                    Log.e(TAG, "curr " + dataResult.getLong("view_count").intValue());
+                    Log.e(TAG, "max " + dataResult.getLong("max_participants").intValue());
+                    currParticipants = dataResult.getLong("view_count").intValue();
+                    maxParticipants = dataResult.getLong("max_participants").intValue();
+                });
+
+        if (currParticipants + 1 > maxParticipants) {
+            Toast.makeText(context, "Max participant limit reached", Toast.LENGTH_SHORT).show();
             return;
         }
         meetingService.addListener(this);
