@@ -20,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Client;
 import com.algolia.search.saas.Query;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.android.material.chip.Chip;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
@@ -51,8 +50,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private static final String TAG = "SearchActivity";
     private SearchView editSearch;
-    private List<SearchResult> mList = new ArrayList<>();
-    private List<SearchResult> fullmList =  new ArrayList<>();
+    private final List<SearchResult> mList = new ArrayList<>();
+    private final List<SearchResult> fullmList = new ArrayList<>();
     private final Executor procES = Executors.newSingleThreadExecutor();
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private LivestreamController livestreamController;
@@ -292,7 +291,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     mList.addAll(searchResults);
                     fullmList.clear();
                     fullmList.addAll(mList);
-                    setUpItemListeners();
+//                    setUpItemListeners();
                     if (b != null) {
                         if (!mList.isEmpty()){
                             b.emptyResultsText.setVisibility(View.GONE);
@@ -315,40 +314,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 Toast.makeText(this, "Error while searching " + e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-    }
-
-    private  void setUpItemListeners() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        for (int i = 0; i < mList.size(); i++) {
-            int index = i;
-            if (!mList.get(index).isUser()) {
-                db.collection("media").document(mList.get(index).getMedia().getUid()).addSnapshotListener((value, e) -> {
-                    if (e != null || value == null) {
-                        Log.w(TAG, "Listen failed.", e);
-                        return;
-                    }
-
-                    procES.execute(() -> {
-                        mList.set(index, new SearchResult(new Media(value)));
-                        this.runOnUiThread(() -> {
-
-                            if (b != null) {
-                                if (!mList.isEmpty()) {
-                                    b.emptyResultsText.setVisibility(View.GONE);
-                                } else {
-                                    b.emptyResultsText.setVisibility(View.VISIBLE);
-                                    b.emptyResultsText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                                }
-                            }
-                            searchRecyclerAdapter.notifyItemChanged(index);
-                            searchRecyclerAdapter.notifyDataChanged();
-                        });
-                        //Log.d(TAG, "media collection update: " + mList);
-                    });
-                });
-            }
-        }
     }
 
     @Override
