@@ -12,9 +12,9 @@
         tools:layout="@layout/fragment_me" />
 
     <keep_state_fragment
-        android:id="@+id/navigation_feed"
-        android:name="com.jackz314.keepfit.views.FeedFragment"
-        android:label="@string/title_feed"
-        tools:layout="@layout/fragment_feed" />
+        android:id="@+id/navigation_explore"
+        android:name="com.jackz314.keepfit.views.ExploreFragment"
+        android:label="@string/title_explore"
+        tools:layout="@layout/fragment_explore" />
 
 </navigation>
