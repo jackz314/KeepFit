@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
@@ -30,6 +31,8 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jackz314.keepfit.R;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,6 +40,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import java.lang.Object;
 
 import static com.google.firebase.Timestamp.now;
 
@@ -196,15 +201,25 @@ public class UploadVideoActivity extends AppCompatActivity {
                 Cursor returnCursor =
                         getContentResolver().query(fileInfo, null, null, null, null);
                 returnCursor.moveToFirst();
-                long sizeIndex = returnCursor.getLong(Math.min(0, returnCursor.getColumnIndex(OpenableColumns.SIZE)));
+                //long sizeIndex = returnCursor.getLong(Math.min(0, returnCursor.getColumnIndex(OpenableColumns.SIZE)));
+                AssetFileDescriptor afd = null;
+                try {
+                    afd = getContentResolver().openAssetFileDescriptor(fileInfo,"r");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }
+                long sizeIndex = afd.getLength();
 
                 if(sizeIndex < 5 * 1024 * 1024){
                     Toast.makeText(UploadVideoActivity.this,"File size okay", Toast.LENGTH_LONG).show();
                     uploadVideoFirebase(data.getData());
-
+                    Long s = sizeIndex / (1024*1024);
+                    Log.d("XXXXXXX", s + "MB");
                 }
                 else{
-                    Toast.makeText(UploadVideoActivity.this,"File size should be less than 5MB", Toast.LENGTH_LONG).show();
+                    Toast.makeText(UploadVideoActivity.this,"File size should be less than 5MB", Toast.LENGTH_SHORT).show();
+                    Long s = sizeIndex / (1024*1024);
+                    Log.d("XXXXXXX", s + "MB");
                 }
             });
         }
