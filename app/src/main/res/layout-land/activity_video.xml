@@ -13,7 +13,6 @@
 
 
         <VideoView
-            android:id="@+id/video_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -31,7 +30,8 @@
         android:id="@+id/layout_video2"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_weight="0"
+        android:visibility="gone">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/comment_profile_pic"
@@ -78,7 +78,8 @@
         android:id="@+id/layout_video3"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="3">
+        android:layout_weight="0"
+        android:visibility="gone">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/comment_recycler"

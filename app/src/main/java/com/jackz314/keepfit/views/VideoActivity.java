@@ -1,24 +1,16 @@
 package com.jackz314.keepfit.views;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
@@ -27,7 +19,7 @@ import android.widget.VideoView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,46 +28,31 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.StorageReference;
-import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.models.Comment;
-import com.jackz314.keepfit.models.User;
-import com.jackz314.keepfit.views.other.BackPressingMediaController;
 import com.jackz314.keepfit.views.other.BackPressingMediaController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.controllers.VideoController;
-import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.views.other.CommentRecyclerAdapter;
-import com.jackz314.keepfit.views.other.FeedRecyclerAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static com.google.firebase.Timestamp.now;
@@ -98,6 +75,9 @@ public class VideoActivity extends AppCompatActivity{
     private final Executor procES = Executors.newSingleThreadExecutor();
     private LinearLayoutManager linearLayoutManager;
 
+    ConstraintLayout layout2;
+    ConstraintLayout layout3;
+
     Button uploadBtn;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     EditText editText;
@@ -115,6 +95,9 @@ public class VideoActivity extends AppCompatActivity{
         linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         commentRecycler.setLayoutManager(linearLayoutManager);
+
+        layout2 = (ConstraintLayout) findViewById(R.id.layout_video2);
+        layout3 = (ConstraintLayout) findViewById(R.id.layout_video3);
 
         uploadBtn = findViewById(R.id.comment_upload_btn);
         editText = findViewById(R.id.comment_text_input);
@@ -156,7 +139,6 @@ public class VideoActivity extends AppCompatActivity{
         mMediaController.setPadding(0,0,0, 200);
         mMediaController.setAnchorView(mVideoView);
         mVideoView.start();
-
 
 
 
@@ -281,6 +263,18 @@ public class VideoActivity extends AppCompatActivity{
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT)
+        {
+            layout2.setVisibility(VISIBLE);
+            layout3.setVisibility(VISIBLE);
+            mMediaController.setPadding(0,0,0, 200);
+        }
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE)
+        {
+            layout2.setVisibility(GONE);
+            layout3.setVisibility(GONE);
+            mMediaController.setPadding(0,0,0, 0);
+        }
     }
 
     public void openVideoActivity() {
