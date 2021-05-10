@@ -71,10 +71,12 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private int originalWeight;
     private int originalHeight;
     private Date originalBirthday;
+    private String originalPhoto;
+    boolean imgChosen = false;
 
     /////
     // views for button
-    private Button btnSelect, btnUpload;
+    private Button btnSelect;
     // view for image view
     private ImageView imageView;
 
@@ -127,6 +129,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     originalWeight = dataResult.getLong("weight").intValue();
                     originalHeight = dataResult.getLong("height").intValue();
                     originalBirthday = dataResult.getDate("birthday");
+                    originalPhoto = dataResult.getString("profile_pic");
                 });
 
 
@@ -137,6 +140,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             mUsernameEditText = findViewById(R.id.editTextUsername);
             String strUsername = mUsernameEditText.getText().toString();
             if (TextUtils.isEmpty(strUsername)) {
@@ -151,7 +155,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
             } else {
                 bio = mBiographyEditText.getText().toString();
             }
-
 
             Spinner spinner = findViewById(R.id.sex);
             boolean sex = true;
@@ -188,19 +191,18 @@ public class UpdateProfileActivity extends AppCompatActivity {
             user.put("email", mFirebaseUser.getEmail());
             user.put("height", height);
             user.put("name", strUsername);
-            ////
+
+            ////waits for img to load
+            while(imgChosen && filePath == null){};
             String photoStr;
             if (filePath == null) {
-                Uri photoUrl = mFirebaseUser.getPhotoUrl();
-                if (photoUrl == null) photoStr = "";
-                else photoStr = photoUrl.toString();
+                photoStr = originalPhoto;
                 Log.d("Update Profile", "Link: null" );
-                Log.d("Update Profile", "Link: " + photoStr);
             } else {
                 photoStr = imgLink;
                 Log.d("Update Profile", "Link: not null");
-                Log.d("Update Profile", "Link: " + photoStr);
             }
+            Log.d("Update Profile", "Link: " + photoStr);
             user.put("profile_pic", photoStr);
             user.put("sex", sex);
             user.put("weight", weight);
@@ -254,7 +256,6 @@ public class UpdateProfileActivity extends AppCompatActivity {
     // Select Image method
     private void selectImage()
     {
-
         // Defining Implicit Intent to mobile gallery
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -284,8 +285,9 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 && resultCode == RESULT_OK
                 && data != null
                 && data.getData() != null) {
-
+            imgChosen = true;
             // Get the Uri of data
+
             filePath = data.getData();
             try {
 
@@ -313,56 +315,58 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
     // UploadImage method
     private void uploadImage() {
-        if (filePath != null) {
             // Defining the child of storageReference
             StorageReference ref
                     = storageReference
                     .child(
                             "images/"
                                     + mFirebaseUser.getUid());
-
             // adding listeners on upload
-            // or failure of image
-            ref.putFile(filePath)
-                    .addOnSuccessListener(
-                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
+            if (filePath != null) {
+                Toast.makeText(UpdateProfileActivity.this,"Profile picture uploading", Toast.LENGTH_LONG).show();
+                ref.putFile(filePath)
+                        .addOnSuccessListener(
+                                new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
-                                @Override
-                                public void onSuccess(
-                                        UploadTask.TaskSnapshot taskSnapshot) {
-                                    Log.d("Update Profile", "Uploaded!");
+                                    @Override
+                                    public void onSuccess(
+                                            UploadTask.TaskSnapshot taskSnapshot) {
+                                        Log.d("Update Profile", "Uploaded!");
+                                        Toast.makeText(UpdateProfileActivity.this, "Profile picture uploaded!", Toast.LENGTH_LONG).show();
+                                        /////from upload video
+                                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                                        while (!uriTask.isComplete()) ;
+                                        Uri uri = uriTask.getResult();
 
-                                    /////from upload video
-                                    Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                    while (!uriTask.isComplete());
-                                    Uri uri = uriTask.getResult();
+                                        imgLink = uri.toString();
+                                        Log.d("Update Profile", imgLink);
 
-                                    imgLink = uri.toString();
-                                    Log.d("Update Profile", imgLink);
+                                        /////
+                                    }
+                                })
 
-                                    /////
-                                }
-                            })
-
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(@NonNull Exception e) {
-                            Log.d("Update Profile", "Failed to Upload");
-                        }
-                    })
-                    .addOnProgressListener(
-                            new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onProgress(
-                                        UploadTask.TaskSnapshot taskSnapshot) {
-                                    double progress
-                                            = (100.0
-                                            * taskSnapshot.getBytesTransferred()
-                                            / taskSnapshot.getTotalByteCount());
-                                    Log.d("Update Profile", "Uploaded " + (int) progress + "%");
-                                }
-                            });
-        }
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d("Update Profile", "Failed to upload");
+                                Toast.makeText(UpdateProfileActivity.this, "Failed to upload profile picture", Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .addOnProgressListener(
+                                new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onProgress(
+                                            UploadTask.TaskSnapshot taskSnapshot) {
+                                        double progress
+                                                = (100.0
+                                                * taskSnapshot.getBytesTransferred()
+                                                / taskSnapshot.getTotalByteCount());
+                                        Log.d("Update Profile", "Uploaded " + (int) progress + "%");
+                                    }
+                                });
+            } else {
+                Log.d("Update Profile", "Something went wrong with image upload :(");
+            }
     }
 
 
