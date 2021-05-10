@@ -50,7 +50,6 @@ import io.reactivex.rxjava3.disposables.Disposable;
 
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    private FirebaseFirestore db;
     private static final String TAG = "SearchActivity";
     private SearchView editSearch;
     private final List<SearchResult> mList = new ArrayList<>();
@@ -64,11 +63,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private com.algolia.search.saas.Index index;
-    private final List<ListenerRegistration> itemListenerList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        db = FirebaseFirestore.getInstance();
         super.onCreate(savedInstanceState);
 
         b = ActivitySearchBinding.inflate(getLayoutInflater());
