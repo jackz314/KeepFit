@@ -73,6 +73,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private Date originalBirthday;
     private String originalPhoto;
     boolean imgChosen = false;
+    boolean imgUploaded = false;
 
     /////
     // views for button
@@ -135,89 +136,85 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
 
         finishEdit.setOnClickListener(view -> {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            if (imgChosen == imgUploaded) {
+                mUsernameEditText = findViewById(R.id.editTextUsername);
+                String strUsername = mUsernameEditText.getText().toString();
+                if (TextUtils.isEmpty(strUsername)) {
+                    //get current data
+                    strUsername = originalName;
+                }
 
-            mUsernameEditText = findViewById(R.id.editTextUsername);
-            String strUsername = mUsernameEditText.getText().toString();
-            if (TextUtils.isEmpty(strUsername)) {
-                //get current data
-                strUsername = originalName;
-            }
+                String bio = "";
+                if (mBiographyEditText.getText().toString().matches("")) {
+                    //get current data
+                    bio = originalBio;
+                } else {
+                    bio = mBiographyEditText.getText().toString();
+                }
 
-            String bio = "";
-            if (mBiographyEditText.getText().toString().matches("")) {
-                //get current data
-                bio = originalBio;
+                Spinner spinner = findViewById(R.id.sex);
+                boolean sex = true;
+                if (spinner.getSelectedItem().toString().matches("Female")) {
+                    sex = false;
+                }
+
+                double height = 0.0;
+                if (!mHeightEditText.getText().toString().matches("")) {
+                    height = Double.parseDouble(mHeightEditText.getText().toString());
+                    height = 2.54 * height;
+                } else {
+                    //get current data
+                    height = originalHeight;
+                }
+
+                double weight = 0.0;
+                if (!mWeightEditText.getText().toString().matches("")) {
+                    weight = Double.parseDouble(mWeightEditText.getText().toString());
+                    weight = 0.453592 * weight;
+                } else {
+                    //get current data
+                    weight = originalWeight;
+                }
+
+                Map<String, Object> user = new HashMap<>();
+                user.put("biography", bio);
+                //birthday check
+                if (mBirthday.get(Calendar.YEAR) >= java.time.LocalDate.now().getYear()) {
+                    user.put("birthday", originalBirthday);
+                } else {
+                    user.put("birthday", mBirthday.getTime());
+                }
+                user.put("email", mFirebaseUser.getEmail());
+                user.put("height", height);
+                user.put("name", strUsername);
+
+                String photoStr;
+                if (filePath == null) {
+                    photoStr = originalPhoto;
+                    Log.d("Update Profile", "Link: null");
+                } else {
+                    photoStr = imgLink;
+                    Log.d("Update Profile", "Link: not null");
+                }
+                Log.d("Update Profile", "Link: " + photoStr);
+                user.put("profile_pic", photoStr);
+                user.put("sex", sex);
+                user.put("weight", weight);
+
+                if (!strUsername.equals(mFirebaseUser.getDisplayName())) {
+                    mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(strUsername).build());
+                }
+
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("users")
+                        .document(mFirebaseUser.getUid())
+                        .update(user)
+                        .addOnSuccessListener(aVoid -> finish())
+                        .addOnFailureListener(e -> Toast.makeText(UpdateProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show());
+                setResult(Activity.RESULT_OK);
             } else {
-                bio = mBiographyEditText.getText().toString();
+               Toast.makeText(UpdateProfileActivity.this, "Please wait for image to upload", Toast.LENGTH_LONG).show();
             }
-
-            Spinner spinner = findViewById(R.id.sex);
-            boolean sex = true;
-            if (spinner.getSelectedItem().toString().matches("Female")) {
-                sex = false;
-            }
-
-            double height = 0.0;
-            if (!mHeightEditText.getText().toString().matches("")) {
-                height = Double.parseDouble(mHeightEditText.getText().toString());
-                height = 2.54 * height;
-            } else {
-                //get current data
-                height = originalHeight;
-            }
-
-            double weight = 0.0;
-            if (!mWeightEditText.getText().toString().matches("")) {
-                weight = Double.parseDouble(mWeightEditText.getText().toString());
-                weight = 0.453592 * weight;
-            } else {
-                //get current data
-                weight = originalWeight;
-            }
-
-            Map<String, Object> user = new HashMap<>();
-            user.put( "biography", bio);
-            //birthday check
-            if (mBirthday.get(Calendar.YEAR) >= java.time.LocalDate.now().getYear()){
-                user.put("birthday", originalBirthday);
-            } else {
-                user.put("birthday", mBirthday.getTime());
-            }
-            user.put("email", mFirebaseUser.getEmail());
-            user.put("height", height);
-            user.put("name", strUsername);
-
-            ////waits for img to load
-            while(imgChosen && filePath == null){};
-            String photoStr;
-            if (filePath == null) {
-                photoStr = originalPhoto;
-                Log.d("Update Profile", "Link: null" );
-            } else {
-                photoStr = imgLink;
-                Log.d("Update Profile", "Link: not null");
-            }
-            Log.d("Update Profile", "Link: " + photoStr);
-            user.put("profile_pic", photoStr);
-            user.put("sex", sex);
-            user.put("weight", weight);
-
-            if (!strUsername.equals(mFirebaseUser.getDisplayName())) {
-                mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(strUsername).build());
-            }
-
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("users")
-                    .document(mFirebaseUser.getUid())
-                    .update(user)
-                    .addOnSuccessListener(aVoid -> finish())
-                    .addOnFailureListener(e -> Toast.makeText(UpdateProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show());
-            setResult(Activity.RESULT_OK);
         });
 
         Spinner spinner = findViewById(R.id.sex);
@@ -332,7 +329,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                                     public void onSuccess(
                                             UploadTask.TaskSnapshot taskSnapshot) {
                                         Log.d("Update Profile", "Uploaded!");
-                                        Toast.makeText(UpdateProfileActivity.this, "Profile picture uploaded!", Toast.LENGTH_LONG).show();
+                                        Toast.makeText(UpdateProfileActivity.this, "Profile picture uploaded!", Toast.LENGTH_SHORT).show();
                                         /////from upload video
                                         Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                                         while (!uriTask.isComplete()) ;
@@ -340,7 +337,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
                                         imgLink = uri.toString();
                                         Log.d("Update Profile", imgLink);
-
+                                        imgUploaded = true;
                                         /////
                                     }
                                 })
@@ -349,7 +346,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Log.d("Update Profile", "Failed to upload");
-                                Toast.makeText(UpdateProfileActivity.this, "Failed to upload profile picture", Toast.LENGTH_LONG).show();
+                                Toast.makeText(UpdateProfileActivity.this, "Failed to upload profile picture", Toast.LENGTH_SHORT).show();
                             }
                         })
                         .addOnProgressListener(
@@ -365,7 +362,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                                     }
                                 });
             } else {
-                Log.d("Update Profile", "Something went wrong with image upload :(");
+                Toast.makeText(UpdateProfileActivity.this, "Something went wrong with image upload :(", Toast.LENGTH_LONG).show();
             }
     }
 
