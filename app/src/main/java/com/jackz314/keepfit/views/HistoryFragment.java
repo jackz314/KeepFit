@@ -75,41 +75,6 @@ public class HistoryFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
     }
 
-    private  void setUpItemListeners() {
-        for (int i = 0; i < itemListenerList.size(); i++) {
-            itemListenerList.get(i).remove();
-        }
-        itemListenerList.clear();
-
-        for (int i = 0; i  < watchedList.size(); i++) {
-            int index = i;
-            itemListenerList.add(db.collection("media").document(watchedList.get(index).getUid()).addSnapshotListener((value, e) -> {
-                if (e != null || value == null) {
-                    Log.w(TAG, "Listen failed.", e);
-                    return;
-                }
-
-                procES.execute(() -> {
-                    watchedList.set(index, new Media(value));
-                    HistoryFragment.this.requireActivity().runOnUiThread(() -> {
-
-                        if (b != null) {
-                            if (!watchedList.isEmpty()) {
-                                b.emptyHistoryText.setVisibility(View.GONE);
-                            } else {
-                                b.emptyHistoryText.setVisibility(View.VISIBLE);
-                                b.emptyHistoryText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                            }
-                        }
-                        historyRecyclerAdapter.notifyItemChanged(index);
-                        historyRecyclerAdapter.notifyDataChanged();
-                    });
-                    Log.d(TAG, "media collection update: " + watchedList);
-                });
-            }));
-        }
-    }
-
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
@@ -152,8 +117,6 @@ public class HistoryFragment extends Fragment {
                                     }
                                     watchedList.add(media);
                                 }
-                                setUpItemListeners();
-
                             } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
                                 executionException.printStackTrace();
                             }
