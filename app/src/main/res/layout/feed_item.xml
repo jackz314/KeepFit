@@ -26,14 +26,14 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter"
         android:background="@color/black"
+        android:contentDescription="Thumbnail"
+        android:scaleType="fitCenter"
         app:layout_constraintDimensionRatio="H,16:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_thumb_placeholder"
-        android:contentDescription="Thumbnail" />
+        app:srcCompat="@drawable/ic_thumb_placeholder" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/feed_profile_pic"
@@ -111,7 +111,7 @@
         app:layout_constraintTop_toBottomOf="@+id/feed_image" />
 
     <com.like.LikeButton
-        android:id= "@+id/feed_dislike_button"
+        android:id="@+id/feed_dislike_button"
         android:layout_width="25dp"
         android:layout_height="25dp"
         android:layout_marginEnd="8dp"
@@ -120,6 +120,5 @@
         app:icon_type="thumb"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/feed_image"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/feed_image" />
 </androidx.constraintlayout.widget.ConstraintLayout>

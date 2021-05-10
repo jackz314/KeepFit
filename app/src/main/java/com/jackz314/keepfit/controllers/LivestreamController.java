@@ -14,8 +14,6 @@ import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.models.Media;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import us.zoom.sdk.InviteOptions;
 import us.zoom.sdk.JoinMeetingOptions;
@@ -49,8 +47,28 @@ public class LivestreamController implements MeetingServiceListener {
         db = FirebaseFirestore.getInstance();
     }
 
+    public static JoinMeetingParams parseMeetingParamsFromLink(String link) {
+        // example: https://usc.zoom.us/j/888888888?pwd=webwehbeqabhhwegg2iwoghwie
+        Uri url = Uri.parse(link);
+        JoinMeetingParams params = new JoinMeetingParams();
+        params.meetingNo = url.getLastPathSegment();
+        params.password = url.getQueryParameter("pwd");
+        params.displayName = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
+        return params;
+    }
+
+    public static void setupMeetingOptions(MeetingOptions options) {
+        options.no_share = true;
+        options.no_meeting_end_message = true;
+        options.no_driving_mode = true;
+        options.invite_options = InviteOptions.INVITE_DISABLE_ALL;
+        options.no_invite = true;
+        options.meeting_views_options = MeetingViewsOptions.NO_TEXT_MEETING_ID + MeetingViewsOptions.NO_TEXT_PASSWORD;
+    }
+
     public void setLivestream(Media livestream) {
-        if (!livestream.isLivestream()) throw new IllegalArgumentException("Media isn't livestream!");
+        if (!livestream.isLivestream())
+            throw new IllegalArgumentException("Media isn't livestream!");
         this.livestream = livestream;
     }
 
@@ -83,25 +101,6 @@ public class LivestreamController implements MeetingServiceListener {
             Log.e(TAG, "joinLivestream: Failed to join meeting, error: " + result);
             Toast.makeText(context, "Failed to join livestream, try again later", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    public static JoinMeetingParams parseMeetingParamsFromLink(String link){
-        // example: https://usc.zoom.us/j/888888888?pwd=webwehbeqabhhwegg2iwoghwie
-        Uri url = Uri.parse(link);
-        JoinMeetingParams params = new JoinMeetingParams();
-        params.meetingNo = url.getLastPathSegment();
-        params.password = url.getQueryParameter("pwd");
-        params.displayName = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
-        return params;
-    }
-
-    public static void setupMeetingOptions(MeetingOptions options) {
-        options.no_share = true;
-        options.no_meeting_end_message = true;
-        options.no_driving_mode = true;
-        options.invite_options = InviteOptions.INVITE_DISABLE_ALL;
-        options.no_invite = true;
-        options.meeting_views_options = MeetingViewsOptions.NO_TEXT_MEETING_ID + MeetingViewsOptions.NO_TEXT_PASSWORD;
     }
 
     @Override

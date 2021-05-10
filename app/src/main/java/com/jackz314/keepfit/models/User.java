@@ -30,17 +30,8 @@ public class User implements Serializable {
     private int weight; // kg
     private boolean sex; // true for men, false for women
 
-    public User(){
+    public User() {
         name = "";
-    }
-
-    public static User populateFromUid(String uid) {
-        try {
-            return new User(Tasks.await(FirebaseFirestore.getInstance().collection("users").document(uid).get()));
-        } catch (ExecutionException | InterruptedException e) {
-            Log.e(TAG, "populateFromUid: error getting user from uid", e);
-        }
-        return null;
     }
 
     public User(DocumentSnapshot doc) {
@@ -52,13 +43,13 @@ public class User implements Serializable {
         profilePic = doc.getString("profile_pic");
         birthday = doc.getDate("birthday");
         Long height = doc.getLong("height");
-        if(height == null) height = 0L;
+        if (height == null) height = 0L;
         this.height = height.intValue();
         Long weight = doc.getLong("weight");
-        if(weight == null) weight = 0L;
+        if (weight == null) weight = 0L;
         this.weight = weight.intValue();
         Boolean sex = doc.getBoolean("sex");
-        if(sex == null) sex = true;
+        if (sex == null) sex = true;
         this.sex = sex;
     }
 
@@ -72,6 +63,15 @@ public class User implements Serializable {
         this.height = height;
         this.weight = weight;
         this.sex = sex;
+    }
+
+    public static User populateFromUid(String uid) {
+        try {
+            return new User(Tasks.await(FirebaseFirestore.getInstance().collection("users").document(uid).get()));
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "populateFromUid: error getting user from uid", e);
+        }
+        return null;
     }
 
     public String getUid() {

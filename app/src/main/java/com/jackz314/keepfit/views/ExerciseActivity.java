@@ -34,16 +34,11 @@ import io.reactivex.rxjava3.disposables.Disposable;
 public class ExerciseActivity extends AppCompatActivity {
 
     private static final String TAG = "ExerciseActivity";
-
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private ActivityExerciseBinding b;
-
     private StopwatchTextView stopwatch;
-
     private User user;
     private ExerciseController exerciseController;
-
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-
     private boolean doubleBackToExitPressedOnce = false;
 
     private String exerciseType;
@@ -108,7 +103,7 @@ public class ExerciseActivity extends AppCompatActivity {
             stopwatch = new StopwatchTextView(b.exerciseTimeText, 50, this);
             stopwatch.setOnTimeUpdateListener(elapsedTime -> {
                 if (exerciseController != null) {
-                    runOnUiThread(() -> b.sitUpCount.setText(String.valueOf((int)elapsedTime/sitUpInterval)));
+                    runOnUiThread(() -> b.sitUpCount.setText(String.valueOf((int) elapsedTime / sitUpInterval)));
                     runOnUiThread(() -> b.exerciseCaloriesText.setText(String.format(Locale.getDefault(), "%.3f", exerciseController.getCalBurned(elapsedTime))));
                 }
             }, 10);
@@ -156,7 +151,7 @@ public class ExerciseActivity extends AppCompatActivity {
         this.doubleBackToExitPressedOnce = true;
         Toast.makeText(this, "Press again to stop exercising", Toast.LENGTH_SHORT).show();
 
-        new Handler().postDelayed(() -> doubleBackToExitPressedOnce=false, 2000);
+        new Handler().postDelayed(() -> doubleBackToExitPressedOnce = false, 2000);
     }
 
     @Override

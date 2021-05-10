@@ -12,9 +12,7 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayoutMediator;
 import com.jackz314.keepfit.databinding.FragmentExploreBinding;
-import com.jackz314.keepfit.databinding.FragmentMeBinding;
 import com.jackz314.keepfit.views.other.ExploreCollectionAdapter;
-import com.jackz314.keepfit.views.other.MeCollectionAdapter;
 
 public class ExploreFragment extends Fragment {
 
@@ -32,7 +30,7 @@ public class ExploreFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        if (b == null){
+        if (b == null) {
             // view binding ftw!
             b = FragmentExploreBinding.inflate(inflater, container, false);
             exploreCollectionAdapter = new ExploreCollectionAdapter(this);

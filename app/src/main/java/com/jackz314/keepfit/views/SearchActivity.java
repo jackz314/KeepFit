@@ -20,9 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Client;
 import com.algolia.search.saas.Query;
-import com.google.android.material.chip.Chip;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.ListenerRegistration;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
@@ -51,23 +48,31 @@ import io.reactivex.rxjava3.disposables.Disposable;
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     private static final String TAG = "SearchActivity";
-    private SearchView editSearch;
     private final List<SearchResult> mList = new ArrayList<>();
     private final List<SearchResult> fullmList = new ArrayList<>();
     private final Executor procES = Executors.newSingleThreadExecutor();
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private SearchView editSearch;
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private LivestreamController livestreamController;
     private ActivitySearchBinding b;
-
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private com.algolia.search.saas.Index index;
+
+    public static String stripQuery(String query) {
+        return query.replaceAll("^[ \t]+|[ \t]+$", "");
+    }
+
+    public static boolean isValidQuery(String query) {
+        query = stripQuery(query);
+        return !query.isEmpty();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         b = ActivitySearchBinding.inflate(getLayoutInflater());
-        View v =b.getRoot();
+        View v = b.getRoot();
         setContentView(v);
 
         searchRecyclerAdapter = new SearchRecyclerAdapter(this, mList);
@@ -95,10 +100,9 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
                 User user = searchResult.getUser();
                 Intent in = new Intent(this, UserProfileActivity.class);
-                in.putExtra(GlobalConstants.USER_PROFILE,user);
+                in.putExtra(GlobalConstants.USER_PROFILE, user);
                 startActivity(in);
-            }
-            else{
+            } else {
                 Media media = searchResult.getMedia();
                 if (media.isLivestream()) {
                     livestreamController.setLivestream(media);
@@ -122,7 +126,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         editSearch = findViewById(R.id.search);
 
 
-
         //Interface\
         CompoundButton.OnCheckedChangeListener filt = new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -132,18 +135,16 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                         if (b.videoChip.isChecked()) {
                             b.videoChip.setChecked(false);
                         }
-                        if(!mList.isEmpty())
+                        if (!mList.isEmpty())
                             filter(1);
-                    }
-                    else if(buttonView == (CompoundButton)b.videoChip){//if video chip is checked, need to uncheck user chip
-                        if(b.userChip.isChecked()){
+                    } else if (buttonView == (CompoundButton) b.videoChip) {//if video chip is checked, need to uncheck user chip
+                        if (b.userChip.isChecked()) {
                             b.userChip.setChecked(false);
                         }
-                        if(!mList.isEmpty())
+                        if (!mList.isEmpty())
                             filter(2);
                     }
-                }
-                else // if unchecked chip, other one is already unchecked, just filter 0
+                } else // if unchecked chip, other one is already unchecked, just filter 0
                     filter(0);
             }
 
@@ -160,48 +161,36 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
     }
 
-    public static String stripQuery(String query){
-        return query.replaceAll("^[ \t]+|[ \t]+$", "");
-    }
-
-    public static boolean isValidQuery(String query){
-        query = stripQuery(query);
-        return !query.isEmpty();
-    }
-
-    private void filter(int mode){
-        if (mode == 1){ // filter by users
+    private void filter(int mode) {
+        if (mode == 1) { // filter by users
             mList.clear();
             mList.addAll(fullmList);
             for (Iterator<SearchResult> iter = mList.listIterator(); iter.hasNext(); ) {
                 SearchResult searchResult = iter.next();
                 if (!searchResult.isUser()) {
-                    Log.d(TAG,"tries to remove video");
+                    Log.d(TAG, "tries to remove video");
                     iter.remove();
                 }
             }
-        }
-        else if(mode == 2){ //filter by videos
+        } else if (mode == 2) { //filter by videos
             mList.clear();
             mList.addAll(fullmList);
             for (Iterator<SearchResult> iter = mList.listIterator(); iter.hasNext(); ) {
                 SearchResult searchResult = iter.next();
                 if (searchResult.isUser()) {
-                    Log.d(TAG,"tries to remove user");
+                    Log.d(TAG, "tries to remove user");
                     iter.remove();
                 }
             }
-        }
-        else{ // use both
+        } else { // use both
             mList.clear();
             mList.addAll(fullmList); //must clear and add full list in case it was filtered previously
         }
-        if(mList.isEmpty()){
+        if (mList.isEmpty()) {
             b.emptyResultsText.setVisibility(View.VISIBLE);
             b.emptyResultsText.setText("No Filtered Results");
             b.searchRecycler.setVisibility(View.GONE);
-        }
-        else{
+        } else {
             b.emptyResultsText.setVisibility(View.GONE);
             b.searchRecycler.setVisibility(View.VISIBLE);
         }
@@ -211,8 +200,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     @Override
     public boolean onQueryTextSubmit(String query) {
-       query = stripQuery(query);
-        if(!isValidQuery(query)){
+        query = stripQuery(query);
+        if (!isValidQuery(query)) {
             b.emptyResultsText.setText("Please input valid search");
             b.emptyResultsText.setVisibility(View.VISIBLE);
             b.searchRecycler.setVisibility(View.INVISIBLE);
@@ -221,7 +210,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
         processSearch(query);
         Log.d(TAG, query);
-        if(b.searchRecycler.getVisibility() == View.INVISIBLE){
+        if (b.searchRecycler.getVisibility() == View.INVISIBLE) {
             b.emptyResultsText.setVisibility(View.GONE);
             b.searchRecycler.setVisibility(View.VISIBLE);
         }
@@ -235,7 +224,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         return false;
     }
 
-    public void closeSearch(View view){
+    public void closeSearch(View view) {
         finish();
     }
 
@@ -290,12 +279,11 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     fullmList.addAll(mList);
 //                    setUpItemListeners();
                     if (b != null) {
-                        if (!mList.isEmpty()){
+                        if (!mList.isEmpty()) {
                             b.emptyResultsText.setVisibility(View.GONE);
-                            if(b.userChip.isChecked()){ // checks if a chip is already clicked to filter before displaying full results
+                            if (b.userChip.isChecked()) { // checks if a chip is already clicked to filter before displaying full results
                                 filter(1);
-                            }
-                            else if(b.videoChip.isChecked()){
+                            } else if (b.videoChip.isChecked()) {
                                 filter(2);
                             }
                         } else {

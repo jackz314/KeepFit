@@ -26,7 +26,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.databinding.FragmentVideosBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.views.other.VideosRecyclerAdapter;
@@ -34,9 +33,7 @@ import com.jackz314.keepfit.views.other.VideosRecyclerAdapter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -44,17 +41,14 @@ import java.util.concurrent.Executors;
 public class VideosFragment extends Fragment {
 
     private static final String TAG = "VideosFragment";
-
+    private final List<Media> videosList = new ArrayList<>();
+    private final List<DocumentReference> videoRefList = new ArrayList<>();
+    private final Executor procES = Executors.newSingleThreadExecutor();
     private FirebaseUser ub;
     private FirebaseFirestore db;
     private FirebaseStorage fs;
     private VideosRecyclerAdapter videoRecyclerAdapter;
     private FragmentVideosBinding b;
-
-    private final List<Media> videosList = new ArrayList<>();
-    private final List<DocumentReference> videoRefList = new ArrayList<>();
-
-    private final Executor procES = Executors.newSingleThreadExecutor();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,11 +58,11 @@ public class VideosFragment extends Fragment {
         videoRecyclerAdapter.setClickListener((view, position) -> {
 
             Media media = videosList.get(position);
-            Log.d(TAG,"Uploaded Video: "+media);
+            Log.d(TAG, "Uploaded Video: " + media);
             Intent intent = new Intent(getActivity(), VideoActivity.class);
 
             String videoPath = media.getLink();
-            String mediaID =  media.getUid();
+            String mediaID = media.getUid();
 
             intent.putExtra("uri", videoPath);
             intent.putExtra("media", mediaID);
@@ -82,7 +76,7 @@ public class VideosFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        if (b == null){ // only inflate for the first time being created
+        if (b == null) { // only inflate for the first time being created
             b = FragmentVideosBinding.inflate(inflater, container, false);
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -126,7 +120,7 @@ public class VideosFragment extends Fragment {
 
                             if (b != null && getActivity() != null) {
                                 getActivity().runOnUiThread(() -> {
-                                    if (!videosList.isEmpty()){
+                                    if (!videosList.isEmpty()) {
                                         b.emptyFeedText.setVisibility(View.GONE);
                                     } else {
                                         b.emptyFeedText.setVisibility(View.VISIBLE);
@@ -142,31 +136,31 @@ public class VideosFragment extends Fragment {
         return b.getRoot();
     }
 
-    public void deleteVideo(String mediaID, String CreatorID, String StorageLink){
+    public void deleteVideo(String mediaID, String CreatorID, String StorageLink) {
 
         db.collection("users").document(CreatorID).collection("videos")
                 .whereEqualTo("ref", db.collection("media").document(mediaID)).get()
                 .continueWithTask(task -> {
-                        if (task.isSuccessful()) {
-                            for (DocumentSnapshot doc : task.getResult().getDocuments()) {
-                                return doc.getReference().delete();
-                            }
+                    if (task.isSuccessful()) {
+                        for (DocumentSnapshot doc : task.getResult().getDocuments()) {
+                            return doc.getReference().delete();
                         }
-                        return null;
+                    }
+                    return null;
                 }).continueWithTask(task -> {
-                    return db.collection("media").document(mediaID).delete()
-                            .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully deleted!"))
-                            .addOnFailureListener(e -> Log.w(TAG, "Error deleting document", e));
-                }).continueWithTask(task -> {
-                    StorageReference videoRef = fs.getReferenceFromUrl(StorageLink);
-                    return videoRef.delete();
-                }).addOnSuccessListener(aVoid -> {
-                    // File deleted successfully
-                    Log.d(TAG, "onSuccess: deleted file");
-                }).addOnFailureListener(exception -> {
-                    // Uh-oh, an error occurred!
-                    Log.d(TAG, "onFailure: did not delete file");
-                });
+            return db.collection("media").document(mediaID).delete()
+                    .addOnSuccessListener(aVoid -> Log.d(TAG, "DocumentSnapshot successfully deleted!"))
+                    .addOnFailureListener(e -> Log.w(TAG, "Error deleting document", e));
+        }).continueWithTask(task -> {
+            StorageReference videoRef = fs.getReferenceFromUrl(StorageLink);
+            return videoRef.delete();
+        }).addOnSuccessListener(aVoid -> {
+            // File deleted successfully
+            Log.d(TAG, "onSuccess: deleted file");
+        }).addOnFailureListener(exception -> {
+            // Uh-oh, an error occurred!
+            Log.d(TAG, "onFailure: did not delete file");
+        });
     }
 
     public void setIsCommentable(String mediaID, String CreatorID, String StorageLink, boolean b) {

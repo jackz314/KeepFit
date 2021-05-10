@@ -61,7 +61,7 @@ object UserControllerKt {
     }
 
     @JvmStatic
-    fun deleteFromHistory(uid: String){
+    fun deleteFromHistory(uid: String) {
         currentUserDoc.collection("history").document(uid).delete()
     }
 

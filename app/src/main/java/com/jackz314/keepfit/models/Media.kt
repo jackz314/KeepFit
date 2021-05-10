@@ -11,7 +11,7 @@ import java.util.concurrent.ExecutionException
 
 private const val TAG = "Media"
 
-class Media(doc: DocumentSnapshot): Serializable {
+class Media(doc: DocumentSnapshot) : Serializable {
 
     @DocumentId
     var uid: String? = null
@@ -20,7 +20,7 @@ class Media(doc: DocumentSnapshot): Serializable {
 
     @PropertyName("is_livestream")
     var isLivestream = false
-    var isCommentable = false;
+    var isCommentable = false
     var link: String? = null
     var categories: List<String>? = null
 
@@ -40,27 +40,27 @@ class Media(doc: DocumentSnapshot): Serializable {
     var disliked = false
 
     init {
-        if (!doc.exists()){
+        if (!doc.exists()) {
             uid = ""
         } else {
             uid = doc.id
             isLivestream = doc.getBoolean("is_livestream") == true
-            isCommentable = doc.getBoolean("is_commentable") == true;
+            isCommentable = doc.getBoolean("is_commentable") == true
             link = doc.getString("link")
             categories = doc.get("categories") as List<String>
             startTime = doc.getDate("start_time")
-            if(!isLivestream) duration = doc.getLong("duration")
+            if (!isLivestream) duration = doc.getLong("duration")
             thumbnail = doc.getString("thumbnail")
             title = doc.getString("title")
-            viewCount = doc.getLong("view_count")?.toInt()?:0
-            likes = doc.getLong("likes")?.toInt()?:0
-            dislikes = doc.getLong("dislikes")?.toInt()?:0
+            viewCount = doc.getLong("view_count")?.toInt() ?: 0
+            likes = doc.getLong("likes")?.toInt() ?: 0
+            dislikes = doc.getLong("dislikes")?.toInt() ?: 0
             creatorRef = doc.getDocumentReference("creator")
             val task = creatorRef!!.get()
             task.addOnCompleteListener { task ->
                 if (!task.isSuccessful) {
                     Log.e(TAG, "error getting creater ref: ", task.exception)
-                }else{
+                } else {
                     creator.value = User(task.result)
                     Log.d(TAG, "creator: " + creator.value)
                 }
@@ -88,7 +88,8 @@ class Media(doc: DocumentSnapshot): Serializable {
         if (isLivestream) return "${creator.name} · ${viewCount} watching · Started $startTimeStr"
         else return "${creator.name} · ${viewCount} views · ${likes} likes · ${dislikes} dislikes · $startTimeStr"
     }
-    fun getProfileString():String{
+
+    fun getProfileString(): String {
         if (isLivestream) return "${viewCount} watching · Started ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
         else return "${viewCount} views · ${likes} likes · ${dislikes} dislikes · ${startTime?.let { DateUtils.getRelativeTimeSpanString(it.time) }}"
     }

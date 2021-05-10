@@ -14,8 +14,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:listitem="@layout/condensed_video_item"
-        />
+        tools:listitem="@layout/condensed_video_item" />
 
     <TextView
         android:id="@+id/empty_feed_text"

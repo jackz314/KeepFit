@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.gms.tasks.Tasks;
-import com.google.api.Distribution;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,7 +30,6 @@ import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.views.other.HistoryRecyclerAdapter;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -40,18 +38,15 @@ import java.util.concurrent.Executors;
 public class HistoryFragment extends Fragment {
 
     private static final String TAG = "HistoryFragment";
-
+    private final List<Media> watchedList = new ArrayList<>();
+    private final List<DocumentReference> videoRefList = new ArrayList<>();
+    private final List<ListenerRegistration> itemListenerList = new ArrayList<>();
+    private final Executor procES = Executors.newSingleThreadExecutor();
     private FirebaseUser ub;
     private FirebaseFirestore db;
     private FirebaseStorage fs;
     private HistoryRecyclerAdapter historyRecyclerAdapter;
     private FragmentHistoryBinding b;
-
-    private final List<Media> watchedList = new ArrayList<>();
-    private final List<DocumentReference> videoRefList = new ArrayList<>();
-    private final List<ListenerRegistration> itemListenerList = new ArrayList<>();
-
-    private final Executor procES = Executors.newSingleThreadExecutor();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,7 +59,7 @@ public class HistoryFragment extends Fragment {
             Intent intent = new Intent(getActivity(), VideoActivity.class);
 
             String videoPath = media.getLink();
-            String mediaID =  media.getUid();
+            String mediaID = media.getUid();
 
             intent.putExtra("uri", videoPath);
             intent.putExtra("media", mediaID);
@@ -78,7 +73,7 @@ public class HistoryFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        if (b == null){ // only inflate for the first time being created
+        if (b == null) { // only inflate for the first time being created
             b = FragmentHistoryBinding.inflate(inflater, container, false);
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -103,7 +98,7 @@ public class HistoryFragment extends Fragment {
 
                         procES.execute(() -> {
                             List<Media> tempList = new ArrayList<>();
-                            for(Media media:watchedList) {
+                            for (Media media : watchedList) {
                                 tempList.add(media);
                             }
                             watchedList.clear();

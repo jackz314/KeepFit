@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.PropertyName;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -26,17 +25,8 @@ public class Comment implements Serializable {
     private String mid;
     private String username;
 
-    public Comment(){
+    public Comment() {
         text = "";
-    }
-
-    public static Comment populateFromCid(String cid) {
-        try {
-            return new Comment(Tasks.await(FirebaseFirestore.getInstance().collection("comment").document(cid).get()));
-        } catch (ExecutionException | InterruptedException e) {
-            Log.e(TAG, "populateFromUid: error getting user from cid", e);
-        }
-        return null;
     }
 
     public Comment(DocumentSnapshot doc) {
@@ -54,6 +44,15 @@ public class Comment implements Serializable {
         this.uid = uid;
         this.mid = mid;
         this.upload_time = uploadTime;
+    }
+
+    public static Comment populateFromCid(String cid) {
+        try {
+            return new Comment(Tasks.await(FirebaseFirestore.getInstance().collection("comment").document(cid).get()));
+        } catch (ExecutionException | InterruptedException e) {
+            Log.e(TAG, "populateFromUid: error getting user from cid", e);
+        }
+        return null;
     }
 
     public String getCid() {

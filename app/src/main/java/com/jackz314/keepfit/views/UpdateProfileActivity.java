@@ -43,6 +43,14 @@ import java.util.Map;
 
 public class UpdateProfileActivity extends AppCompatActivity {
 
+    private final FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    // request code
+    private final int PICK_IMAGE_REQUEST = 22;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    boolean imgChosen = false;
+    boolean imgUploaded = false;
+    String imgLink = "";
+    StorageReference storageReference;
     private TextView mDisplayBirthday;
     private DatePickerDialog.OnDateSetListener mDateSetListener;
     private EditText mUsernameEditText;
@@ -50,34 +58,20 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private EditText mHeightEditText;
     private EditText mWeightEditText;
     private Calendar mBirthday = Calendar.getInstance();
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private Map mCurrentData;
-
     private String originalName;
     private String originalBio;
     private int originalWeight;
     private int originalHeight;
     private Date originalBirthday;
     private String originalPhoto;
-    boolean imgChosen = false;
-    boolean imgUploaded = false;
-
     /////
     // views for button
     private Button btnSelect;
     // view for image view
     private ImageView imageView;
-
-
     // Uri indicates, where the image will be picked from
     private Uri filePath = null;
-    String imgLink = "";
-
-    StorageReference storageReference;
-
-    // request code
-    private final int PICK_IMAGE_REQUEST = 22;
     /////
 
     @Override
@@ -108,13 +102,12 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     DocumentSnapshot dataResult = task.getResult();
                     originalName = (String) dataResult.getString("name");
-                    originalBio =(String) dataResult.getString("biography");
+                    originalBio = (String) dataResult.getString("biography");
                     originalWeight = dataResult.getLong("weight").intValue();
                     originalHeight = dataResult.getLong("height").intValue();
                     originalBirthday = dataResult.getDate("birthday");
                     originalPhoto = dataResult.getString("profile_pic");
                 });
-
 
 
         finishEdit.setOnClickListener(view -> {
@@ -194,7 +187,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                         .addOnSuccessListener(aVoid -> finish())
                         .addOnFailureListener(e -> Toast.makeText(UpdateProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show());
             } else {
-               Toast.makeText(UpdateProfileActivity.this, "Please wait for image to upload", Toast.LENGTH_LONG).show();
+                Toast.makeText(UpdateProfileActivity.this, "Please wait for image to upload", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -232,8 +225,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
 
     // Select Image method
-    private void selectImage()
-    {
+    private void selectImage() {
         // Defining Implicit Intent to mobile gallery
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -248,8 +240,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode,
-                                    Intent data)
-    {
+                                    Intent data) {
 
         super.onActivityResult(requestCode,
                 resultCode,
@@ -277,9 +268,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                                 getContentResolver(),
                                 filePath);
                 imageView.setImageBitmap(bitmap);
-            }
-
-            catch (IOException e) {
+            } catch (IOException e) {
                 // Log the exception
                 e.printStackTrace();
             }
@@ -290,59 +279,58 @@ public class UpdateProfileActivity extends AppCompatActivity {
     }
 
 
-
     // UploadImage method
     private void uploadImage() {
-            // Defining the child of storageReference
-            StorageReference ref
-                    = storageReference
-                    .child(
-                            "images/"
-                                    + mFirebaseUser.getUid());
-            // adding listeners on upload
-            if (filePath != null) {
-                Toast.makeText(UpdateProfileActivity.this,"Profile picture uploading", Toast.LENGTH_LONG).show();
-                ref.putFile(filePath)
-                        .addOnSuccessListener(
-                                new OnSuccessListener<UploadTask.TaskSnapshot>() {
+        // Defining the child of storageReference
+        StorageReference ref
+                = storageReference
+                .child(
+                        "images/"
+                                + mFirebaseUser.getUid());
+        // adding listeners on upload
+        if (filePath != null) {
+            Toast.makeText(UpdateProfileActivity.this, "Profile picture uploading", Toast.LENGTH_LONG).show();
+            ref.putFile(filePath)
+                    .addOnSuccessListener(
+                            new OnSuccessListener<UploadTask.TaskSnapshot>() {
 
-                                    @Override
-                                    public void onSuccess(
-                                            UploadTask.TaskSnapshot taskSnapshot) {
-                                        Log.d("Update Profile", "Uploaded!");
-                                        Toast.makeText(UpdateProfileActivity.this, "Profile picture uploaded!", Toast.LENGTH_SHORT).show();
-                                        /////from upload video
-                                        Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                        while (!uriTask.isComplete()) ;
-                                        Uri uri = uriTask.getResult();
+                                @Override
+                                public void onSuccess(
+                                        UploadTask.TaskSnapshot taskSnapshot) {
+                                    Log.d("Update Profile", "Uploaded!");
+                                    Toast.makeText(UpdateProfileActivity.this, "Profile picture uploaded!", Toast.LENGTH_SHORT).show();
+                                    /////from upload video
+                                    Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
+                                    while (!uriTask.isComplete()) ;
+                                    Uri uri = uriTask.getResult();
 
-                                        imgLink = uri.toString();
-                                        Log.d("Update Profile", imgLink);
-                                        imgUploaded = true;
-                                        /////
-                                    }
-                                })
+                                    imgLink = uri.toString();
+                                    Log.d("Update Profile", imgLink);
+                                    imgUploaded = true;
+                                    /////
+                                }
+                            })
 
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                Log.d("Update Profile", "Failed to upload");
-                                Toast.makeText(UpdateProfileActivity.this, "Failed to upload profile picture", Toast.LENGTH_SHORT).show();
-                            }
-                        })
-                        .addOnProgressListener(
-                                new OnProgressListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onProgress(
-                                            UploadTask.TaskSnapshot taskSnapshot) {
-                                        double progress
-                                                = (100.0
-                                                * taskSnapshot.getBytesTransferred()
-                                                / taskSnapshot.getTotalByteCount());
-                                        Log.d("Update Profile", "Uploaded " + (int) progress + "%");
-                                    }
-                                });
-            } 
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d("Update Profile", "Failed to upload");
+                            Toast.makeText(UpdateProfileActivity.this, "Failed to upload profile picture", Toast.LENGTH_SHORT).show();
+                        }
+                    })
+                    .addOnProgressListener(
+                            new OnProgressListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onProgress(
+                                        UploadTask.TaskSnapshot taskSnapshot) {
+                                    double progress
+                                            = (100.0
+                                            * taskSnapshot.getBytesTransferred()
+                                            / taskSnapshot.getTotalByteCount());
+                                    Log.d("Update Profile", "Uploaded " + (int) progress + "%");
+                                }
+                            });
+        }
     }
 
 

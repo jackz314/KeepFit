@@ -3,9 +3,6 @@ package com.jackz314.keepfit.helper;
 import android.content.res.Resources;
 import android.view.View;
 
-import android.content.res.Resources;
-import android.view.View;
-
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.hamcrest.Description;
@@ -18,6 +15,10 @@ public class RecyclerViewMatcher {
 
     public RecyclerViewMatcher(int recyclerViewId) {
         this.recyclerViewId = recyclerViewId;
+    }
+
+    public static RecyclerViewMatcher withRecyclerView(final int recyclerViewId) {
+        return new RecyclerViewMatcher(recyclerViewId);
     }
 
     public Matcher<View> atPosition(final int position) {
@@ -54,8 +55,7 @@ public class RecyclerViewMatcher {
                             (RecyclerView) view.getRootView().findViewById(recyclerViewId);
                     if (recyclerView != null && recyclerView.getId() == recyclerViewId) {
                         childView = recyclerView.findViewHolderForAdapterPosition(position).itemView;
-                    }
-                    else {
+                    } else {
                         return false;
                     }
                 }
@@ -69,11 +69,5 @@ public class RecyclerViewMatcher {
 
             }
         };
-    }
-
-
-
-    public static RecyclerViewMatcher withRecyclerView(final int recyclerViewId) {
-        return new RecyclerViewMatcher(recyclerViewId);
     }
 }

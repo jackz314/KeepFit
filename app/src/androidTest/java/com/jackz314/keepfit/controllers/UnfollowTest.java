@@ -1,13 +1,10 @@
 package com.jackz314.keepfit.controllers;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jackz314.keepfit.controllers.UserController;
-import com.jackz314.keepfit.controllers.UserControllerKt;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class UnfollowTest {
     Boolean unfollowerWorked = true;

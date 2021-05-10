@@ -137,11 +137,9 @@ class PromptActivity : AppCompatActivity() {
             var maxParticipants = b.promptMaxParticipants.text.toString()
             if (maxParticipants.isEmpty()) {
                 maxParticipants = "100"
-            }
-            else if (maxParticipants.toInt() >= 100) {
+            } else if (maxParticipants.toInt() >= 100) {
                 maxParticipants = "100"
-            }
-            else if (maxParticipants.toInt() == 0) {
+            } else if (maxParticipants.toInt() == 0) {
                 maxParticipants = "1"
             }
             intent.putExtra(GlobalConstants.MAX_PARTICIPANTS, maxParticipants)

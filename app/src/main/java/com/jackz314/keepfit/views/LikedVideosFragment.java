@@ -22,11 +22,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.controllers.UserControllerKt;
-import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.databinding.FragmentLikedVideosBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.SearchResult;
-import com.jackz314.keepfit.views.other.FeedRecyclerAdapter;
 import com.jackz314.keepfit.views.other.SearchRecyclerAdapter;
 
 import java.util.ArrayList;
@@ -38,15 +36,12 @@ import java.util.concurrent.Executors;
 public class LikedVideosFragment extends Fragment {
 
     private static final String TAG = "LikedVideosFragment";
-
+    private final List<SearchResult> likedVideosList = new ArrayList<>();
+    private final Executor procES = Executors.newSingleThreadExecutor();
     private FirebaseUser ub;
     private FirebaseFirestore db;
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private FragmentLikedVideosBinding b;
-
-    private final List<SearchResult> likedVideosList = new ArrayList<>();
-
-    private final Executor procES = Executors.newSingleThreadExecutor();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,7 +67,7 @@ public class LikedVideosFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        if (b == null){ // only inflate for the first time being created
+        if (b == null) { // only inflate for the first time being created
             b = FragmentLikedVideosBinding.inflate(inflater, container, false);
 
             LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
@@ -111,7 +106,7 @@ public class LikedVideosFragment extends Fragment {
                             if (activity == null) return;
                             activity.runOnUiThread(() -> {
                                 if (b != null) {
-                                    if (!likedVideosList.isEmpty()){
+                                    if (!likedVideosList.isEmpty()) {
                                         b.emptyFeedText.setVisibility(View.GONE);
                                     } else {
                                         b.emptyFeedText.setVisibility(View.VISIBLE);

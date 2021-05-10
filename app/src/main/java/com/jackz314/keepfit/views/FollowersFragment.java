@@ -17,34 +17,30 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.jackz314.keepfit.GlobalConstants;
-import com.jackz314.keepfit.databinding.FragmentFollowersBinding;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.jackz314.keepfit.GlobalConstants;
+import com.jackz314.keepfit.databinding.FragmentFollowersBinding;
 import com.jackz314.keepfit.models.SearchResult;
 import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.other.SearchRecyclerAdapter;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class FollowersFragment extends Fragment {
 
     private static final String TAG = "FollowerFragment";
-
-    private FirebaseUser ub;
-    private FirebaseFirestore db;
-
-    private FragmentFollowersBinding b;
-    private SearchRecyclerAdapter searchRecyclerAdapter;
     private final List<SearchResult> followersList = new ArrayList<>();
     private final List<DocumentReference> followersRefList = new ArrayList<>();
-
     private final Executor procES = Executors.newSingleThreadExecutor();
+    private FirebaseUser ub;
+    private FirebaseFirestore db;
+    private FragmentFollowersBinding b;
+    private SearchRecyclerAdapter searchRecyclerAdapter;
 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,13 +52,14 @@ public class FollowersFragment extends Fragment {
             SearchResult searchResult = followersList.get(position);
             User user = searchResult.getUser();
             Intent in = new Intent(requireActivity(), UserProfileActivity.class);
-            in.putExtra(GlobalConstants.USER_PROFILE,user);
+            in.putExtra(GlobalConstants.USER_PROFILE, user);
             startActivity(in);
         });
     }
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        if(b == null) {
+        if (b == null) {
             b = FragmentFollowersBinding.inflate(inflater, container, false);
 
             b.searchRecycler.setLayoutManager(new LinearLayoutManager(getContext()));

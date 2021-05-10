@@ -44,6 +44,7 @@ import static com.jackz314.keepfit.GlobalConstants.TOS_URL;
 
 public class Utils {
     private static final String TAG = "Utils";
+    private static AtomicBoolean isRunningTest;
 
     public static void createSignInIntent(Activity activity) {
         // Create and launch sign-in intent
@@ -132,30 +133,30 @@ public class Utils {
     }
 
     // get the token from local cache first, if expired, get a new one from server
-    public static Single<String> getZoomJWTToken(Context context){
-         return Single.create((SingleEmitter<String> emitter) -> {
+    public static Single<String> getZoomJWTToken(Context context) {
+        return Single.create((SingleEmitter<String> emitter) -> {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             String savedToken = prefs.getString(GlobalConstants.ZOOM_JWT_TOKEN_KEY, "");
             Date expirationDate = getJWTExpirationDate(savedToken);
-            if(expirationDate == null) {
+            if (expirationDate == null) {
                 emitter.onSuccess("");
                 return;
-            }
-            else expirationDate = new Date(expirationDate.getTime() - 10 * DateUtils.MINUTE_IN_MILLIS); // assume expiration 10 min before actual exp
-            if(new Date().after(expirationDate)){ // invalid, get a new one
+            } else
+                expirationDate = new Date(expirationDate.getTime() - 10 * DateUtils.MINUTE_IN_MILLIS); // assume expiration 10 min before actual exp
+            if (new Date().after(expirationDate)) { // invalid, get a new one
                 emitter.onSuccess("");
-            }else {
+            } else {
                 emitter.onSuccess(savedToken);
             }
         }).flatMap(token -> {
-            if (token.isEmpty()){
+            if (token.isEmpty()) {
                 return getZoomJWTTokenFromServer() // save token after getting it
                         .doOnSuccess(newToken -> PreferenceManager.getDefaultSharedPreferences(context).edit()
                                 .putString(GlobalConstants.ZOOM_JWT_TOKEN_KEY, newToken).apply());
-            }else{
+            } else {
                 return Single.just(token);
             }
-         });
+        });
     }
 
     private static Single<String> getZoomJWTTokenFromServer() {
@@ -173,7 +174,7 @@ public class Utils {
                     if (taskResult == null) return "";
                     return (String) taskResult.getData();
                 }).addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()){
+                    if (!task.isSuccessful()) {
                         Exception e = task.getException();
                         if (e == null) {
                             e = new Exception("Original exception was null");
@@ -188,20 +189,20 @@ public class Utils {
     }
 
     // get the key from local cache first, if expired, get a new one from server
-    public static Single<String> getAlgoliaSearchKey(Context context){
-         return Single.create((SingleEmitter<String> emitter) -> {
+    public static Single<String> getAlgoliaSearchKey(Context context) {
+        return Single.create((SingleEmitter<String> emitter) -> {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
             String savedToken = prefs.getString(GlobalConstants.ALGOLIA_SEARCH_KEY, "");
             emitter.onSuccess(savedToken);
         }).flatMap(token -> {
-            if (token.isEmpty()){
+            if (token.isEmpty()) {
                 return getAlgoliaSearchKeyFromServer() // save token after getting it
                         .doOnSuccess(newKey -> PreferenceManager.getDefaultSharedPreferences(context).edit()
                                 .putString(GlobalConstants.ALGOLIA_SEARCH_KEY, newKey).apply());
-            }else{
+            } else {
                 return Single.just(token);
             }
-         });
+        });
     }
 
     private static Single<String> getAlgoliaSearchKeyFromServer() {
@@ -219,7 +220,7 @@ public class Utils {
                     if (taskResult == null) return "";
                     return (String) taskResult.getData();
                 }).addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()){
+                    if (!task.isSuccessful()) {
                         Exception e = task.getException();
                         if (e == null) {
                             e = new Exception("Original exception was null");
@@ -253,12 +254,12 @@ public class Utils {
         }
     }
 
-    private static String decodeJwtPart(String strEncoded) throws IllegalArgumentException{
+    private static String decodeJwtPart(String strEncoded) throws IllegalArgumentException {
         byte[] decodedBytes = Base64.decode(strEncoded, Base64.URL_SAFE);
         return new String(decodedBytes, StandardCharsets.UTF_8);
     }
 
-    public static boolean isValidEmail(CharSequence charSequence){
+    public static boolean isValidEmail(CharSequence charSequence) {
         if (charSequence == null) return false;
         return PatternsCompat.EMAIL_ADDRESS.matcher(charSequence).matches();
     }
@@ -278,6 +279,14 @@ public class Utils {
             return ""; // should never happen
         }
     }
+
+    // from https://stackoverflow.com/a/40487511/8170714
+//    public static String toHumanReadableFormat(Duration duration) {
+//        return duration.toString()
+//                .substring(2)
+//                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
+//                .toLowerCase();
+//    }
 
     // from https://www.baeldung.com/java-string-title-case
     public static String toTitleCase(String str) {
@@ -303,14 +312,6 @@ public class Utils {
         return converted.toString();
     }
 
-    // from https://stackoverflow.com/a/40487511/8170714
-//    public static String toHumanReadableFormat(Duration duration) {
-//        return duration.toString()
-//                .substring(2)
-//                .replaceAll("(\\d[HMS])(?!$)", "$1 ")
-//                .toLowerCase();
-//    }
-
     public static String centimeterToFeet(double centemeter) {
         if (centemeter < 0) return "";
         int feetPart;
@@ -321,14 +322,12 @@ public class Utils {
         return String.format(Locale.US, "%d' %d''", feetPart, inchesPart);
     }
 
-    private static AtomicBoolean isRunningTest;
-
     public static synchronized boolean isRunningTest() {
         if (null == isRunningTest) {
             boolean istest;
 
             try {
-                Class.forName ("androidx.test.espresso.Espresso");
+                Class.forName("androidx.test.espresso.Espresso");
                 istest = true;
             } catch (ClassNotFoundException e) {
                 istest = false;

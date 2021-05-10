@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.view.KeyEvent;
-import android.view.View;
 import android.widget.MediaController;
 
 // from https://stackoverflow.com/a/62715887/8170714
@@ -15,21 +14,21 @@ public class BackPressingMediaController extends MediaController {
         super(context);
         mParentActivity = parentActivity;
 
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             OnUnhandledKeyEventListener eventListener = (v, event) -> {
                 boolean fHandled = false;
 
                 if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
                     if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                        fHandled =  true;
+                        fHandled = true;
                     } else if (event.getAction() == KeyEvent.ACTION_UP) {
-                        if(mParentActivity != null) {
+                        if (mParentActivity != null) {
                             mParentActivity.onBackPressed();
                             fHandled = true;
                         }
                     }
                 }
-                return(fHandled);
+                return (fHandled);
             };
             addOnUnhandledKeyEventListener(eventListener);
         }
@@ -40,16 +39,16 @@ public class BackPressingMediaController extends MediaController {
         boolean fHandled = false;
         if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
             if (event.getAction() == KeyEvent.ACTION_DOWN) {
-                fHandled =  true;
+                fHandled = true;
             } else if (event.getAction() == KeyEvent.ACTION_UP) {
                 mParentActivity.onBackPressed();
                 fHandled = true;
             }
         }
-        if(!fHandled) {
+        if (!fHandled) {
             fHandled = super.dispatchKeyEvent(event);
         }
-        return(fHandled);
+        return (fHandled);
     }
 
 

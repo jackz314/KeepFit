@@ -38,9 +38,8 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
 
     private final List<Media> mData;
     private final LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
-
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
+    private ItemClickListener mClickListener;
 
 
     // data is passed into the constructor
@@ -63,15 +62,16 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         Media media = mData.get(position);
         holder.titleText.setText(media.getTitle());
 
-        if(media.isLivestream()){
+        if (media.isLivestream()) {
             holder.durationText.setText("LIVE");
-            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8,0x03, 0x06)));
-        }else{
+            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8, 0x03, 0x06)));
+        } else {
             holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
         }
 
         String thumbnail;
-        if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
+        if (media.isLivestream() || !"".equals(media.getThumbnail()))
+            thumbnail = media.getThumbnail();
         else thumbnail = media.getLink();
         Glide.with(holder.image)
                 .load(thumbnail)
@@ -85,7 +85,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
             media.getCreator().observeForever(new Observer<User>() {
                 @Override
                 public void onChanged(User user) {
-                    if(user != null && user.getUid() != null){
+                    if (user != null && user.getUid() != null) {
                         long duration = System.currentTimeMillis() - start;
                         Log.d(TAG, "onBindViewHolder: duration: " + duration);
                         media.getCreator().removeObserver(this);
@@ -93,7 +93,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
                     }
                 }
             });
-        }else{
+        } else {
             populateCreatorInfo(holder, media, creator);
         }
         holder.profilePic.setVisibility(View.GONE);
@@ -154,9 +154,7 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         });
 
 
-
     }
-
 
 
     // total number of rows
@@ -165,6 +163,21 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         return mData.size();
     }
 
+    // convenience method for getting data at click position
+    public Media getItem(int id) {
+        return mData.get(id);
+    }
+
+    // allows clicks events to be caught
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    // parent activity will implement this method to respond to click events
+    @FunctionalInterface
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
+    }
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -196,21 +209,5 @@ public class FollowRecyclerAdapter extends RecyclerView.Adapter<FollowRecyclerAd
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
-    }
-
-    // convenience method for getting data at click position
-    public Media getItem(int id) {
-        return mData.get(id);
-    }
-
-    // allows clicks events to be caught
-    public void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    @FunctionalInterface
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
     }
 }

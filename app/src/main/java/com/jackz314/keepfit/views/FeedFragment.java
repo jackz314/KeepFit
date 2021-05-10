@@ -37,17 +37,12 @@ import java.util.concurrent.Executors;
 public class FeedFragment extends Fragment {
 
     private static final String TAG = "FeedFragment";
-
+    private final List<Media> mediaList = new ArrayList<>();
+    private final Executor procES = Executors.newSingleThreadExecutor();
     private FragmentFeedBinding b;
     private FirebaseFirestore db;
     private FeedRecyclerAdapter feedRecyclerAdapter;
-
     private LivestreamController livestreamController;
-
-    private final List<Media> mediaList = new ArrayList<>();
-
-    private final Executor procES = Executors.newSingleThreadExecutor();
-
     private ListenerRegistration registration;
 
     @Override
@@ -59,12 +54,10 @@ public class FeedFragment extends Fragment {
             // TODO: 3/6/21 replace with activity intent
 
             Media media = mediaList.get(position);
-            if(media.isLivestream()) {
+            if (media.isLivestream()) {
                 livestreamController.setLivestream(media);
                 livestreamController.joinLivestream();
-            }
-
-            else{
+            } else {
                 Intent intent = new Intent(requireActivity(), VideoActivity.class);
 
                 //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
@@ -72,8 +65,6 @@ public class FeedFragment extends Fragment {
                 intent.putExtra("media", media.getUid());
                 startActivity(intent);
             }
-
-            //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
         });
 
         db = FirebaseFirestore.getInstance();

@@ -28,7 +28,7 @@ public class MeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        if (b == null){
+        if (b == null) {
             // view binding ftw!
             b = FragmentMeBinding.inflate(inflater, container, false);
             meCollectionAdapter = new MeCollectionAdapter(this);

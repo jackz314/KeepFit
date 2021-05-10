@@ -21,7 +21,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
-import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
@@ -44,11 +43,10 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
 
     private final List<Media> mData;
     private final LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
     private final HashSet<String> likedVideos = new HashSet<>();
     private final HashSet<String> dislikedVideos = new HashSet<>();
-
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
+    private ItemClickListener mClickListener;
 
 
     // data is passed into the constructor
@@ -89,8 +87,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                 Media media = mData.get(i);
                 media.setLiked(likedVideos.contains(media.getUid()));
             }
-        }
-        else {
+        } else {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 Media media = mData.get(i);
                 media.setDisliked(dislikedVideos.contains(media.getUid()));
@@ -99,7 +96,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         notifyDataSetChanged();
     }
 
-    public void notifyDataChanged(){
+    public void notifyDataChanged() {
         updateMediaListLikeStatus(true);
         updateMediaListLikeStatus(false);
     }
@@ -118,16 +115,17 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         Media media = mData.get(position);
         holder.titleText.setText(media.getTitle());
 
-        if(media.isLivestream()){
+        if (media.isLivestream()) {
             holder.durationText.setText("LIVE");
-            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8,0x03, 0x06)));
-        }else{
+            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8, 0x03, 0x06)));
+        } else {
             holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
             holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         }
 
         String thumbnail;
-        if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
+        if (media.isLivestream() || !"".equals(media.getThumbnail()))
+            thumbnail = media.getThumbnail();
         else thumbnail = media.getLink();
         Glide.with(holder.image)
                 .load(thumbnail)
@@ -141,7 +139,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
             media.getCreator().observeForever(new Observer<User>() {
                 @Override
                 public void onChanged(User user) {
-                    if(user != null && user.getUid() != null){
+                    if (user != null && user.getUid() != null) {
                         long duration = System.currentTimeMillis() - start;
                         Log.d(TAG, "onBindViewHolder: duration: " + duration);
                         media.getCreator().removeObserver(this);
@@ -149,7 +147,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
                     }
                 }
             });
-        }else{
+        } else {
             populateCreatorInfo(holder, media, creator);
         }
 
@@ -158,7 +156,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         holder.likeButton.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
-                if(holder.dislikeButton.isLiked()) {
+                if (holder.dislikeButton.isLiked()) {
                     holder.dislikeButton.callOnClick();
                 }
                 UserControllerKt.likeVideo(media.getUid());
@@ -176,7 +174,7 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         holder.dislikeButton.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton dislikeButton) {
-                if(holder.likeButton.isLiked()) {
+                if (holder.likeButton.isLiked()) {
                     holder.likeButton.callOnClick();
                 }
                 UserControllerKt.dislikeVideo(media.getUid());
@@ -254,13 +252,27 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
     }
 
 
-
     // total number of rows
     @Override
     public int getItemCount() {
         return mData.size();
     }
 
+    // convenience method for getting data at click position
+    public Media getItem(int id) {
+        return mData.get(id);
+    }
+
+    // allows clicks events to be caught
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    // parent activity will implement this method to respond to click events
+    @FunctionalInterface
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
+    }
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -290,21 +302,5 @@ public class FeedRecyclerAdapter extends RecyclerView.Adapter<FeedRecyclerAdapte
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
-    }
-
-    // convenience method for getting data at click position
-    public Media getItem(int id) {
-        return mData.get(id);
-    }
-
-    // allows clicks events to be caught
-    public void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    @FunctionalInterface
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
     }
 }

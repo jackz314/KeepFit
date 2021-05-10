@@ -71,18 +71,12 @@ import static com.jackz314.keepfit.GlobalConstants.RC_REAUTH_DELETE;
 public class UserInfoFragment extends Fragment {
 
     private static final String TAG = "userInfoFragment";
-
-    private FragmentUserInfoBinding b;
-
-    private FirebaseAuth.AuthStateListener authStateListener;
-
     private final List<Exercise> exerciseList = new ArrayList<>();
-    private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
-
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-
     private final ExecutorService es = Executors.newSingleThreadExecutor();
-
+    private FragmentUserInfoBinding b;
+    private FirebaseAuth.AuthStateListener authStateListener;
+    private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
     private MenuItem clearExerciseItem;
 
 
@@ -103,7 +97,7 @@ public class UserInfoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //        View root = inflater.inflate(R.layout.fragment_me, container, false);
-        if (b == null){
+        if (b == null) {
             // view binding ftw!
             b = FragmentUserInfoBinding.inflate(inflater, container, false);
 
@@ -128,7 +122,7 @@ public class UserInfoFragment extends Fragment {
                 exerciseList.addAll(value.toObjects(Exercise.class));
                 exerciseRecyclerAdapter.notifyDataSetChanged();
 
-                if (!exerciseList.isEmpty()){
+                if (!exerciseList.isEmpty()) {
                     if (clearExerciseItem != null) clearExerciseItem.setVisible(true);
                     b.emptyExerciseLogText.setVisibility(View.GONE);
                 } else {
@@ -155,8 +149,7 @@ public class UserInfoFragment extends Fragment {
             SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
             String date = df.format(c);
             String str = sharedPref.getString("LAST_LAUNCH_DATE", "");
-            if (!str.equals(date))
-            {
+            if (!str.equals(date)) {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("LAST_LAUNCH_DATE", date);
                 editor.apply();
@@ -164,21 +157,21 @@ public class UserInfoFragment extends Fragment {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Today's recommended workout")
-                    .setMessage(recentExercise)
-                    .setPositiveButton("GO", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent intent = new Intent(getContext(), PromptActivity.class);
-                            intent.setAction(GlobalConstants.ACTION_EXERCISE);
-                            getContext().startActivity(intent);
-                        }
-                    })
-                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the dialog
-                        }
-                    })
-                    .create()
-                    .show();
+                        .setMessage(recentExercise)
+                        .setPositiveButton("GO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(getContext(), PromptActivity.class);
+                                intent.setAction(GlobalConstants.ACTION_EXERCISE);
+                                getContext().startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        })
+                        .create()
+                        .show();
             }
         }
 
@@ -192,8 +185,8 @@ public class UserInfoFragment extends Fragment {
                 b.userNameText.setText(getGreetingMsg() + user.getName());
                 b.userEmailText.setText(user.getEmail());
                 b.userHeightText.setText(Utils.centimeterToFeet(user.getHeight()));
-                b.userWeightText.setText((int)(user.getWeight() *  2.205) + " lbs");
-                b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
+                b.userWeightText.setText((int) (user.getWeight() * 2.205) + " lbs");
+                b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24, 0);
                 b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), user.getBirthday().getTime(),
                         DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
                 b.userBiographyText.setText(user.getBiography());
@@ -206,8 +199,8 @@ public class UserInfoFragment extends Fragment {
                             .into(b.userProfilePicture);
                 }
             }
-        },throwable -> {
-            Log.d(TAG,"no current user, sign in required");
+        }, throwable -> {
+            Log.d(TAG, "no current user, sign in required");
         });
         compositeDisposable.add(disposable);
     }
@@ -379,7 +372,7 @@ public class UserInfoFragment extends Fragment {
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         populateUserInfo();
     }

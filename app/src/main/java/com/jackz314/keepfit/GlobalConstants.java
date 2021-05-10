@@ -1,7 +1,5 @@
 package com.jackz314.keepfit;
 
-import org.jetbrains.annotations.NotNull;
-
 public interface GlobalConstants {
     int RC_SIGN_IN = 1087;
     int RC_REAUTH_DELETE = 2019;

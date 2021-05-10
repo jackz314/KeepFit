@@ -26,11 +26,9 @@ public class ExerciseRecyclerAdapter extends RecyclerView.Adapter<ExerciseRecycl
 
     private final List<Exercise> mData;
     private final LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
-
     private final Context mContext;
-
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
+    private ItemClickListener mClickListener;
 
 
     // data is passed into the constructor
@@ -54,7 +52,7 @@ public class ExerciseRecyclerAdapter extends RecyclerView.Adapter<ExerciseRecycl
         Exercise exercise = mData.get(position);
         holder.categoryText.setText(exercise.getCategory());
         holder.calText.setText(String.format(Locale.getDefault(), "%.3f Cal", exercise.getCalories()));
-        holder.dateText.setText(DateUtils.getRelativeDateTimeString(mContext,  exercise.getStartingTime().getTime(), DateUtils.MINUTE_IN_MILLIS, DateUtils.WEEK_IN_MILLIS,
+        holder.dateText.setText(DateUtils.getRelativeDateTimeString(mContext, exercise.getStartingTime().getTime(), DateUtils.MINUTE_IN_MILLIS, DateUtils.WEEK_IN_MILLIS,
                 DateUtils.FORMAT_ABBREV_MONTH));
         holder.durationText.setText(UtilsKt.formatDurationTextString((exercise.getElapsedTime() / DateUtils.SECOND_IN_MILLIS)));
     }
@@ -65,6 +63,21 @@ public class ExerciseRecyclerAdapter extends RecyclerView.Adapter<ExerciseRecycl
         return mData.size();
     }
 
+    // convenience method for getting data at click position
+    public Exercise getItem(int id) {
+        return mData.get(id);
+    }
+
+    // allows clicks events to be caught
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    // parent activity will implement this method to respond to click events
+    @FunctionalInterface
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
+    }
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -86,21 +99,5 @@ public class ExerciseRecyclerAdapter extends RecyclerView.Adapter<ExerciseRecycl
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
-    }
-
-    // convenience method for getting data at click position
-    public Exercise getItem(int id) {
-        return mData.get(id);
-    }
-
-    // allows clicks events to be caught
-    public void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    @FunctionalInterface
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
     }
 }

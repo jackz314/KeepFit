@@ -12,7 +12,6 @@
     tools:context=".views.PromptActivity">
 
 
-
     <EditText
         android:id="@+id/prompt_title"
         android:layout_width="0dp"
@@ -98,23 +97,23 @@
         app:singleSelection="true">
 
         <com.google.android.material.chip.Chip
-            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:id="@+id/prompt_intensity_low"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Light" />
 
         <com.google.android.material.chip.Chip
-            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:id="@+id/prompt_intensity_medium"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Moderate"
             app:closeIconVisible="false" />
 
         <com.google.android.material.chip.Chip
-            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:id="@+id/prompt_intensity_high"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Vigorous" />

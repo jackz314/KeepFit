@@ -1,19 +1,10 @@
 package com.jackz314.keepfit.controllers;
 
-import android.util.Log;
-
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jackz314.keepfit.models.User;
 
 import org.junit.Test;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 public class FollowTest {
     Boolean followingWorked;
@@ -36,19 +27,19 @@ public class FollowTest {
         UserControllerKt.getCurrentUserDoc()
                 .collection("following")
                 .whereEqualTo("ref", db.collection("users").document(otherUserId))
-                        .addSnapshotListener((value, e) -> {
-                            followingWorked = value != null && !value.isEmpty();
-                        });
+                .addSnapshotListener((value, e) -> {
+                    followingWorked = value != null && !value.isEmpty();
+                });
 
         //check if user in other user follower list
         db.collection("users").document(otherUserId).collection("followers")
                 .whereEqualTo("ref", UserControllerKt.getCurrentUserDoc())
-                        .addSnapshotListener((value, e) -> {
-                            if (e != null || value == null) {
-                                return;
-                            }
-                            followerWorked = !value.isEmpty();
-                        });
+                .addSnapshotListener((value, e) -> {
+                    if (e != null || value == null) {
+                        return;
+                    }
+                    followerWorked = !value.isEmpty();
+                });
         Thread.sleep(3000);
         assertTrue(followingWorked && followerWorked);
     }

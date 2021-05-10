@@ -27,10 +27,10 @@ public class Helper {
 
     public static Task<Void> createOrSignInTempAccount(String email, String password) {
         return FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).continueWithTask(task -> {
-            if (task.isSuccessful()){
+            if (task.isSuccessful()) {
                 Map<String, Object> user = new HashMap<>();
-                user.put( "biography", "test account");
-                user.put("birthday", new Date(2000,1,1));
+                user.put("biography", "test account");
+                user.put("birthday", new Date(2000, 1, 1));
                 user.put("email", email);
                 user.put("height", 180);
                 user.put("name", "Test Account");
@@ -40,12 +40,12 @@ public class Helper {
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 return db.collection("users")
                         .document(task.getResult().getUser().getUid())
-                        .set(user);   
+                        .set(user);
             } else {
                 return FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).continueWithTask(task1 -> {
                     Map<String, Object> user = new HashMap<>();
-                    user.put( "biography", "test account");
-                    user.put("birthday", new Date(2000,1,1));
+                    user.put("biography", "test account");
+                    user.put("birthday", new Date(2000, 1, 1));
                     user.put("email", email);
                     user.put("height", 180);
                     user.put("name", "Test Account");
@@ -63,7 +63,7 @@ public class Helper {
 
     public static Task<Object> createOrSignInTempAccountNoDoc(String email, String password) {
         return FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password).continueWith(task -> {
-            if (task.isSuccessful()){
+            if (task.isSuccessful()) {
                 return true;
             } else {
                 return FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password).continueWith(task1 -> {
@@ -88,7 +88,7 @@ public class Helper {
     }
 
     public static String getTextfromTextView(final Matcher<View> matcher) {
-        final String[] stringHolder = { null };
+        final String[] stringHolder = {null};
         onView(matcher).perform(new ViewAction() {
             @Override
             public Matcher<View> getConstraints() {
@@ -102,7 +102,7 @@ public class Helper {
 
             @Override
             public void perform(UiController uiController, View view) {
-                TextView tv = (TextView)view; //Save, because of check in getConstraints()
+                TextView tv = (TextView) view; //Save, because of check in getConstraints()
                 stringHolder[0] = tv.getText().toString();
             }
         });

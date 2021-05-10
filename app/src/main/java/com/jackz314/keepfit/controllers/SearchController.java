@@ -31,7 +31,7 @@ public class SearchController {
             if (hit == null) continue;
 
             SearchResult result;
-            if ("user".equals(hit.optString("type"))){
+            if ("user".equals(hit.optString("type"))) {
                 User user = User.populateFromUid(hit.optString("objectID"));
                 if (user == null) continue;
                 result = new SearchResult(user);

@@ -40,19 +40,14 @@ import java.util.concurrent.Executors;
 public class ExploreFollowingFragment extends Fragment {
 
     private static final String TAG = "FeedFragment";
-
-    private FragmentFeedBinding b;
-    private FirebaseFirestore db;
-    private FeedRecyclerAdapter feedRecyclerAdapter;
-
-    private LivestreamController livestreamController;
-
     private final List<Media> mediaList = new ArrayList<>();
     private final List<Media> fullMediaList = new ArrayList<>();
     private final Set<String> uidSet = new HashSet<>();
-
     private final Executor procES = Executors.newSingleThreadExecutor();
-
+    private FragmentFeedBinding b;
+    private FirebaseFirestore db;
+    private FeedRecyclerAdapter feedRecyclerAdapter;
+    private LivestreamController livestreamController;
     private ListenerRegistration registration;
 
     @Override
@@ -64,12 +59,10 @@ public class ExploreFollowingFragment extends Fragment {
             // TODO: 3/6/21 replace with activity intent
 
             Media media = mediaList.get(position);
-            if(media.isLivestream()) {
+            if (media.isLivestream()) {
                 livestreamController.setLivestream(media);
                 livestreamController.joinLivestream();
-            }
-
-            else{
+            } else {
                 Intent intent = new Intent(requireActivity(), VideoActivity.class);
 
                 //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
