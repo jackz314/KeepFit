@@ -28,18 +28,13 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.controllers.ExerciseController;
 import com.jackz314.keepfit.controllers.LivestreamController;
-import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
-import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.other.FeedRecyclerAdapter;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -60,7 +55,6 @@ public class ExploreFollowingFragment extends Fragment {
     private final Executor procES = Executors.newSingleThreadExecutor();
 
     private ListenerRegistration registration;
-    private UserController userController = new UserController();
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {

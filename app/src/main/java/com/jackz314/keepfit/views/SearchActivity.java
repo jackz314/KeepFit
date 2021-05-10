@@ -107,8 +107,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                 } else {
                     Intent intent = new Intent(this, VideoActivity.class);
 
-
-                    //String videoPath = "android.resource://" + getActivity().getPackageName() + "/" + R.raw.sample;
                     intent.putExtra("uri", media.getLink());
                     intent.putExtra("media", media.getUid());
                     startActivity(intent);
@@ -170,7 +168,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     public static boolean isValidQuery(String query){
         query = stripQuery(query);
-        return !query.isEmpty() && query.matches("[a-zA-Z0-9 ]*");
+        return !query.isEmpty();
     }
 
     private void filter(int mode){

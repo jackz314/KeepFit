@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
@@ -23,7 +22,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
-import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
@@ -35,7 +33,6 @@ import com.like.LikeButton;
 import com.like.OnLikeListener;
 
 import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -109,8 +106,6 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
                     if (res.getMedia().getLiked() != isLiked) {
                         res.getMedia().setLiked(isLiked);
-
-                        notifyDataSetChanged();
                     }
                 }
             }
@@ -124,12 +119,11 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
                     if (res.getMedia().getDisliked() != isDisliked) {
                         res.getMedia().setDisliked(isDisliked);
-
-                        notifyDataSetChanged();
                     }
                 }
             }
         }
+        notifyDataSetChanged();
     }
 
     public void notifyDataChanged(){
@@ -212,7 +206,6 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
         MediaViewHolder(View itemView) {
             super(itemView);
-           ;
             titleText = itemView.findViewById(R.id.title_text);
             detailText = itemView.findViewById(R.id.detail_text);
             durationText = itemView.findViewById(R.id.duration_text);
