@@ -21,6 +21,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.storage.FirebaseStorage;
 import com.jackz314.keepfit.R;
@@ -30,6 +31,7 @@ import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.views.other.HistoryRecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
@@ -47,6 +49,7 @@ public class HistoryFragment extends Fragment {
 
     private final List<Media> watchedList = new ArrayList<>();
     private final List<DocumentReference> videoRefList = new ArrayList<>();
+    private final List<ListenerRegistration> itemListenerList = new ArrayList<>();
 
     private final Executor procES = Executors.newSingleThreadExecutor();
 
@@ -73,9 +76,14 @@ public class HistoryFragment extends Fragment {
     }
 
     private  void setUpItemListeners() {
+        for (int i = 0; i < itemListenerList.size(); i++) {
+            itemListenerList.get(i).remove();
+        }
+        itemListenerList.clear();
+
         for (int i = 0; i  < watchedList.size(); i++) {
             int index = i;
-            db.collection("media").document(watchedList.get(index).getUid()).addSnapshotListener((value, e) -> {
+            itemListenerList.add(db.collection("media").document(watchedList.get(index).getUid()).addSnapshotListener((value, e) -> {
                 if (e != null || value == null) {
                     Log.w(TAG, "Listen failed.", e);
                     return;
@@ -98,7 +106,7 @@ public class HistoryFragment extends Fragment {
                     });
                     Log.d(TAG, "media collection update: " + watchedList);
                 });
-            });
+            }));
         }
     }
 
@@ -129,6 +137,10 @@ public class HistoryFragment extends Fragment {
                         }
 
                         procES.execute(() -> {
+                            List<Media> tempList = new ArrayList<>();
+                            for(Media media:watchedList) {
+                                tempList.add(media);
+                            }
                             watchedList.clear();
                             try {
                                 for (QueryDocumentSnapshot doc : value) {
@@ -149,7 +161,7 @@ public class HistoryFragment extends Fragment {
                             if (activity == null) return;
                             activity.runOnUiThread(() -> {
                                 if (b != null) {
-                                    if (!watchedList.isEmpty()){
+                                    if (!watchedList.isEmpty()) {
                                         b.emptyHistoryText.setVisibility(View.GONE);
                                     } else {
                                         b.emptyHistoryText.setVisibility(View.VISIBLE);

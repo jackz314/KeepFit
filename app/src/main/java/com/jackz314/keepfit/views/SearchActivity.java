@@ -21,6 +21,8 @@ import com.algolia.search.saas.AlgoliaException;
 import com.algolia.search.saas.Client;
 import com.algolia.search.saas.Query;
 import com.google.android.material.chip.Chip;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.ListenerRegistration;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
@@ -48,6 +50,7 @@ import io.reactivex.rxjava3.disposables.Disposable;
 
 public class SearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
+    private FirebaseFirestore db;
     private static final String TAG = "SearchActivity";
     private SearchView editSearch;
     private final List<SearchResult> mList = new ArrayList<>();
@@ -61,10 +64,11 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private com.algolia.search.saas.Index index;
+    private final List<ListenerRegistration> itemListenerList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        db = FirebaseFirestore.getInstance();
         super.onCreate(savedInstanceState);
 
         b = ActivitySearchBinding.inflate(getLayoutInflater());

@@ -98,7 +98,6 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
 
                 if (media.getLiked() != isLiked) {
                     media.setLiked(isLiked);
-                    notifyItemChanged(i);
                 }
             }
         }
@@ -110,10 +109,10 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
 
                 if (media.getDisliked() != isDisliked) {
                     media.setDisliked(isDisliked);
-                    notifyItemChanged(i);
                 }
             }
         }
+        notifyDataSetChanged();
     }
 
     public void notifyDataChanged(){
