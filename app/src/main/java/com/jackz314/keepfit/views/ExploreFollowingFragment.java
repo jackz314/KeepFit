@@ -25,19 +25,24 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.controllers.ExerciseController;
 import com.jackz314.keepfit.controllers.LivestreamController;
+import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.views.other.FeedRecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class FeedFragment extends Fragment {
+public class ExploreFollowingFragment extends Fragment {
 
     private static final String TAG = "FeedFragment";
     private final List<Media> mediaList = new ArrayList<>();
+    private final List<Media> fullMediaList = new ArrayList<>();
+    private final Set<String> uidSet = new HashSet<>();
     private final Executor procES = Executors.newSingleThreadExecutor();
     private FragmentFeedBinding b;
     private FirebaseFirestore db;
@@ -65,6 +70,8 @@ public class FeedFragment extends Fragment {
                 intent.putExtra("media", media.getUid());
                 startActivity(intent);
             }
+
+            //startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(mediaList.get(position).getLink())));
         });
 
         db = FirebaseFirestore.getInstance();
@@ -73,38 +80,58 @@ public class FeedFragment extends Fragment {
     }
 
     private void setupFeedListener(String category) {
-        db.collection("media").document();
         Query feedQuery = db.collection("media").orderBy("likes", Query.Direction.DESCENDING)
                 .orderBy("start_time", Query.Direction.DESCENDING);
         if (category != null) feedQuery = feedQuery.whereArrayContains("categories", category);
+
+        UserControllerKt.getCurrentUserDoc()
+                .collection("following")
+                .addSnapshotListener((value, e) -> {
+                    if (e != null || value == null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+
+                    uidSet.clear();
+                    for (QueryDocumentSnapshot doc : value)
+                        uidSet.add(doc.getDocumentReference("ref").getId());
+
+                    filterMediaList();
+                });
+
         if (registration != null) registration.remove();
         registration = feedQuery.addSnapshotListener((value, e) -> {
             if (e != null || value == null) {
                 Log.w(TAG, "Listen failed.", e);
                 return;
             }
+            fullMediaList.clear();
+            for (QueryDocumentSnapshot queryDocumentSnapshot : value)
+                fullMediaList.add(new Media(queryDocumentSnapshot));
 
-            procES.execute(() -> {
-                mediaList.clear();
-                for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                    mediaList.add(new Media(queryDocumentSnapshot));
-                }
-                // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
-                FeedFragment.this.requireActivity().runOnUiThread(() -> {
-
-                    if (b != null) {
-                        if (!mediaList.isEmpty()) {
-                            b.emptyFeedText.setVisibility(View.GONE);
-                        } else {
-                            b.emptyFeedText.setVisibility(View.VISIBLE);
-                            b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                        }
-                    }
-                    feedRecyclerAdapter.notifyDataChanged();
-                });
-                Log.d(TAG, "media collection update: " + mediaList);
-            });
+            filterMediaList();
         });
+    }
+
+    private void filterMediaList() {
+        mediaList.clear();
+        for (Media media : fullMediaList) {
+            String uid = media.getCreatorRef().getId();
+            if (uidSet.contains(uid)) {
+                mediaList.add(media);
+            }
+        }
+
+        if (b != null) {
+            if (!mediaList.isEmpty()) {
+                b.emptyFeedText.setVisibility(View.GONE);
+            } else {
+                b.emptyFeedText.setVisibility(View.VISIBLE);
+                b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+            }
+        }
+        feedRecyclerAdapter.notifyDataChanged();
+        Log.d(TAG, "media collection update: " + mediaList);
     }
 
     @Override

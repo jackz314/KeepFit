@@ -1,33 +1,23 @@
 package com.jackz314.keepfit.views;
 
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.media.MediaMetadataRetriever;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.OpenableColumns;
 import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -36,74 +26,65 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.StorageReference;
-import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.controllers.LivestreamController;
-import com.jackz314.keepfit.models.Comment;
-import com.jackz314.keepfit.models.User;
-import com.jackz314.keepfit.views.other.BackPressingMediaController;
-import com.jackz314.keepfit.views.other.BackPressingMediaController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.controllers.VideoController;
-import com.jackz314.keepfit.models.Media;
+import com.jackz314.keepfit.models.Comment;
+import com.jackz314.keepfit.views.other.BackPressingMediaController;
 import com.jackz314.keepfit.views.other.CommentRecyclerAdapter;
-import com.jackz314.keepfit.views.other.FeedRecyclerAdapter;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static android.view.View.GONE;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 import static com.google.firebase.Timestamp.now;
 
-public class VideoActivity extends AppCompatActivity{
+public class VideoActivity extends AppCompatActivity {
     private static final String TAG = "VideoActivity";
+    public static Comparator<Comment> CommentDateComparator = new Comparator<Comment>() {
 
-    private VideoView mVideoView;
-    private BackPressingMediaController mMediaController;
+        public int compare(Comment c1, Comment c2) {
+            Date c1date = c1.getUploadTime();
+            Date c2date = c2.getUploadTime();
 
-    private CommentRecyclerAdapter commentRecyclerAdapter;
+            //return c1date.compareTo(c2date);
 
-    private VideoController mVideoController;
-    private FirebaseUser ub;
-
-    private RecyclerView commentRecycler;
-
+            return c2date.compareTo(c1date);
+        }
+    };
     private final ArrayList<Comment> commentList = new ArrayList<>();
-
     private final Executor procES = Executors.newSingleThreadExecutor();
-    private LinearLayoutManager linearLayoutManager;
-
+    ConstraintLayout layout2;
+    ConstraintLayout layout3;
     Button uploadBtn;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     EditText editText;
     TextView emptyText;
     TextView offCommentText;
     CircleImageView prof_img;
+    private VideoView mVideoView;
+    private BackPressingMediaController mMediaController;
+    private CommentRecyclerAdapter commentRecyclerAdapter;
+    private VideoController mVideoController;
+    private FirebaseUser ub;
+    private RecyclerView commentRecycler;
+    private LinearLayoutManager linearLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,6 +96,9 @@ public class VideoActivity extends AppCompatActivity{
         linearLayoutManager = new LinearLayoutManager(this);
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         commentRecycler.setLayoutManager(linearLayoutManager);
+
+        layout2 = (ConstraintLayout) findViewById(R.id.layout_video2);
+        layout3 = (ConstraintLayout) findViewById(R.id.layout_video3);
 
         uploadBtn = findViewById(R.id.comment_upload_btn);
         editText = findViewById(R.id.comment_text_input);
@@ -138,11 +122,11 @@ public class VideoActivity extends AppCompatActivity{
         mVideoController = new VideoController(getBaseContext(), mediaID);
 
 
-        try{
+        try {
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                     WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } catch (NullPointerException ignored) {
         }
-        catch (NullPointerException ignored){}
 
         mVideoController.updateVideoStatus();
 
@@ -153,11 +137,9 @@ public class VideoActivity extends AppCompatActivity{
 
         mMediaController = new BackPressingMediaController(VideoActivity.this, VideoActivity.this);
         mVideoView.setMediaController(mMediaController);
-        mMediaController.setPadding(0,0,0, 200);
+        mMediaController.setPadding(0, 0, 0, 200);
         mMediaController.setAnchorView(mVideoView);
         mVideoView.start();
-
-
 
 
         mVideoView.setOnErrorListener((mp, what, extra) -> {
@@ -196,12 +178,11 @@ public class VideoActivity extends AppCompatActivity{
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        if(document.getBoolean("is_commentable")){
+                        if (document.getBoolean("is_commentable")) {
                             loadComments(mediaID);
                             emptyText.setVisibility(INVISIBLE);
                             setUploadCommentVisibility(VISIBLE);
-                        }
-                        else{
+                        } else {
                             emptyText.setVisibility(INVISIBLE);
                             offCommentText.setVisibility(VISIBLE);
                             setUploadCommentVisibility(INVISIBLE);
@@ -216,33 +197,28 @@ public class VideoActivity extends AppCompatActivity{
         });
 
 
-
-
-
-
         uploadBtn.setOnClickListener(view -> {
-            if(editText.getText().toString().equals("")){
-                Toast.makeText(getBaseContext(),"Empty Comment!", Toast.LENGTH_LONG).show();
-            }
-            else{
+            if (editText.getText().toString().equals("")) {
+                Toast.makeText(getBaseContext(), "Empty Comment!", Toast.LENGTH_LONG).show();
+            } else {
                 uploadCommentFirebase(mediaID);
             }
         });
 
     }
 
-    public void loadComments(String mediaID){
-        if(!commentList.isEmpty())
+    public void loadComments(String mediaID) {
+        if (!commentList.isEmpty())
             commentList.clear();
 
 
         db.collection("comments").get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                for(DocumentSnapshot qs: task.getResult()){
-                    if(qs.getString("media").equals(mediaID)){
+                for (DocumentSnapshot qs : task.getResult()) {
+                    if (qs.getString("media").equals(mediaID)) {
 
-                        Comment comment = new Comment(qs.getId(),qs.getString("text"),qs.getString("user"),qs.getString("media"), qs.getDate("upload_time"));
+                        Comment comment = new Comment(qs.getId(), qs.getString("text"), qs.getString("user"), qs.getString("media"), qs.getDate("upload_time"));
                         commentList.add(comment);
                     }
                 }
@@ -250,10 +226,9 @@ public class VideoActivity extends AppCompatActivity{
                 commentList.sort(CommentDateComparator);
                 commentRecyclerAdapter = new CommentRecyclerAdapter(VideoActivity.this, commentList, VideoActivity.this);
                 commentRecycler.setAdapter(commentRecyclerAdapter);
-                if(!commentList.isEmpty()){
+                if (!commentList.isEmpty()) {
                     emptyText.setVisibility(INVISIBLE);
-                }
-                else{
+                } else {
                     emptyText.setVisibility(VISIBLE);
                 }
             }
@@ -266,21 +241,19 @@ public class VideoActivity extends AppCompatActivity{
         });
     }
 
-    public static Comparator<Comment> CommentDateComparator = new Comparator<Comment>() {
-
-        public int compare(Comment c1, Comment c2) {
-            Date c1date = c1.getUploadTime();
-            Date c2date = c2.getUploadTime();
-
-            //return c1date.compareTo(c2date);
-
-            return c2date.compareTo(c1date);
-        }};
-
-
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            layout2.setVisibility(VISIBLE);
+            layout3.setVisibility(VISIBLE);
+            mMediaController.setPadding(0, 0, 0, 200);
+        }
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            layout2.setVisibility(GONE);
+            layout3.setVisibility(GONE);
+            mMediaController.setPadding(0, 0, 0, 0);
+        }
     }
 
     public void openVideoActivity() {
@@ -288,7 +261,7 @@ public class VideoActivity extends AppCompatActivity{
         startActivity(intent);
     }
 
-    public void addToHistory(String mediaID){
+    public void addToHistory(String mediaID) {
         Map<String, Object> obj = new HashMap<>();
         obj.put("watched", new Timestamp(new Date()));
 
@@ -312,15 +285,15 @@ public class VideoActivity extends AppCompatActivity{
 
         DocumentReference commentRef = db.collection("comments").document();
         commentRef.set(comment).addOnCompleteListener(task -> {
-            Toast.makeText(getApplicationContext(),"Comment Uploaded!", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), "Comment Uploaded!", Toast.LENGTH_LONG).show();
         });
 
         loadComments(mediaID);
     }
 
-    public void deleteComment(String uid , String cid, String mediaID){
+    public void deleteComment(String uid, String cid, String mediaID) {
         String curruserID = FirebaseAuth.getInstance().getCurrentUser().getUid();
-        if(curruserID.equals(uid)){
+        if (curruserID.equals(uid)) {
             db.collection("comments").document(cid)
                     .delete()
                     .addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -336,22 +309,22 @@ public class VideoActivity extends AppCompatActivity{
                             Log.w(TAG, "Error deleting document", e);
                         }
                     });
-        }
-        else {
+        } else {
 
             AlertDialog alertDialog = new AlertDialog.Builder(VideoActivity.this)
                     .setMessage("Cannot delete others comments!")
-                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener()
-                    {@Override
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        @Override
                         public void onClick(DialogInterface dialog, int id) {
-                        dialog.dismiss();
-                    }}).create();
+                            dialog.dismiss();
+                        }
+                    }).create();
             alertDialog.show();
         }
         loadComments(mediaID);
     }
 
-    private void setUploadCommentVisibility(int visibility){
+    private void setUploadCommentVisibility(int visibility) {
         editText.setVisibility(visibility);
         uploadBtn.setVisibility(visibility);
         prof_img.setVisibility(visibility);

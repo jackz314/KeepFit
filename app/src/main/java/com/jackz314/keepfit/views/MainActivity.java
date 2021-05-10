@@ -1,6 +1,7 @@
 package com.jackz314.keepfit.views;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -17,6 +18,7 @@ import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.preference.PreferenceManager;
 
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
@@ -55,9 +57,55 @@ public
 class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
+    private final SpeedDialMenuAdapter speedDialMenuAdapter = new SpeedDialMenuAdapter() {
+        @Override
+        public int getCount() {
+            return 3;
+        }
 
+        @NotNull
+        @Override
+        public SpeedDialMenuItem getMenuItem(@NotNull Context context, int pos) {
+            @DrawableRes int icon;
+            String label;
+            if (pos == 0) {
+                icon = R.drawable.ic_baseline_directions_run_24;
+                label = "Track exercise";
+            } else if (pos == 1) {
+                icon = R.drawable.ic_baseline_go_live_24;
+                label = "Go live";
+            } else { // 2
+                icon = R.drawable.ic_baseline_cloud_upload_24;
+                label = "Upload a video";
+            }
+            return new SpeedDialMenuItem(context, icon, label);
+        }
+
+        @Override
+        public boolean onMenuItemClick(int pos) {
+            if (pos == 0) { // exercise
+                Intent intent = new Intent(MainActivity.this, PromptActivity.class);
+                intent.setAction(GlobalConstants.ACTION_EXERCISE);
+                startActivity(intent);
+            } else if (pos == 1) { // livestream
+                Intent intent = new Intent(MainActivity.this, PromptActivity.class);
+                intent.setAction(GlobalConstants.ACTION_LIVESTREAM);
+                startActivity(intent);
+            } else { // video upload
+                Intent intent = new Intent(MainActivity.this, UploadVideoActivity.class);
+                intent.putExtra("UserID", "Upload Video");
+                startActivity(intent);
+            }
+            return true;
+        }
+
+        @Override
+        public float fabRotationDegrees() {
+            return 135F;
+        }
+    };
     private ActivityMainBinding b;
-
     private final ActivityResultLauncher<Intent> newUserResultLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
@@ -67,8 +115,6 @@ class MainActivity extends AppCompatActivity {
                     if (b == null) initMainViews();
                 }
             });
-
-    private final CompositeDisposable compositeDisposable = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,60 +171,13 @@ class MainActivity extends AppCompatActivity {
                 }
 
                 @Override
-                public void onZoomAuthIdentityExpired() { }
+                public void onZoomAuthIdentityExpired() {
+                }
             };
             sdk.initialize(context, listener, params);
         });
         compositeDisposable.add(disposable);
     }
-
-    private final SpeedDialMenuAdapter speedDialMenuAdapter = new SpeedDialMenuAdapter() {
-        @Override
-        public int getCount() {
-            return 3;
-        }
-
-        @NotNull
-        @Override
-        public SpeedDialMenuItem getMenuItem(@NotNull Context context, int pos) {
-            @DrawableRes int icon;
-            String label;
-            if (pos == 0) {
-                icon = R.drawable.ic_baseline_directions_run_24;
-                label = "Track exercise";
-            } else if (pos == 1) {
-                icon = R.drawable.ic_baseline_go_live_24;
-                label = "Go live";
-            } else { // 2
-                icon = R.drawable.ic_baseline_cloud_upload_24;
-                label = "Upload a video";
-            }
-            return new SpeedDialMenuItem(context, icon, label);
-        }
-
-        @Override
-        public boolean onMenuItemClick(int pos) {
-            if (pos == 0) { // exercise
-                Intent intent = new Intent(MainActivity.this, PromptActivity.class);
-                intent.setAction(GlobalConstants.ACTION_EXERCISE);
-                startActivity(intent);
-            } else if (pos == 1) { // livestream
-                Intent intent = new Intent(MainActivity.this, PromptActivity.class);
-                intent.setAction(GlobalConstants.ACTION_LIVESTREAM);
-                startActivity(intent);
-            } else { // video upload
-                Intent intent = new Intent(MainActivity.this, UploadVideoActivity.class);
-                intent.putExtra("UserID", "Upload Video");
-                startActivity(intent);
-            }
-            return true;
-        }
-
-        @Override
-        public float fabRotationDegrees() {
-            return 135F;
-        }
-    };
 
     private void initMainViews() {
         b = ActivityMainBinding.inflate(getLayoutInflater());
@@ -186,6 +185,13 @@ class MainActivity extends AppCompatActivity {
         setContentView(rootView);
 
         initializeZoomSdk(this);
+
+        if (SchedulingController.getIntentForDailyNotification(this, PendingIntent.FLAG_NO_CREATE) == null) { // alarm manager not scheduled
+            long lastDailyNotifScheduledTime = PreferenceManager.getDefaultSharedPreferences(this).getLong(GlobalConstants.DAILY_NOTIF_SCHEDULED_TIME, 0);
+            if (lastDailyNotifScheduledTime != 0L) { // has previous daily notif time
+                SchedulingController.scheduleDailyNotifications(this, lastDailyNotifScheduledTime); // schedule again
+            }
+        }
 
         b.mainActionBtn.setSpeedDialMenuAdapter(speedDialMenuAdapter);
 
@@ -201,7 +207,7 @@ class MainActivity extends AppCompatActivity {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_me, R.id.navigation_feed)
+                R.id.navigation_me, R.id.navigation_explore)
                 .build();
         NavController navController = NavHostFragment.findNavController(Objects.requireNonNull(getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment)));
 
@@ -230,7 +236,7 @@ class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == RC_SIGN_IN) {
-            if(Utils.isRunningTest()){
+            if (Utils.isRunningTest()) {
                 setupAfterSignIn();
                 return;
             }
@@ -270,7 +276,7 @@ class MainActivity extends AppCompatActivity {
                             Toast.makeText(this, "Error deleting the account: " +
                                     Objects.requireNonNull(e).getLocalizedMessage(), Toast.LENGTH_SHORT).show();
                         }
-            });
+                    });
         }
     }
 

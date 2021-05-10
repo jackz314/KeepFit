@@ -18,12 +18,10 @@ import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.UtilsKt;
-import com.jackz314.keepfit.controllers.UserControllerKt;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
@@ -38,8 +36,6 @@ import java.util.concurrent.ExecutionException;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
-import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
-import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -48,7 +44,6 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static com.jackz314.keepfit.helper.RecyclerViewItemCountAssertion.withItemCount;
 import static com.jackz314.keepfit.helper.RecyclerViewMatcher.withRecyclerView;
-import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.not;
@@ -64,6 +59,25 @@ public class LivestreamTest {
     public ActivityTestRule<MainActivity> mainActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
     private IdlingResource idlingResource;
+
+    private static Matcher<View> childAtPosition(
+            final Matcher<View> parentMatcher, final int position) {
+
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Child at position " + position + " in parent ");
+                parentMatcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                ViewParent parent = view.getParent();
+                return parent instanceof ViewGroup && parentMatcher.matches(parent)
+                        && view.equals(((ViewGroup) parent).getChildAt(position));
+            }
+        };
+    }
 
     @Before
     public void beforeClass() {
@@ -99,7 +113,7 @@ public class LivestreamTest {
         livestreamEntry.check(matches(hasDescendant(withText(title))));
         livestreamEntry.check(matches(hasDescendant(withText("LIVE"))));
         String displayName = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getDisplayName();
-        if(displayName != null && !displayName.trim().isEmpty())
+        if (displayName != null && !displayName.trim().isEmpty())
             livestreamEntry.check(matches(hasDescendant(withText(containsString(displayName)))));
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -149,24 +163,5 @@ public class LivestreamTest {
 
         ViewInteraction newLivestreamEntry = onView(withRecyclerView(R.id.feed_recycler).atPosition(0));
         newLivestreamEntry.check(matches(hasDescendant(not(withText(title)))));
-    }
-
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position) {
-
-        return new TypeSafeMatcher<View>() {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Child at position " + position + " in parent ");
-                parentMatcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view) {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                        && view.equals(((ViewGroup) parent).getChildAt(position));
-            }
-        };
     }
 }

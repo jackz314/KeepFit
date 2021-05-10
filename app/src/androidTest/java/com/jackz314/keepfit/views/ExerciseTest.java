@@ -45,7 +45,6 @@ import static com.jackz314.keepfit.helper.RecyclerViewItemCountAssertion.withIte
 import static com.jackz314.keepfit.helper.RecyclerViewMatcher.withRecyclerView;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -58,11 +57,23 @@ public class ExerciseTest {
 
     private IdlingResource idlingResource;
 
-    @Before
-    public void before() {
-        final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        idlingResource = TestIdlingResource.countingIdlingResource;
-        IdlingRegistry.getInstance().register(idlingResource);
+    private static Matcher<View> childAtPosition(
+            final Matcher<View> parentMatcher, final int position) {
+
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Child at position " + position + " in parent ");
+                parentMatcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                ViewParent parent = view.getParent();
+                return parent instanceof ViewGroup && parentMatcher.matches(parent)
+                        && view.equals(((ViewGroup) parent).getChildAt(position));
+            }
+        };
     }
 
 //    @Test
@@ -70,6 +81,13 @@ public class ExerciseTest {
 //        DocumentSnapshot ds = Tasks.await(UserControllerKt.getCurrentUserDoc().get());
 //        assertTrue(ds.exists());
 //    }
+
+    @Before
+    public void before() {
+        final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
+        idlingResource = TestIdlingResource.countingIdlingResource;
+        IdlingRegistry.getInstance().register(idlingResource);
+    }
 
     @Test
     public void exerciseCompleteFlow() throws InterruptedException, ExecutionException {
@@ -156,24 +174,5 @@ public class ExerciseTest {
 
         qs = Tasks.await(UserControllerKt.getCurrentUserDoc().collection("exercises").whereEqualTo("category", Utils.toTitleCase(category)).get());
         assertTrue(qs.isEmpty());
-    }
-
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position) {
-
-        return new TypeSafeMatcher<View>() {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Child at position " + position + " in parent ");
-                parentMatcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view) {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                        && view.equals(((ViewGroup) parent).getChildAt(position));
-            }
-        };
     }
 }

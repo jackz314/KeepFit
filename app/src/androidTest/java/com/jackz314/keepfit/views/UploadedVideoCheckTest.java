@@ -1,14 +1,5 @@
 package com.jackz314.keepfit.views;
 
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-import androidx.test.filters.LargeTest;
-
-import com.google.firebase.firestore.FirebaseFirestore;
-
-import org.junit.Rule;
-
-
-
 import android.app.Instrumentation;
 import android.content.Context;
 import android.util.Log;
@@ -21,19 +12,15 @@ import androidx.test.espresso.IdlingRegistry;
 import androidx.test.espresso.IdlingResource;
 import androidx.test.espresso.ViewInteraction;
 import androidx.test.espresso.contrib.RecyclerViewActions;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.storage.FirebaseStorage;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.TestIdlingResource;
 
@@ -50,19 +37,13 @@ import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.action.ViewActions.closeSoftKeyboard;
 import static androidx.test.espresso.action.ViewActions.replaceText;
-import static androidx.test.espresso.action.ViewActions.scrollTo;
-import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.contrib.RecyclerViewActions.actionOnItemAtPosition;
 import static androidx.test.espresso.matcher.ViewMatchers.hasDescendant;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
-import static androidx.test.espresso.matcher.ViewMatchers.withClassName;
 import static androidx.test.espresso.matcher.ViewMatchers.withContentDescription;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static java.lang.System.currentTimeMillis;
 import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 
 
@@ -70,14 +51,30 @@ import static org.junit.Assert.assertEquals;
 @RunWith(AndroidJUnit4.class)
 public class UploadedVideoCheckTest {
 
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
     private static final String TAG = "UploadVideoTest";
-
     @Rule
     public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
-
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
     private IdlingResource idlingResource;
+
+    private static Matcher<View> childAtPosition(
+            final Matcher<View> parentMatcher, final int position) {
+
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Child at position " + position + " in parent ");
+                parentMatcher.describeTo(description);
+            }
+
+            @Override
+            public boolean matchesSafely(View view) {
+                ViewParent parent = view.getParent();
+                return parent instanceof ViewGroup && parentMatcher.matches(parent)
+                        && view.equals(((ViewGroup) parent).getChildAt(position));
+            }
+        };
+    }
 
     @Before
     public void beforeClass() {
@@ -86,7 +83,6 @@ public class UploadedVideoCheckTest {
         idlingResource = TestIdlingResource.countingIdlingResource;
         IdlingRegistry.getInstance().register(idlingResource);
     }
-
 
     @Test
     public void uploadVideoTest() throws InterruptedException {
@@ -173,16 +169,14 @@ public class UploadedVideoCheckTest {
                         if (task.isSuccessful()) {
                             Log.d(TAG, "SUCCESS! " + task.getResult().size() + " " + curString);
 
-                            if(task.getResult().size() > 0){
+                            if (task.getResult().size() > 0) {
 
                                 Log.d(TAG, "FOUND! ");
-                                assertEquals(true,true);
+                                assertEquals(true, true);
+                            } else {
+                                assertEquals(true, false);
                             }
-                            else{
-                                assertEquals(true,false);
-                            }
-                        }
-                        else {
+                        } else {
                             Log.d(TAG, "Error getting documents: ", task.getException());
                         }
                     }
@@ -244,24 +238,5 @@ public class UploadedVideoCheckTest {
         }
 
         onView(withId(R.id.feed_recycler)).perform(RecyclerViewActions.actionOnItem(hasDescendant(withText(curString)), click()));
-    }
-
-    private static Matcher<View> childAtPosition(
-            final Matcher<View> parentMatcher, final int position) {
-
-        return new TypeSafeMatcher<View>() {
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Child at position " + position + " in parent ");
-                parentMatcher.describeTo(description);
-            }
-
-            @Override
-            public boolean matchesSafely(View view) {
-                ViewParent parent = view.getParent();
-                return parent instanceof ViewGroup && parentMatcher.matches(parent)
-                        && view.equals(((ViewGroup) parent).getChildAt(position));
-            }
-        };
     }
 }

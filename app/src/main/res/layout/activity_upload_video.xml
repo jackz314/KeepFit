@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -11,21 +9,22 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@id/comment_checkbox"
+        android:layout_centerHorizontal="true"
         android:clickable="true"
         android:focusable="false"
         android:hint="Select File from Storage"
-        android:layout_centerHorizontal="true"
         android:textColor="#0000FF"
         android:textStyle="bold" />
 
-    <Button android:id="@+id/btn_video_upload"
-        android:layout_height="wrap_content"
+    <Button
+        android:id="@+id/btn_video_upload"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_below="@+id/comment_checkbox"
         android:layout_centerHorizontal="true"
         android:text="Upload Video"
-        android:textSize="20sp"
-        android:textColor="#0000FF"/>
+        android:textColor="#0000FF"
+        android:textSize="20sp" />
 
     <EditText
         android:id="@+id/video_title_input"
@@ -34,28 +33,26 @@
         android:layout_above="@+id/categories_input"
         android:layout_centerHorizontal="true"
         android:ems="10"
-        android:inputType="textPersonName"
-        android:hint="Title" />
+        android:hint="Title"
+        android:inputType="textPersonName" />
 
     <EditText
-    android:id="@+id/categories_input"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_above="@+id/choose_file_to_upload"
-    android:layout_centerHorizontal="true"
-    android:clickable="true"
-    android:focusable="false"
-    android:ems="10"
-    android:inputType="textPersonName"
-    android:hint="Select Category"
-    />
+        android:id="@+id/categories_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/choose_file_to_upload"
+        android:layout_centerHorizontal="true"
+        android:clickable="true"
+        android:ems="10"
+        android:focusable="false"
+        android:hint="Select Category"
+        android:inputType="textPersonName" />
 
     <CheckBox
         android:id="@+id/comment_checkbox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:text="Enable Comments"
-        />
+        android:text="Enable Comments" />
 
 </RelativeLayout>

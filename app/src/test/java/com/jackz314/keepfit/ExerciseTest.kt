@@ -8,7 +8,7 @@ import java.util.*
 
 class ExerciseTest {
     private val dummyUser = User().apply {
-        birthday = Date(2000,1,1)
+        birthday = Date(2000, 1, 1)
         sex = true
         height = 180
         weight = 75
@@ -20,7 +20,7 @@ class ExerciseTest {
         assertEquals(11140.31, ExerciseController(dummyUser.copy().apply { sex = false }).userBMR, 0.1)
         assertEquals(11243.81, ExerciseController(dummyUser.copy().apply { height = 170 }).userBMR, 0.1)
         assertEquals(11456.31, ExerciseController(dummyUser.copy().apply { weight = 90 }).userBMR, 0.1)
-        assertEquals(11055.45, ExerciseController(dummyUser.copy().apply { birthday = Date(1950,1,1) }).userBMR, 0.1)
+        assertEquals(11055.45, ExerciseController(dummyUser.copy().apply { birthday = Date(1950, 1, 1) }).userBMR, 0.1)
     }
 
     @Test
@@ -29,7 +29,7 @@ class ExerciseTest {
         assertEquals(4641.79, ExerciseController(dummyUser.copy().apply { sex = false }).calMultiplier, 0.1)
         assertEquals(4684.92, ExerciseController(dummyUser.copy().apply { height = 170 }).calMultiplier, 0.1)
         assertEquals(4773.46, ExerciseController(dummyUser.copy().apply { weight = 90 }).calMultiplier, 0.1)
-        assertEquals(4606.44, ExerciseController(dummyUser.copy().apply { birthday = Date(1950,1,1) }).calMultiplier, 0.1)
+        assertEquals(4606.44, ExerciseController(dummyUser.copy().apply { birthday = Date(1950, 1, 1) }).calMultiplier, 0.1)
         assertEquals(2355.48, ExerciseController(dummyUser, 5F).calMultiplier, 0.1)
         assertEquals(47109.61, ExerciseController(dummyUser, 100F).calMultiplier, 0.1)
     }

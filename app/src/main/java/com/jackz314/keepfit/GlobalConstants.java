@@ -5,6 +5,8 @@ public interface GlobalConstants {
     int RC_REAUTH_DELETE = 2019;
     int RC_TRIGGER_REMINDER = 3012;
     int RC_CANCEL_REMINDER = 3013;
+    int RC_TRIGGER_DAILY = 3014;
+    int DAILY_NOTIF_ID = 13058;
 
     String PRIVACY_POLICY_URL = "https://www.usc.edu/pages/usc-privacy-notice/";
     String TOS_URL = "https://www.usc.edu/pages/usc-privacy-notice/";
@@ -21,6 +23,7 @@ public interface GlobalConstants {
     String ZOOM_PASSWORD_KEY = "zoom_pwd";
     String ALGOLIA_SEARCH_KEY = "algolia_search_key";
     String RECENT_EXERCISE_KEY = "recent_exercise";
+    String DAILY_NOTIF_SCHEDULED_TIME = "daily_notif_scheduled";
 
     // intent stuff
     // extras
@@ -35,6 +38,8 @@ public interface GlobalConstants {
     String SCHEDULE_PRESET_DATE = "scheduled_preset_date";
     String ACTION_TRIGGER_REMINDER = "trigger_reminder";
     String ACTION_CANCEL_REMINDER = "cancel_reminder";
+    String ACTION_DAILY_NOTIF = "daily_notif";
+    String MAX_PARTICIPANTS = "max_participants";
 
     // actions
     String ACTION_EXERCISE = "action_exercise";
@@ -42,4 +47,5 @@ public interface GlobalConstants {
 
     //notifications
     String REMINDER_NOTIF_CHANNEL_ID = "reminder_notif_channel";
+    String DAILY_NOTIF_CHANNEL_ID = "daily_notif_channel";
 }

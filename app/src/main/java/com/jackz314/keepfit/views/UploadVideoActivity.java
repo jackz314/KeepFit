@@ -4,12 +4,12 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,6 +30,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jackz314.keepfit.R;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -43,32 +44,7 @@ import static com.google.firebase.Timestamp.now;
 
 public class UploadVideoActivity extends AppCompatActivity {
 
-    public class PutVideo {
-        public String title;
-        public String url;
-
-        public PutVideo(){}
-
-        public PutVideo(String name, String url){
-            this.title = name;
-            this.url = url;
-        }
-        public String getTitle() {
-            return title;
-        }
-        public void setTitle(String title){
-            this.title = title;
-        }
-        public String getUrl() {
-            return url;
-        }
-        public void setUrl(String url) {
-            this.url = url;
-        }
-    }
-
     private static final String TAG = "UploadVideoActivity";
-
     FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     EditText editText;
     EditText titleText;
@@ -76,13 +52,11 @@ public class UploadVideoActivity extends AppCompatActivity {
     EditText categoryText;
     boolean[] selectedCategory;
     ArrayList<Integer> categoryList = new ArrayList<>();
-
-
     StorageReference storageReference;
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
-    protected void onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_upload_video);
 
@@ -96,7 +70,7 @@ public class UploadVideoActivity extends AppCompatActivity {
         List<String> cgs = Arrays.asList(getResources().getStringArray(R.array.exercise_categories));
 
         String[] categoryArray = new String[cgs.size()];
-        for(int j = 0 ; j < categoryArray.length ; j++){
+        for (int j = 0; j < categoryArray.length; j++) {
             categoryArray[j] = cgs.get(j);
         }
 
@@ -164,7 +138,6 @@ public class UploadVideoActivity extends AppCompatActivity {
             }
 
 
-
         });
 
         btn.setEnabled(false);
@@ -177,18 +150,18 @@ public class UploadVideoActivity extends AppCompatActivity {
         intent.setType("video/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         Intent videoFileSelect = Intent.createChooser(intent, "VIDEO FILE SELECT");
-        startActivityForResult(videoFileSelect,12);
+        startActivityForResult(videoFileSelect, 12);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode==12 && resultCode==RESULT_OK && data!=null && data.getData()!=null){
+        if (requestCode == 12 && resultCode == RESULT_OK && data != null && data.getData() != null) {
             btn.setEnabled(true);
 
             String path = data.getDataString();
-            String filename = path.substring(path.lastIndexOf("/")+1);
+            String filename = path.substring(path.lastIndexOf("/") + 1);
             editText.setText(filename);
             btn.setOnClickListener(view -> {
 
@@ -196,15 +169,24 @@ public class UploadVideoActivity extends AppCompatActivity {
                 Cursor returnCursor =
                         getContentResolver().query(fileInfo, null, null, null, null);
                 returnCursor.moveToFirst();
-                long sizeIndex = returnCursor.getLong(Math.min(0, returnCursor.getColumnIndex(OpenableColumns.SIZE)));
-
-                if(sizeIndex < 5 * 1024 * 1024){
-                    Toast.makeText(UploadVideoActivity.this,"File size okay", Toast.LENGTH_LONG).show();
-                    uploadVideoFirebase(data.getData());
-
+                //long sizeIndex = returnCursor.getLong(Math.min(0, returnCursor.getColumnIndex(OpenableColumns.SIZE)));
+                AssetFileDescriptor afd = null;
+                try {
+                    afd = getContentResolver().openAssetFileDescriptor(fileInfo, "r");
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
                 }
-                else{
-                    Toast.makeText(UploadVideoActivity.this,"File size should be less than 5MB", Toast.LENGTH_LONG).show();
+                long sizeIndex = afd.getLength();
+
+                if (sizeIndex < 5 * 1024 * 1024) {
+                    Toast.makeText(UploadVideoActivity.this, "File size okay", Toast.LENGTH_LONG).show();
+                    uploadVideoFirebase(data.getData());
+                    Long s = sizeIndex / (1024 * 1024);
+                    Log.d("XXXXXXX", s + "MB");
+                } else {
+                    Toast.makeText(UploadVideoActivity.this, "File size should be less than 5MB", Toast.LENGTH_SHORT).show();
+                    Long s = sizeIndex / (1024 * 1024);
+                    Log.d("XXXXXXX", s + "MB");
                 }
             });
         }
@@ -231,15 +213,15 @@ public class UploadVideoActivity extends AppCompatActivity {
 
         String path = uidRef.toString();
         String[] segments = path.split("@");
-        String userID = segments[segments.length -1];
+        String userID = segments[segments.length - 1];
 
-        StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + user.getUid()+".mp4");
+        StorageReference reference = storageReference.child(titleText.getText().toString() + "@" + user.getUid() + ".mp4");
 
 
         reference.putFile(data).addOnSuccessListener(taskSnapshot -> {
 
             Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-            while (!uriTask.isComplete());
+            while (!uriTask.isComplete()) ;
             Uri uri = uriTask.getResult();
 
             PutVideo putvideo = new PutVideo(editText.getText().toString(), uri.toString());
@@ -254,7 +236,7 @@ public class UploadVideoActivity extends AppCompatActivity {
             List<String> categoryList = Arrays.stream(raw.split(",")).map(String::trim).collect(Collectors.toList());
 
             String titleTmp = titleText.getText().toString();
-            if(titleTmp.length() == 0){
+            if (titleTmp.length() == 0) {
                 titleTmp = "Untitled";
             }
 
@@ -273,20 +255,20 @@ public class UploadVideoActivity extends AppCompatActivity {
             media.put("title", titleTmp);
             media.put("view_count", 0);
             media.put("thumbnail", "");
-            
+
             DocumentReference mediaRef = db.collection("media").document();
             mediaRef.set(media);
             Map<String, Object> refData = new HashMap<>();
             refData.put("ref", mediaRef);
             db.collection("users").document(user.getUid()).collection("videos").document().set(refData)
                     .addOnCompleteListener(task -> {
-                        Toast.makeText(UploadVideoActivity.this,"File Uploaded", Toast.LENGTH_LONG).show();
+                        Toast.makeText(UploadVideoActivity.this, "File Uploaded", Toast.LENGTH_LONG).show();
                         progressDialog.dismiss();
                         finish();
                     });
         }).addOnProgressListener(snapshot -> {
-            double progress=(100.0 * snapshot.getBytesTransferred())/snapshot.getTotalByteCount();
-            progressDialog.setMessage("File Uploading.." +(int) progress + "%");
+            double progress = (100.0 * snapshot.getBytesTransferred()) / snapshot.getTotalByteCount();
+            progressDialog.setMessage("File Uploading.." + (int) progress + "%");
         });
 
     }
@@ -306,5 +288,34 @@ public class UploadVideoActivity extends AppCompatActivity {
 
 
         return res;
+    }
+
+    public class PutVideo {
+        public String title;
+        public String url;
+
+        public PutVideo() {
+        }
+
+        public PutVideo(String name, String url) {
+            this.title = name;
+            this.url = url;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
     }
 }

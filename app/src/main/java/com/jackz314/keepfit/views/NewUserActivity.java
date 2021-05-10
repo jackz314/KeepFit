@@ -5,7 +5,6 @@ import android.app.DatePickerDialog;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -13,8 +12,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -29,8 +26,8 @@ import java.util.Map;
 
 public class NewUserActivity extends AppCompatActivity {
 
+    private final FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private ActivityNewUserBinding b;
-
     private TextView mDisplayBirthday;
     private DatePickerDialog.OnDateSetListener mDateSetListener;
     private EditText mUsernameEditText;
@@ -38,7 +35,6 @@ public class NewUserActivity extends AppCompatActivity {
     private EditText mHeightEditText;
     private EditText mWeightEditText;
     private Calendar mBirthday = Calendar.getInstance();
-    private final FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +82,7 @@ public class NewUserActivity extends AppCompatActivity {
             }
 
             Map<String, Object> user = new HashMap<>();
-            user.put( "biography", mBiographyEditText.getText().toString());
+            user.put("biography", mBiographyEditText.getText().toString());
             user.put("birthday", mBirthday.getTime());
             user.put("email", mFirebaseUser.getEmail());
             user.put("height", height);
@@ -134,7 +130,7 @@ public class NewUserActivity extends AppCompatActivity {
             String date = month + "/" + day + "/" + year;
             mDisplayBirthday.setText(date);
             mBirthday = Calendar.getInstance();
-            mBirthday.set(year, month, day,0,0);
+            mBirthday.set(year, month, day, 0, 0);
         };
 
     }

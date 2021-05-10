@@ -21,56 +21,40 @@ package com.jackz314.keepfit.views.other;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.util.Log;
 import android.widget.TextView;
 
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.Locale;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 /**
  * Turns a TextView widget into a timer, with full stop-watch
  * functionality. Uses a Handler to update at a given time
  * interval.
- * 
+ * <p>
  * The constructor takes a TextView and a time in milliseconds,
  * specifying the update interval. This implementation is
  * independent of the TextView widget.
- *  
+ *
  * @author Euan Freeman
- * 
  * @see TextView
  * @see Handler
  */
 // from https://github.com/Sabirjan/Android-Stopwatch-TextView/blob/master/StopwatchTextView.java
 public class StopwatchTextView implements Runnable, Closeable {
 	private static final String TAG = "StopwatchTextView";
-
-	@Override
-	public void close() throws IOException {
-		handlerThread.quit();
-		handler.removeCallbacks(this);
-	}
-
-	public enum TimerState {STOPPED, PAUSED, RUNNING}
-
-    private final TextView widget;
+	private final TextView widget;
+	private final Handler handler;
+	private final HandlerThread handlerThread;
+	private final Activity activity;
 	private long updateInterval;
 	private long time;
 	private long startTime;
 	private TimerState state;
-	private final Handler handler;
-
 	private OnTimeUpdateListener updateListener;
 	private int listenerUpdateScale; // scale based on updateInterval
 
 	private int currScale;
-
-	private final HandlerThread handlerThread;
-
-	private final Activity activity;
 
 	public StopwatchTextView(TextView widget, long updateInterval, Activity activity) {
 		this.widget = widget;
@@ -84,6 +68,12 @@ public class StopwatchTextView implements Runnable, Closeable {
 		this.activity = activity;
 	}
 
+	@Override
+	public void close() throws IOException {
+		handlerThread.quit();
+		handler.removeCallbacks(this);
+	}
+
 	// don't call this directly
 	@Override
 	public void run() {
@@ -95,7 +85,7 @@ public class StopwatchTextView implements Runnable, Closeable {
 
 		if (updateListener != null) {
 			currScale += 1;
-			if (currScale >= listenerUpdateScale){
+			if (currScale >= listenerUpdateScale) {
 				currScale = 0;
 				updateListener.onTimeUpdate(getElapsedTime());
 			}
@@ -105,7 +95,7 @@ public class StopwatchTextView implements Runnable, Closeable {
 			handler.postDelayed(this, updateInterval);
 		}
 	}
-	
+
 	/**
 	 * Sets the timer into a running state and
 	 * initialises all time values.
@@ -113,7 +103,7 @@ public class StopwatchTextView implements Runnable, Closeable {
 	public void start() {
 		startTime = time = System.currentTimeMillis();
 		state = TimerState.RUNNING;
-		
+
 		handler.post(this);
 	}
 
@@ -129,18 +119,18 @@ public class StopwatchTextView implements Runnable, Closeable {
 	 */
 	public void pause() {
 		handler.removeCallbacks(this);
-		
+
 		state = TimerState.PAUSED;
 	}
-	
+
 	/**
 	 * Resumes the timer.
 	 */
 	public void resume() {
 		state = TimerState.RUNNING;
-		
+
 		startTime = System.currentTimeMillis() - (time - startTime);
-		
+
 		handler.post(this);
 	}
 
@@ -149,20 +139,19 @@ public class StopwatchTextView implements Runnable, Closeable {
 	 */
 	public void stop() {
 		handler.removeCallbacks(this);
-		
+
 		time = 0;
 		startTime = 0;
 		state = TimerState.STOPPED;
-		
+
 		widget.setText("00:00.000");
 	}
 
 	/**
 	 * Returns the interval (in ms) at which
 	 * the timer widget is updated.
-	 * 
-	 * @return
-	 * 		Time in milliseconds
+	 *
+	 * @return Time in milliseconds
 	 */
 	public long getUpdateInterval() {
 		return updateInterval;
@@ -171,19 +160,17 @@ public class StopwatchTextView implements Runnable, Closeable {
 	/**
 	 * Sets the update interval for the
 	 * timer widget.
-	 * 
-	 * @param updateInterval
-	 * 		Interval in milliseconds
+	 *
+	 * @param updateInterval Interval in milliseconds
 	 */
 	public void setUpdateInterval(long updateInterval) {
 		this.updateInterval = updateInterval;
 	}
-	
+
 	/**
 	 * Returns the current state of the stop-watch.
-	 * 
-	 * @return
-	 * 		State of stop-watch
+	 *
+	 * @return State of stop-watch
 	 */
 	public TimerState getState() {
 		return state;
@@ -191,19 +178,22 @@ public class StopwatchTextView implements Runnable, Closeable {
 
 	/**
 	 * Returns the elapsed time so far
+	 *
 	 * @return elapsed time in milliseconds
 	 */
 	public long getElapsedTime() {
 		return time - startTime;
 	}
 
-	public void setOnTimeUpdateListener(OnTimeUpdateListener listener, int updateScale){
+	public void setOnTimeUpdateListener(OnTimeUpdateListener listener, int updateScale) {
 		updateListener = listener;
 		listenerUpdateScale = updateScale;
 	}
 
+	public enum TimerState {STOPPED, PAUSED, RUNNING}
+
 	@FunctionalInterface
-	public interface OnTimeUpdateListener{
+	public interface OnTimeUpdateListener {
 		void onTimeUpdate(long elapsedTime);
 	}
 

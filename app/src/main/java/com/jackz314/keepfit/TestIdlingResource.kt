@@ -5,8 +5,7 @@ object TestIdlingResource {
     private const val RESOURCE = "GLOBAL"
 
     @JvmField
-    val countingIdlingResource
-        = SimpleCountingIdlingResource(RESOURCE)
+    val countingIdlingResource = SimpleCountingIdlingResource(RESOURCE)
 
     @JvmStatic
     fun increment() {

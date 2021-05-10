@@ -19,7 +19,6 @@ import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.api.ResourceDescriptor;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
@@ -28,9 +27,6 @@ import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
-import com.jackz314.keepfit.views.FeedFragment;
-import com.jackz314.keepfit.views.HistoryFragment;
-import com.jackz314.keepfit.views.LikedVideosFragment;
 import com.jackz314.keepfit.views.SearchActivity;
 import com.jackz314.keepfit.views.UserProfileActivity;
 import com.like.LikeButton;
@@ -49,12 +45,11 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
 
     private final List<Media> mData;
     private final LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
     private final HashSet<String> likedVideos = new HashSet<>();
     private final HashSet<String> dislikedVideos = new HashSet<>();
-    private Context con;
-
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
+    private final Context con;
+    private ItemClickListener mClickListener;
 
 
     // data is passed into the constructor
@@ -73,7 +68,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
                 likedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus("liked");
+            updateMediaListLikeStatus(true);
         }));
         UserControllerKt.getCurrentUserDoc().collection("disliked_videos").addSnapshotListener(((value, e) -> {
             if (e != null || value == null) {
@@ -86,23 +81,21 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
                 dislikedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus("disliked");
+            updateMediaListLikeStatus(false);
         }));
     }
 
-    private void updateMediaListLikeStatus(String video) {
-        if (video == "liked") {
+    private void updateMediaListLikeStatus(boolean liked) {
+        if (liked) {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 Media media = mData.get(i);
-                boolean isLiked =likedVideos.contains(media.getUid());
+                boolean isLiked = likedVideos.contains(media.getUid());
 
                 if (media.getLiked() != isLiked) {
                     media.setLiked(isLiked);
-                    notifyItemChanged(i);
                 }
             }
-        }
-        else {
+        } else {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 Media media = mData.get(i);
 
@@ -110,15 +103,15 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
 
                 if (media.getDisliked() != isDisliked) {
                     media.setDisliked(isDisliked);
-                    notifyItemChanged(i);
                 }
             }
         }
+        notifyDataSetChanged();
     }
 
-    public void notifyDataChanged(){
-        updateMediaListLikeStatus("liked");
-        updateMediaListLikeStatus("disliked");
+    public void notifyDataChanged() {
+        updateMediaListLikeStatus(true);
+        updateMediaListLikeStatus(false);
     }
 
     // inflates the row layout from xml when needed
@@ -135,16 +128,17 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
         Media media = mData.get(position);
         holder.titleText.setText(media.getTitle());
 
-        if(media.isLivestream()){
+        if (media.isLivestream()) {
             holder.durationText.setText("LIVE");
-            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8,0x03, 0x06)));
-        }else{
+            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8, 0x03, 0x06)));
+        } else {
             holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
             holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         }
 
         String thumbnail;
-        if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
+        if (media.isLivestream() || !"".equals(media.getThumbnail()))
+            thumbnail = media.getThumbnail();
         else thumbnail = media.getLink();
         Glide.with(holder.image)
                 .load(thumbnail)
@@ -158,7 +152,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
             media.getCreator().observeForever(new Observer<User>() {
                 @Override
                 public void onChanged(User user) {
-                    if(user != null && user.getUid() != null){
+                    if (user != null && user.getUid() != null) {
                         long duration = System.currentTimeMillis() - start;
                         Log.d(TAG, "onBindViewHolder: duration: " + duration);
                         media.getCreator().removeObserver(this);
@@ -166,7 +160,7 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
                     }
                 }
             });
-        }else{
+        } else {
             populateCreatorInfo(holder, media, creator);
         }
 
@@ -177,17 +171,19 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
         holder.likeButton.setOnLikeListener(new OnLikeListener() {
             @Override
             public void liked(LikeButton likeButton) {
-                if(holder.dislikeButton.isLiked()) {
+                if (holder.dislikeButton.isLiked()) {
                     holder.dislikeButton.callOnClick();
                 }
                 UserControllerKt.likeVideo(media.getUid());
                 VideoController.likeVideo(media.getUid());
+                media.setLikes(media.getLikes() + 1); // no listener, so manually update
             }
 
             @Override
             public void unLiked(LikeButton likeButton) {
                 UserControllerKt.unlikeVideo(media.getUid());
                 VideoController.unlikeVideo(media.getUid());
+                media.setLikes(media.getLikes() - 1);
             }
         });
         holder.dislikeButton.setOnLikeListener(new OnLikeListener() {
@@ -198,12 +194,14 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
                 }
                 UserControllerKt.dislikeVideo(media.getUid());
                 VideoController.dislikeVideo(media.getUid());
+                media.setDislikes(media.getDislikes() + 1); // no listener, so manually update
             }
 
             @Override
             public void unLiked(LikeButton likeButton) {
                 UserControllerKt.undislikeVideo(media.getUid());
                 VideoController.undislikeVideo(media.getUid());
+                media.setDislikes(media.getDislikes() - 1); // no listener, so manually update
             }
         });
 
@@ -283,13 +281,27 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
     }
 
 
-
     // total number of rows
     @Override
     public int getItemCount() {
         return mData.size();
     }
 
+    // convenience method for getting data at click position
+    public Media getItem(int id) {
+        return mData.get(id);
+    }
+
+    // allows clicks events to be caught
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    // parent activity will implement this method to respond to click events
+    @FunctionalInterface
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
+    }
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -321,21 +333,5 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
-    }
-
-    // convenience method for getting data at click position
-    public Media getItem(int id) {
-        return mData.get(id);
-    }
-
-    // allows clicks events to be caught
-    public void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    @FunctionalInterface
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
     }
 }

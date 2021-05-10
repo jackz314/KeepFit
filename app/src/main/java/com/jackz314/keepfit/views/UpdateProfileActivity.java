@@ -1,29 +1,13 @@
 package com.jackz314.keepfit.views;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -33,6 +17,12 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
@@ -44,17 +34,23 @@ import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.models.User;
 
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class UpdateProfileActivity extends AppCompatActivity {
 
+    private final FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+    // request code
+    private final int PICK_IMAGE_REQUEST = 22;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+    boolean imgChosen = false;
+    boolean imgUploaded = false;
+    String imgLink = "";
+    StorageReference storageReference;
     private TextView mDisplayBirthday;
     private DatePickerDialog.OnDateSetListener mDateSetListener;
     private EditText mUsernameEditText;
@@ -62,31 +58,20 @@ public class UpdateProfileActivity extends AppCompatActivity {
     private EditText mHeightEditText;
     private EditText mWeightEditText;
     private Calendar mBirthday = Calendar.getInstance();
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final FirebaseUser mFirebaseUser = FirebaseAuth.getInstance().getCurrentUser();
     private Map mCurrentData;
-
     private String originalName;
     private String originalBio;
     private int originalWeight;
     private int originalHeight;
     private Date originalBirthday;
-
+    private String originalPhoto;
     /////
     // views for button
-    private Button btnSelect, btnUpload;
+    private Button btnSelect;
     // view for image view
     private ImageView imageView;
-
-
     // Uri indicates, where the image will be picked from
     private Uri filePath = null;
-    String imgLink = "";
-
-    StorageReference storageReference;
-
-    // request code
-    private final int PICK_IMAGE_REQUEST = 22;
     /////
 
     @Override
@@ -106,13 +91,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
         btnSelect = findViewById(R.id.btnChoose);
         imageView = findViewById(R.id.imgView);
 
-        btnSelect.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                selectImage();
-            }
-        });
+        btnSelect.setOnClickListener(v -> selectImage());
 
 
         Button finishEdit = findViewById(R.id.finish_new_user_btn);
@@ -123,99 +102,93 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 .addOnCompleteListener(task -> {
                     DocumentSnapshot dataResult = task.getResult();
                     originalName = (String) dataResult.getString("name");
-                    originalBio =(String) dataResult.getString("biography");
+                    originalBio = (String) dataResult.getString("biography");
                     originalWeight = dataResult.getLong("weight").intValue();
                     originalHeight = dataResult.getLong("height").intValue();
                     originalBirthday = dataResult.getDate("birthday");
+                    originalPhoto = dataResult.getString("profile_pic");
                 });
 
 
-
         finishEdit.setOnClickListener(view -> {
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            mUsernameEditText = findViewById(R.id.editTextUsername);
-            String strUsername = mUsernameEditText.getText().toString();
-            if (TextUtils.isEmpty(strUsername)) {
-                //get current data
-                strUsername = originalName;
-            }
+            if (imgChosen == imgUploaded) {
+                mUsernameEditText = findViewById(R.id.editTextUsername);
+                String strUsername = mUsernameEditText.getText().toString();
+                if (TextUtils.isEmpty(strUsername)) {
+                    //get current data
+                    strUsername = originalName;
+                }
 
-            String bio = "";
-            if (mBiographyEditText.getText().toString().matches("")) {
-                //get current data
-                bio = originalBio;
-            } else {
-                bio = mBiographyEditText.getText().toString();
-            }
+                String bio = "";
+                if (mBiographyEditText.getText().toString().matches("")) {
+                    //get current data
+                    bio = originalBio;
+                } else {
+                    bio = mBiographyEditText.getText().toString();
+                }
 
+                Spinner spinner = findViewById(R.id.sex);
+                boolean sex = true;
+                if (spinner.getSelectedItem().toString().matches("Female")) {
+                    sex = false;
+                }
 
-            Spinner spinner = findViewById(R.id.sex);
-            boolean sex = true;
-            if (spinner.getSelectedItem().toString().matches("Female")) {
-                sex = false;
-            }
+                double height = 0.0;
+                if (!mHeightEditText.getText().toString().matches("")) {
+                    height = Double.parseDouble(mHeightEditText.getText().toString());
+                    height = 2.54 * height;
+                } else {
+                    //get current data
+                    height = originalHeight;
+                }
 
-            double height = 0.0;
-            if (!mHeightEditText.getText().toString().matches("")) {
-                height = Double.parseDouble(mHeightEditText.getText().toString());
-                height = 2.54 * height;
-            } else {
-                //get current data
-                height = originalHeight;
-            }
+                double weight = 0.0;
+                if (!mWeightEditText.getText().toString().matches("")) {
+                    weight = Double.parseDouble(mWeightEditText.getText().toString());
+                    weight = 0.453592 * weight;
+                } else {
+                    //get current data
+                    weight = originalWeight;
+                }
 
-            double weight = 0.0;
-            if (!mWeightEditText.getText().toString().matches("")) {
-                weight = Double.parseDouble(mWeightEditText.getText().toString());
-                weight = 0.453592 * weight;
-            } else {
-                //get current data
-                weight = originalWeight;
-            }
+                Map<String, Object> user = new HashMap<>();
+                user.put("biography", bio);
+                //birthday check
+                if (mBirthday.get(Calendar.YEAR) >= java.time.LocalDate.now().getYear()) {
+                    user.put("birthday", originalBirthday);
+                } else {
+                    user.put("birthday", mBirthday.getTime());
+                }
+                user.put("email", mFirebaseUser.getEmail());
+                user.put("height", height);
+                user.put("name", strUsername);
 
-            Map<String, Object> user = new HashMap<>();
-            user.put( "biography", bio);
-            //birthday check
-            if (mBirthday.get(Calendar.YEAR) >= java.time.LocalDate.now().getYear()){
-                user.put("birthday", originalBirthday);
-            } else {
-                user.put("birthday", mBirthday.getTime());
-            }
-            user.put("email", mFirebaseUser.getEmail());
-            user.put("height", height);
-            user.put("name", strUsername);
-            ////
-            String photoStr;
-            if (filePath == null) {
-                Uri photoUrl = mFirebaseUser.getPhotoUrl();
-                if (photoUrl == null) photoStr = "";
-                else photoStr = photoUrl.toString();
-                Log.d("Update Profile", "Link: null" );
+                String photoStr;
+                if (filePath == null) {
+                    photoStr = originalPhoto;
+                    Log.d("Update Profile", "Link: null");
+                } else {
+                    photoStr = imgLink;
+                    Log.d("Update Profile", "Link: not null");
+                }
                 Log.d("Update Profile", "Link: " + photoStr);
+                user.put("profile_pic", photoStr);
+                user.put("sex", sex);
+                user.put("weight", weight);
+
+                if (!strUsername.equals(mFirebaseUser.getDisplayName())) {
+                    mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(strUsername).build());
+                }
+
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("users")
+                        .document(mFirebaseUser.getUid())
+                        .update(user)
+                        .addOnSuccessListener(aVoid -> finish())
+                        .addOnFailureListener(e -> Toast.makeText(UpdateProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show());
             } else {
-                photoStr = imgLink;
-                Log.d("Update Profile", "Link: not null");
-                Log.d("Update Profile", "Link: " + photoStr);
+                Toast.makeText(UpdateProfileActivity.this, "Please wait for image to upload", Toast.LENGTH_LONG).show();
             }
-            user.put("profile_pic", photoStr);
-            user.put("sex", sex);
-            user.put("weight", weight);
-
-            if (!strUsername.equals(mFirebaseUser.getDisplayName())) {
-                mFirebaseUser.updateProfile(new UserProfileChangeRequest.Builder().setDisplayName(strUsername).build());
-            }
-
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("users")
-                    .document(mFirebaseUser.getUid())
-                    .update(user)
-                    .addOnSuccessListener(aVoid -> finish())
-                    .addOnFailureListener(e -> Toast.makeText(UpdateProfileActivity.this, "Error updating profile", Toast.LENGTH_SHORT).show());
-            setResult(Activity.RESULT_OK);
         });
 
         Spinner spinner = findViewById(R.id.sex);
@@ -252,9 +225,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
 
 
     // Select Image method
-    private void selectImage()
-    {
-
+    private void selectImage() {
         // Defining Implicit Intent to mobile gallery
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -269,8 +240,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode,
                                     int resultCode,
-                                    Intent data)
-    {
+                                    Intent data) {
 
         super.onActivityResult(requestCode,
                 resultCode,
@@ -284,8 +254,9 @@ public class UpdateProfileActivity extends AppCompatActivity {
                 && resultCode == RESULT_OK
                 && data != null
                 && data.getData() != null) {
-
+            imgChosen = true;
             // Get the Uri of data
+
             filePath = data.getData();
             try {
 
@@ -297,9 +268,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                                 getContentResolver(),
                                 filePath);
                 imageView.setImageBitmap(bitmap);
-            }
-
-            catch (IOException e) {
+            } catch (IOException e) {
                 // Log the exception
                 e.printStackTrace();
             }
@@ -310,19 +279,17 @@ public class UpdateProfileActivity extends AppCompatActivity {
     }
 
 
-
     // UploadImage method
     private void uploadImage() {
+        // Defining the child of storageReference
+        StorageReference ref
+                = storageReference
+                .child(
+                        "images/"
+                                + mFirebaseUser.getUid());
+        // adding listeners on upload
         if (filePath != null) {
-            // Defining the child of storageReference
-            StorageReference ref
-                    = storageReference
-                    .child(
-                            "images/"
-                                    + mFirebaseUser.getUid());
-
-            // adding listeners on upload
-            // or failure of image
+            Toast.makeText(UpdateProfileActivity.this, "Profile picture uploading", Toast.LENGTH_LONG).show();
             ref.putFile(filePath)
                     .addOnSuccessListener(
                             new OnSuccessListener<UploadTask.TaskSnapshot>() {
@@ -331,15 +298,15 @@ public class UpdateProfileActivity extends AppCompatActivity {
                                 public void onSuccess(
                                         UploadTask.TaskSnapshot taskSnapshot) {
                                     Log.d("Update Profile", "Uploaded!");
-
+                                    Toast.makeText(UpdateProfileActivity.this, "Profile picture uploaded!", Toast.LENGTH_SHORT).show();
                                     /////from upload video
                                     Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
-                                    while (!uriTask.isComplete());
+                                    while (!uriTask.isComplete()) ;
                                     Uri uri = uriTask.getResult();
 
                                     imgLink = uri.toString();
                                     Log.d("Update Profile", imgLink);
-
+                                    imgUploaded = true;
                                     /////
                                 }
                             })
@@ -347,7 +314,8 @@ public class UpdateProfileActivity extends AppCompatActivity {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(@NonNull Exception e) {
-                            Log.d("Update Profile", "Failed to Upload");
+                            Log.d("Update Profile", "Failed to upload");
+                            Toast.makeText(UpdateProfileActivity.this, "Failed to upload profile picture", Toast.LENGTH_SHORT).show();
                         }
                     })
                     .addOnProgressListener(

@@ -40,6 +40,55 @@ public class ExerciseController {
         this.met = met;
     }
 
+    public static void deleteExercise(String uid) {
+        UserControllerKt.getCurrentUserDoc().collection("exercises").document(uid).delete();
+    }
+
+    public static float getMETofIntensity(int intensity) {
+        if (intensity == 1) {
+            return 5;
+        } else if (intensity == 2) {
+            return 10;
+        } else {
+            return 15;
+        }
+    }
+
+    public static String getStrOfIntensity(int intensity) {
+        if (intensity == 1) return "Light";
+        else if (intensity == 2) return "Moderate";
+        else return "Vigorous";
+    }
+
+    public static List<Exercise> getTodayExercises(List<Exercise> exercises) {
+        Date todayStartTime = Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+        return exercises.stream().filter(ex -> ex.getStartingTime().after(todayStartTime)).collect(Collectors.toList());
+    }
+
+    public static double getTotalCalories(List<Exercise> exercises) {
+        return exercises.stream().mapToDouble(Exercise::getCalories).sum();
+    }
+
+    public static long getTotalExerciseTime(List<Exercise> exercises) {
+        return exercises.stream().mapToLong(Exercise::getElapsedTime).sum();
+    }
+
+    public static void setMostRecentExercise(Context context, String exercise) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        prefs.edit().putString(GlobalConstants.RECENT_EXERCISE_KEY, exercise).apply();
+    }
+
+    public static String getMostRecentExercise(Context context) {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        return prefs.getString(GlobalConstants.RECENT_EXERCISE_KEY, null);
+    }
+
+    public static String[] getExerciseCategoryArray(Context context) {
+        if (exerciseCategories == null)
+            exerciseCategories = context.getResources().getStringArray(R.array.exercise_categories);
+        return exerciseCategories;
+    }
+
     public void setUser(User user) {
         this.user = user;
     }
@@ -96,54 +145,5 @@ public class ExerciseController {
 
         FirebaseFirestore.getInstance().collection("users").document(uid).collection("exercises")
                 .add(exercise);
-    }
-
-    public static void deleteExercise(String uid) {
-        UserControllerKt.getCurrentUserDoc().collection("exercises").document(uid).delete();
-    }
-
-    public static float getMETofIntensity(int intensity) {
-        if (intensity == 1) {
-            return 5;
-        } else if (intensity == 2) {
-            return 10;
-        } else {
-            return 15;
-        }
-    }
-
-    public static String getStrOfIntensity(int intensity) {
-        if (intensity == 1) return "Light";
-        else if (intensity == 2) return "Moderate";
-        else return "Vigorous";
-    }
-
-    public static List<Exercise> getTodayExercises(List<Exercise> exercises) {
-        Date todayStartTime = Date.from(LocalDate.now().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
-        return exercises.stream().filter(ex -> ex.getStartingTime().after(todayStartTime)).collect(Collectors.toList());
-    }
-
-    public static double getTotalCalories(List<Exercise> exercises) {
-        return exercises.stream().mapToDouble(Exercise::getCalories).sum();
-    }
-
-    public static long getTotalExerciseTime(List<Exercise> exercises) {
-        return exercises.stream().mapToLong(Exercise::getElapsedTime).sum();
-    }
-
-    public static void setMostRecentExercise(Context context, String exercise) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        prefs.edit().putString(GlobalConstants.RECENT_EXERCISE_KEY, exercise).apply();
-    }
-
-    public static String getMostRecentExercise(Context context) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
-        return prefs.getString(GlobalConstants.RECENT_EXERCISE_KEY, null);
-    }
-
-    public static String[] getExerciseCategoryArray(Context context) {
-        if (exerciseCategories == null)
-            exerciseCategories = context.getResources().getStringArray(R.array.exercise_categories);
-        return exerciseCategories;
     }
 }

@@ -17,39 +17,30 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
-import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.models.Comment;
-import com.jackz314.keepfit.models.Media;
 import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.UserProfileActivity;
 import com.jackz314.keepfit.views.VideoActivity;
-import com.jackz314.keepfit.views.VideosFragment;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecyclerAdapter.CommentViewHolder>{
-    FirebaseFirestore db = FirebaseFirestore.getInstance();
+public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecyclerAdapter.CommentViewHolder> {
     private static final String TAG = "CommentRecyclerAdapter";
-
     private final List<Comment> mData;
     private final LayoutInflater mInflater;
+    private final VideoActivity videoActivity;
     private VideosRecyclerAdapter.ItemClickListener mClickListener;
-
-    private VideoActivity videoActivity;
-
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
-    public CommentRecyclerAdapter(Context context, List<Comment> data, VideoActivity videoActivity){
+    public CommentRecyclerAdapter(Context context, List<Comment> data, VideoActivity videoActivity) {
         this.mInflater = LayoutInflater.from(context);
         this.mData = data;
         this.videoActivity = videoActivity;
@@ -96,7 +87,6 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
         holder.mUploadTime.setText(convertStringToDate(comment.getUploadTime()));
 
 
-
         holder.mProfilePic.setOnClickListener(v -> {
             Intent in = new Intent(v.getContext(), UserProfileActivity.class);
             DocumentReference docRef2 = db.collection("users").document(comment.getUid());
@@ -124,7 +114,7 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
         holder.deleteButton.setOnClickListener(v -> {
             new AlertDialog.Builder(videoActivity)
                     .setMessage("Do you want to delete the comment?")
-                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> videoActivity.deleteComment(comment.getUid(),comment.getCid(), comment.getMid()))
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> videoActivity.deleteComment(comment.getUid(), comment.getCid(), comment.getMid()))
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
@@ -132,16 +122,15 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
 
     }
 
-    public String convertStringToDate(Date indate)
-    {
+    public String convertStringToDate(Date indate) {
         String dateString = null;
         SimpleDateFormat sdfr = new SimpleDateFormat(" hh:mm:ss dd/MMM/yy");
         /*you can also use DateFormat reference instead of SimpleDateFormat
          * like this: DateFormat df = new SimpleDateFormat("dd/MMM/yyyy");
          */
-        try{
-            dateString = sdfr.format( indate );
-        }catch (Exception ex ){
+        try {
+            dateString = sdfr.format(indate);
+        } catch (Exception ex) {
             System.out.println(ex);
         }
         return dateString;
@@ -152,13 +141,23 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
         return mData.size();
     }
 
-    public class CommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
-        private TextView mUsername;
-        private TextView mText;
-        private TextView mUploadTime;
-        private ImageView mProfilePic;
-        private ImageButton deleteButton;
+    public void setClickListener(VideosRecyclerAdapter.ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    // parent activity will implement this method to respond to click events
+    @FunctionalInterface
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
+    }
+
+    public class CommentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         String uid;
+        private final TextView mUsername;
+        private final TextView mText;
+        private final TextView mUploadTime;
+        private final ImageView mProfilePic;
+        private final ImageButton deleteButton;
 
         public CommentViewHolder(View itemView) {
             super(itemView);
@@ -176,15 +175,6 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
     }
-
-    public void setClickListener(VideosRecyclerAdapter.ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    @FunctionalInterface
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
-    }
 }
+
 

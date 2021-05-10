@@ -2,7 +2,6 @@ package com.jackz314.keepfit.views.other;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnMultiChoiceClickListener;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
@@ -32,7 +31,6 @@ import com.jackz314.keepfit.views.SearchActivity;
 import com.jackz314.keepfit.views.VideosFragment;
 import com.like.LikeButton;
 
-
 import java.util.HashSet;
 import java.util.List;
 
@@ -45,11 +43,10 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
 
     private final List<Media> mData;
     private final LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
     private final HashSet<String> ownVideos = new HashSet<>();
     private final VideosFragment frag;
-
     private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
+    private ItemClickListener mClickListener;
 
 
     // data is passed into the constructor
@@ -72,8 +69,7 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
     }
 
 
-
-    public void notifyDataChanged(){
+    public void notifyDataChanged() {
 
         super.notifyDataSetChanged();
     }
@@ -92,16 +88,17 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
         Media media = mData.get(position);
         holder.titleText.setText(media.getTitle());
 
-        if(media.isLivestream()){
+        if (media.isLivestream()) {
             holder.durationText.setText("LIVE");
-            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8,0x03, 0x06)));
-        }else{
+            holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.rgb(0xB8, 0x03, 0x06)));
+        } else {
             holder.durationText.setText(UtilsKt.formatDurationString(media.getDuration()));
             holder.durationText.setBackgroundTintList(ColorStateList.valueOf(Color.BLACK));
         }
 
         String thumbnail;
-        if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
+        if (media.isLivestream() || !"".equals(media.getThumbnail()))
+            thumbnail = media.getThumbnail();
         else thumbnail = media.getLink();
         Glide.with(holder.image)
                 .load(thumbnail)
@@ -115,7 +112,7 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
             media.getCreator().observeForever(new Observer<User>() {
                 @Override
                 public void onChanged(User user) {
-                    if(user != null && user.getUid() != null){
+                    if (user != null && user.getUid() != null) {
                         long duration = System.currentTimeMillis() - start;
                         Log.d(TAG, "onBindViewHolder: duration: " + duration);
                         media.getCreator().removeObserver(this);
@@ -123,13 +120,13 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
                     }
                 }
             });
-        }else{
+        } else {
             populateCreatorInfo(holder, media, creator);
         }
         holder.deleteButton.setOnClickListener(v -> {
             new AlertDialog.Builder(frag.getContext())
                     .setMessage(R.string.delete_video_confirm)
-                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> frag.deleteVideo(media.getUid(),media.getCreatorRef().getId(),media.getLink()))
+                    .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> frag.deleteVideo(media.getUid(), media.getCreatorRef().getId(), media.getLink()))
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
@@ -198,13 +195,27 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
     }
 
 
-
     // total number of rows
     @Override
     public int getItemCount() {
         return mData.size();
     }
 
+    // convenience method for getting data at click position
+    public Media getItem(int id) {
+        return mData.get(id);
+    }
+
+    // allows clicks events to be caught
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    // parent activity will implement this method to respond to click events
+    @FunctionalInterface
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
+    }
 
     // stores and recycles views as they are scrolled off screen
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -239,21 +250,5 @@ public class VideosRecyclerAdapter extends RecyclerView.Adapter<VideosRecyclerAd
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
         }
-    }
-
-    // convenience method for getting data at click position
-    public Media getItem(int id) {
-        return mData.get(id);
-    }
-
-    // allows clicks events to be caught
-    public void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    @FunctionalInterface
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
     }
 }

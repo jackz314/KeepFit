@@ -19,12 +19,12 @@ public class SearchResult {
         return isUser;
     }
 
-    public void setUser(boolean user) {
-        isUser = user;
-    }
-
     public User getUser() {
         return user;
+    }
+
+    public void setUser(boolean user) {
+        isUser = user;
     }
 
     public void setUser(User user) {

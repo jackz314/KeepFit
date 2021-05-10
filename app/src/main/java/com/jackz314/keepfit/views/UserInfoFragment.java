@@ -1,12 +1,14 @@
 package com.jackz314.keepfit.views;
 
 import android.annotation.SuppressLint;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.SearchRecentSuggestions;
+import android.text.format.DateFormat;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +17,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -37,6 +38,7 @@ import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.Utils;
 import com.jackz314.keepfit.UtilsKt;
 import com.jackz314.keepfit.controllers.ExerciseController;
+import com.jackz314.keepfit.controllers.SchedulingController;
 import com.jackz314.keepfit.controllers.SearchHistoryController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentUserInfoBinding;
@@ -47,7 +49,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -67,18 +71,12 @@ import static com.jackz314.keepfit.GlobalConstants.RC_REAUTH_DELETE;
 public class UserInfoFragment extends Fragment {
 
     private static final String TAG = "userInfoFragment";
-
-    private FragmentUserInfoBinding b;
-
-    private FirebaseAuth.AuthStateListener authStateListener;
-
     private final List<Exercise> exerciseList = new ArrayList<>();
-    private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
-
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
-
     private final ExecutorService es = Executors.newSingleThreadExecutor();
-
+    private FragmentUserInfoBinding b;
+    private FirebaseAuth.AuthStateListener authStateListener;
+    private ExerciseRecyclerAdapter exerciseRecyclerAdapter;
     private MenuItem clearExerciseItem;
 
 
@@ -99,7 +97,7 @@ public class UserInfoFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         //        View root = inflater.inflate(R.layout.fragment_me, container, false);
-        if (b == null){
+        if (b == null) {
             // view binding ftw!
             b = FragmentUserInfoBinding.inflate(inflater, container, false);
 
@@ -124,7 +122,7 @@ public class UserInfoFragment extends Fragment {
                 exerciseList.addAll(value.toObjects(Exercise.class));
                 exerciseRecyclerAdapter.notifyDataSetChanged();
 
-                if (!exerciseList.isEmpty()){
+                if (!exerciseList.isEmpty()) {
                     if (clearExerciseItem != null) clearExerciseItem.setVisible(true);
                     b.emptyExerciseLogText.setVisibility(View.GONE);
                 } else {
@@ -151,8 +149,7 @@ public class UserInfoFragment extends Fragment {
             SimpleDateFormat df = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
             String date = df.format(c);
             String str = sharedPref.getString("LAST_LAUNCH_DATE", "");
-            if (!str.equals(date))
-            {
+            if (!str.equals(date)) {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString("LAST_LAUNCH_DATE", date);
                 editor.apply();
@@ -160,21 +157,21 @@ public class UserInfoFragment extends Fragment {
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
                 builder.setTitle("Today's recommended workout")
-                    .setMessage(recentExercise)
-                    .setPositiveButton("GO", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            Intent intent = new Intent(getContext(), SearchActivity.class);
-                            intent.putExtra(GlobalConstants.SEARCH_QUERY, recentExercise);
-                            getContext().startActivity(intent);
-                        }
-                    })
-                    .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            // User cancelled the dialog
-                        }
-                    })
-                    .create()
-                    .show();
+                        .setMessage(recentExercise)
+                        .setPositiveButton("GO", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                Intent intent = new Intent(getContext(), PromptActivity.class);
+                                intent.setAction(GlobalConstants.ACTION_EXERCISE);
+                                getContext().startActivity(intent);
+                            }
+                        })
+                        .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int id) {
+                                // User cancelled the dialog
+                            }
+                        })
+                        .create()
+                        .show();
             }
         }
 
@@ -188,8 +185,8 @@ public class UserInfoFragment extends Fragment {
                 b.userNameText.setText(getGreetingMsg() + user.getName());
                 b.userEmailText.setText(user.getEmail());
                 b.userHeightText.setText(Utils.centimeterToFeet(user.getHeight()));
-                b.userWeightText.setText((int)(user.getWeight() *  2.205) + " lbs");
-                b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0,0, user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24,0);
+                b.userWeightText.setText((int) (user.getWeight() * 2.205) + " lbs");
+                b.userNameText.setCompoundDrawablesWithIntrinsicBounds(0, 0, user.getSex() ? R.drawable.ic_baseline_male_24 : R.drawable.ic_baseline_female_24, 0);
                 b.userBirthdayText.setText(DateUtils.formatDateTime(getContext(), user.getBirthday().getTime(),
                         DateUtils.FORMAT_ABBREV_ALL | DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_YEAR));
                 b.userBiographyText.setText(user.getBiography());
@@ -202,8 +199,8 @@ public class UserInfoFragment extends Fragment {
                             .into(b.userProfilePicture);
                 }
             }
-        },throwable -> {
-            Log.d(TAG,"no current user, sign in required");
+        }, throwable -> {
+            Log.d(TAG, "no current user, sign in required");
         });
         compositeDisposable.add(disposable);
     }
@@ -277,7 +274,7 @@ public class UserInfoFragment extends Fragment {
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> clearExerciseLog())
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
-        }else if (item.getItemId() == R.id.clear_search_history_btn){
+        } else if (item.getItemId() == R.id.clear_search_history_btn) {
             new AlertDialog.Builder(requireContext())
                     .setMessage(R.string.clear_search_log_confirm_msg)
                     .setPositiveButton(android.R.string.ok, (dialogInterface, i) -> {
@@ -286,6 +283,28 @@ public class UserInfoFragment extends Fragment {
                         suggestions.clearHistory();
                     })
                     .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        } else if (item.getItemId() == R.id.daily_notif_btn) {
+            new AlertDialog.Builder(requireContext())
+                    .setMessage(R.string.daily_notif_setting_msg)
+                    .setPositiveButton("Yes", (dialogInterface, i) -> {
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+                        long lastDailyNotifScheduledTime = prefs.getLong(GlobalConstants.DAILY_NOTIF_SCHEDULED_TIME, 0);
+                        if (lastDailyNotifScheduledTime == 0)
+                            lastDailyNotifScheduledTime = System.currentTimeMillis();
+                        ZonedDateTime time = Instant.ofEpochMilli(lastDailyNotifScheduledTime).atZone(ZoneId.systemDefault());
+                        new TimePickerDialog(requireContext(), (view, hour, minute) -> {
+                            Instant scheduleTime = time.with(LocalTime.of(hour, minute)).toInstant();
+                            long scheduledMillis = scheduleTime.toEpochMilli();
+                            SchedulingController.scheduleDailyNotifications(requireContext(), scheduledMillis);
+                            Toast.makeText(requireContext(), "Daily notifications scheduled at " +
+                                    DateUtils.formatDateTime(requireContext(), scheduledMillis, DateUtils.FORMAT_SHOW_TIME), Toast.LENGTH_SHORT).show();
+                        }, time.getHour(), time.getMinute(), DateFormat.is24HourFormat(requireContext())).show();
+                    }).setNegativeButton("No", (dialog, which) -> {
+                SchedulingController.cancelDailyNotifications(requireContext());
+                SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+                prefs.edit().putLong(GlobalConstants.DAILY_NOTIF_SCHEDULED_TIME, 0).apply();
+            })
                     .show();
         }
         return super.onOptionsItemSelected(item);
@@ -353,7 +372,7 @@ public class UserInfoFragment extends Fragment {
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         populateUserInfo();
     }

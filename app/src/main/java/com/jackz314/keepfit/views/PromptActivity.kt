@@ -80,6 +80,7 @@ class PromptActivity : AppCompatActivity() {
                 titleValid = true
                 b.promptDescription.text = "Track Exercise"
                 titleValid = true
+                b.promptMaxParticipants.visibility = View.GONE
                 val recentExercise = ExerciseController.getMostRecentExercise(this)
                 val exerciseCategories = ExerciseController.getExerciseCategoryArray(this).toMutableList()
                 if (recentExercise != null) exerciseCategories.add(0, "$recentExercise • Most Recent")
@@ -133,26 +134,26 @@ class PromptActivity : AppCompatActivity() {
             val categoryStr = selectedChips.joinToString();*/
             val categoryView = findViewById<TextView>(R.id.prompt_category_select)
             intent.putExtra(GlobalConstants.EXERCISE_TYPE, categoryView.text.toString())
+            var maxParticipants = b.promptMaxParticipants.text.toString()
+            if (maxParticipants.isEmpty()) {
+                maxParticipants = "100"
+            } else if (maxParticipants.toInt() >= 100) {
+                maxParticipants = "100"
+            } else if (maxParticipants.toInt() == 0) {
+                maxParticipants = "1"
+            }
+            intent.putExtra(GlobalConstants.MAX_PARTICIPANTS, maxParticipants)
             startActivity(intent)
         } else {
             if (intent.hasExtra(GlobalConstants.SCHEDULED_EXERCISE)) {
                 SchedulingController.cancelScheduledExercise(this, intent.getSerializableExtra(GlobalConstants.SCHEDULED_EXERCISE) as ScheduledExercise)
             }
             //check if the exercise is sit up to start that activity
-            val exerc = b.promptCategoryDropdown.selectedItem.toString()
-            if (exerc.contains("Most Recent")) {
-                val intent = Intent(this, ExerciseActivity::class.java)
-                intent.putExtra(GlobalConstants.EXERCISE_TYPE, ExerciseController.getMostRecentExercise(this))
-                intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
-                startActivity(intent)
-            }
-            else {
-                val intent = Intent(this, ExerciseActivity::class.java)
-                intent.putExtra(GlobalConstants.EXERCISE_TYPE, b.promptCategoryDropdown.selectedItem.toString())
-                intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
-                startActivity(intent)
-            }
-            
+            val exercise = b.promptCategoryDropdown.selectedItem.toString().replace(" • Most Recent", "", true)
+            val intent = Intent(this, ExerciseActivity::class.java)
+            intent.putExtra(GlobalConstants.EXERCISE_TYPE, exercise)
+            intent.putExtra(GlobalConstants.EXERCISE_INTENSITY, getIntensityValue(b.promptExerciseIntensity.checkedChipId))
+            startActivity(intent)
         }
         finish()
     }

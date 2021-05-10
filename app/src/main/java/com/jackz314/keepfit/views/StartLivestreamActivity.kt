@@ -75,7 +75,6 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
     }
 
 
-
     private fun startLoading() {
         b.zoomLoginContainer.visibility = View.INVISIBLE
         b.zoomLoginProgress.visibility = View.VISIBLE
@@ -85,6 +84,7 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
         b.zoomLoginContainer.visibility = View.VISIBLE
         b.zoomLoginProgress.visibility = View.INVISIBLE
     }
+
     private fun showInMeetingUI() {
         b.zoomLoginContainer.visibility = View.INVISIBLE
         b.zoomLoginProgress.visibility = View.INVISIBLE
@@ -115,7 +115,7 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         //listen for SSO sign-in callback here
-        if(waitingForSSOSignin){ // otherwise ignore
+        if (waitingForSSOSignin) { // otherwise ignore
             waitingForSSOSignin = false
             try {
                 val token = intent?.data?.getQueryParameter("token")
@@ -150,11 +150,14 @@ class StartLivestreamActivity : AppCompatActivity(), MeetingServiceListener {
 
     override fun onMeetingStatusChanged(meetingStatus: MeetingStatus?, errorCode: Int, internalErrorCode: Int) {
         Log.d(TAG, "onMeetingStatusChanged, meetingStatus=$meetingStatus, errorCode=$errorCode, internalErrorCode=$internalErrorCode")
-        if (meetingStatus == MeetingStatus.MEETING_STATUS_INMEETING && errorCode == MeetingError.MEETING_ERROR_SUCCESS){
+        if (meetingStatus == MeetingStatus.MEETING_STATUS_INMEETING && errorCode == MeetingError.MEETING_ERROR_SUCCESS) {
             // user joined meeting, publish live stream
             currMeetingLink = sdk.inMeetingService.currentMeetingUrl
-            UtilsKt.createLivestream(currMeetingLink, intent.getStringExtra(GlobalConstants.MEDIA_TITLE)?:"Untitled",
-                    intent.getStringExtra(GlobalConstants.EXERCISE_TYPE)?:"", Utils.getHighResProfilePicUrl())
+            UtilsKt.createLivestream(currMeetingLink, intent.getStringExtra(GlobalConstants.MEDIA_TITLE)
+                    ?: "Untitled",
+                    intent.getStringExtra(GlobalConstants.EXERCISE_TYPE) ?: "",
+                    intent.getStringExtra(GlobalConstants.MAX_PARTICIPANTS)
+                            ?: "100", Utils.getHighResProfilePicUrl())
         } else if (meetingStatus == MeetingStatus.MEETING_STATUS_DISCONNECTING) {
             sdk.meetingService.removeListener(this)
             UtilsKt.removeLivestream(currMeetingLink)

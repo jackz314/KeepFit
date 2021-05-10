@@ -12,7 +12,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Observer;
@@ -23,7 +22,6 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jackz314.keepfit.GlobalConstants;
 import com.jackz314.keepfit.R;
 import com.jackz314.keepfit.UtilsKt;
-import com.jackz314.keepfit.controllers.UserController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.controllers.VideoController;
 import com.jackz314.keepfit.models.Media;
@@ -35,7 +33,6 @@ import com.like.LikeButton;
 import com.like.OnLikeListener;
 
 import org.jetbrains.annotations.NotNull;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -49,22 +46,18 @@ import co.lujun.androidtagview.TagView;
 
 public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
+    final static int USER = 1;
+    final static int MEDIA = 2;
     private static final String TAG = "SearchRecyclerAdapter";
-
     private final List<String> greetings = Arrays.asList("Hello", "Hi!", "Let's Be Friends");
     private final List<SearchResult> mData;
     private final LayoutInflater mInflater;
-    private ItemClickListener mClickListener;
-
-    private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
     // TODO: Alter file to add profile functionality
-
-
-    ArrayList<Object> models;
-    final static int USER =1;
-    final static int MEDIA=2;
+    private final int widthPx = Resources.getSystem().getDisplayMetrics().widthPixels;
     private final HashSet<String> likedVideos = new HashSet<>();
     private final HashSet<String> dislikedVideos = new HashSet<>();
+    ArrayList<Object> models;
+    private ItemClickListener mClickListener;
 
 
     // data is passed into the constructor
@@ -82,7 +75,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 likedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus("liked");
+            updateMediaListLikeStatus(true);
         }));
         UserControllerKt.getCurrentUserDoc().collection("disliked_videos").addSnapshotListener(((value, e) -> {
             if (e != null || value == null) {
@@ -95,62 +88,59 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 dislikedVideos.add(doc.getId());
             }
 
-            updateMediaListLikeStatus("disliked");
+            updateMediaListLikeStatus(false);
         }));
     }
 
-    private void updateMediaListLikeStatus(String video) {
-        if (video == "liked" ) {
+    private void updateMediaListLikeStatus(boolean liked) {
+        if (liked) {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 SearchResult res = mData.get(i);
 
-                if(!res.isUser()) {
+                if (!res.isUser()) {
                     boolean isLiked = likedVideos.contains(res.getMedia().getUid());
 
                     if (res.getMedia().getLiked() != isLiked) {
                         res.getMedia().setLiked(isLiked);
-
-                        notifyDataSetChanged();
                     }
                 }
             }
-        }
-        else {
+        } else {
             for (int i = 0, mDataSize = mData.size(); i < mDataSize; i++) {
                 SearchResult res = mData.get(i);
 
-                if(!res.isUser()) {
+                if (!res.isUser()) {
                     boolean isDisliked = dislikedVideos.contains(res.getMedia().getUid());
 
                     if (res.getMedia().getDisliked() != isDisliked) {
                         res.getMedia().setDisliked(isDisliked);
-
-                        notifyDataSetChanged();
                     }
                 }
             }
         }
+        notifyDataSetChanged();
     }
 
-    public void notifyDataChanged(){
-        updateMediaListLikeStatus("liked");
-        updateMediaListLikeStatus("disliked");
+    public void notifyDataChanged() {
+        updateMediaListLikeStatus(true);
+        updateMediaListLikeStatus(false);
     }
 
     // inflates the row layout from xml when needed
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewTy) {
-        switch (viewTy)
-        {
-            case USER:return new UserViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item,parent,false));
-            default:return new MediaViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.condensed_video_item,parent,false));
+        switch (viewTy) {
+            case USER:
+                return new UserViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.user_item, parent, false));
+            default:
+                return new MediaViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.condensed_video_item, parent, false));
         }
     }
 
     @Override
     public int getItemViewType(int position) {
-        if(mData.get(position).isUser())
+        if (mData.get(position).isUser())
             return USER;
         else
             return MEDIA;
@@ -159,11 +149,10 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
     // binds the data to the TextView in each row
     @Override
     public void onBindViewHolder(@NotNull RecyclerView.ViewHolder holder, int position) {
-        if(mData.get(position).isUser())
-            ((UserViewHolder)holder).Bind(mData.get(position).getUser());
+        if (mData.get(position).isUser())
+            ((UserViewHolder) holder).Bind(mData.get(position).getUser());
         else
-            ((MediaViewHolder)holder).Bind(mData.get(position).getMedia());
-
+            ((MediaViewHolder) holder).Bind(mData.get(position).getMedia());
 
 
         //use ref directly, similar speed
@@ -193,6 +182,21 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         return mData.size();
     }
 
+    // convenience method for getting data at click position
+    public Object getItem(int id) {
+        return mData.get(id);
+    }
+
+    // allows clicks events to be caught
+    public void setClickListener(ItemClickListener itemClickListener) {
+        this.mClickListener = itemClickListener;
+    }
+
+    // parent activity will implement this method to respond to click events
+    @FunctionalInterface
+    public interface ItemClickListener {
+        void onItemClick(View view, int position);
+    }
 
     // stores and recycles views as they are scrolled off screen
     public class MediaViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -212,7 +216,6 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
         MediaViewHolder(View itemView) {
             super(itemView);
-           ;
             titleText = itemView.findViewById(R.id.title_text);
             detailText = itemView.findViewById(R.id.detail_text);
             durationText = itemView.findViewById(R.id.duration_text);
@@ -284,7 +287,8 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 in.putExtra(GlobalConstants.USER_PROFILE, creator);
                 v.getContext().startActivity(in);
 //            Toast.makeText(v.getContext(), "Go to " + creator.getName() + "'s profile page", Toast.LENGTH_SHORT).show()
-            });        }
+            });
+        }
 
         public void Bind(Media media) {
             this.media = media;
@@ -299,7 +303,8 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             }
 
             String thumbnail;
-            if (media.isLivestream() || !"".equals(media.getThumbnail())) thumbnail = media.getThumbnail();
+            if (media.isLivestream() || !"".equals(media.getThumbnail()))
+                thumbnail = media.getThumbnail();
             else thumbnail = media.getLink();
             Glide.with(image)
                     .load(thumbnail)
@@ -325,43 +330,47 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                 populateCreatorInfo(creator);
             }
 
-            if(likeButton != null) {
+            if (likeButton != null) {
                 likeButton.setLiked(media.getLiked());
 
                 likeButton.setOnLikeListener(new OnLikeListener() {
                     @Override
                     public void liked(LikeButton likeButton) {
-                        if(dislikeButton.isLiked()) {
+                        if (dislikeButton.isLiked()) {
                             dislikeButton.callOnClick();
                         }
                         UserControllerKt.likeVideo(media.getUid());
                         VideoController.likeVideo(media.getUid());
+                        media.setLikes(media.getLikes() + 1); // no listener, so manually update
                     }
 
                     @Override
                     public void unLiked(LikeButton likeButton) {
                         UserControllerKt.unlikeVideo(media.getUid());
                         VideoController.unlikeVideo(media.getUid());
+                        media.setLikes(media.getLikes() - 1);
                     }
                 });
             }
-            if(dislikeButton != null) {
+            if (dislikeButton != null) {
                 dislikeButton.setLiked(media.getDisliked());
 
                 dislikeButton.setOnLikeListener(new OnLikeListener() {
                     @Override
                     public void liked(LikeButton dislikeButton) {
-                        if(likeButton.isLiked()) {
+                        if (likeButton.isLiked()) {
                             likeButton.callOnClick();
                         }
                         UserControllerKt.dislikeVideo(media.getUid());
                         VideoController.dislikeVideo(media.getUid());
+                        media.setDislikes(media.getDislikes() + 1); // no listener, so manually update
                     }
 
                     @Override
                     public void unLiked(LikeButton dislikeButton) {
                         UserControllerKt.undislikeVideo(media.getUid());
                         VideoController.undislikeVideo(media.getUid());
+                        media.setDislikes(media.getDislikes() - 1); // no listener, so manually update
                     }
                 });
             }
@@ -370,7 +379,8 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         }
 
     }
-    public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+
+    public class UserViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView userName;
         TextView userEmail;
         TextView bio;
@@ -379,7 +389,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
         User user = null;
 
 
-        UserViewHolder(View itemView){
+        UserViewHolder(View itemView) {
             super(itemView);
             userName = itemView.findViewById(R.id.user_name_text);
             userEmail = itemView.findViewById(R.id.user_email_text);
@@ -388,6 +398,7 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
 
             itemView.setOnClickListener(this);
         }
+
         @Override
         public void onClick(View view) {
             if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
@@ -409,29 +420,12 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
             });
             userName.setText(user.getName());
             userEmail.setText(user.getEmail());
-            if(user.getBiography().isEmpty()){
+            if (user.getBiography().isEmpty()) {
                 Random rand = new Random();
                 String randGreeting = greetings.get(rand.nextInt(greetings.size()));
                 bio.setText(randGreeting);
-            }
-            else
-                bio.setText("About Me: "+user.getBiography());
+            } else
+                bio.setText("About Me: " + user.getBiography());
         }
-    }
-
-    // convenience method for getting data at click position
-    public Object getItem(int id) {
-        return mData.get(id);
-    }
-
-    // allows clicks events to be caught
-    public void setClickListener(ItemClickListener itemClickListener) {
-        this.mClickListener = itemClickListener;
-    }
-
-    // parent activity will implement this method to respond to click events
-    @FunctionalInterface
-    public interface ItemClickListener {
-        void onItemClick(View view, int position);
     }
 }

@@ -14,7 +14,8 @@ public class Exercise implements Serializable {
     private long elapsedTime;
     private Date startingTime;
 
-    public Exercise(){}
+    public Exercise() {
+    }
 
     public Exercise(double calories, String category, long elapsedTime, Date startingTime) {
         this.calories = calories;
