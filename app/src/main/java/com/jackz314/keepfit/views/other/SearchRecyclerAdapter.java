@@ -329,12 +329,14 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                         }
                         UserControllerKt.likeVideo(media.getUid());
                         VideoController.likeVideo(media.getUid());
+                        media.setLikes(media.getLikes() + 1); // no listener, so manually update
                     }
 
                     @Override
                     public void unLiked(LikeButton likeButton) {
                         UserControllerKt.unlikeVideo(media.getUid());
                         VideoController.unlikeVideo(media.getUid());
+                        media.setLikes(media.getLikes() - 1);
                     }
                 });
             }
@@ -349,12 +351,14 @@ public class SearchRecyclerAdapter extends RecyclerView.Adapter {
                         }
                         UserControllerKt.dislikeVideo(media.getUid());
                         VideoController.dislikeVideo(media.getUid());
+                        media.setDislikes(media.getDislikes() + 1); // no listener, so manually update
                     }
 
                     @Override
                     public void unLiked(LikeButton dislikeButton) {
                         UserControllerKt.undislikeVideo(media.getUid());
                         VideoController.undislikeVideo(media.getUid());
+                        media.setDislikes(media.getDislikes() - 1); // no listener, so manually update
                     }
                 });
             }
