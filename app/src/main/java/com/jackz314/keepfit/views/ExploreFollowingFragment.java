@@ -18,10 +18,6 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
@@ -32,13 +28,12 @@ import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
-import com.jackz314.keepfit.models.SearchResult;
-import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.other.FeedRecyclerAdapter;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -48,13 +43,13 @@ public class ExploreFollowingFragment extends Fragment {
 
     private FragmentFeedBinding b;
     private FirebaseFirestore db;
-    private FirebaseUser ub;
     private FeedRecyclerAdapter feedRecyclerAdapter;
 
     private LivestreamController livestreamController;
 
     private final List<Media> mediaList = new ArrayList<>();
-    private final List<String> uidList = new ArrayList<>();
+    private final List<Media> fullMediaList = new ArrayList<>();
+    private final Set<String> uidSet = new HashSet<>();
 
     private final Executor procES = Executors.newSingleThreadExecutor();
 
@@ -92,14 +87,11 @@ public class ExploreFollowingFragment extends Fragment {
     }
 
     private void setupFeedListener(String category) {
-        ub = FirebaseAuth.getInstance().getCurrentUser();
         Query feedQuery = db.collection("media").orderBy("likes", Query.Direction.DESCENDING)
                 .orderBy("start_time", Query.Direction.DESCENDING);
         if (category != null) feedQuery = feedQuery.whereArrayContains("categories", category);
 
-
-        db.collection("users")
-                .document(ub.getUid())
+        UserControllerKt.getCurrentUserDoc()
                 .collection("following")
                 .addSnapshotListener((value, e) -> {
                     if (e != null || value == null) {
@@ -107,23 +99,11 @@ public class ExploreFollowingFragment extends Fragment {
                         return;
                     }
 
-                    procES.execute(() -> {
+                    uidSet.clear();
+                    for (QueryDocumentSnapshot doc : value)
+                        uidSet.add(doc.getDocumentReference("ref").getId());
 
-                        uidList.clear();
-                        try {
-                            for (QueryDocumentSnapshot doc : value) {
-                                DocumentSnapshot userDoc = Tasks.await(doc.getDocumentReference("ref").get());
-                                User user = new User(userDoc);
-                                if (user.getUid() == null) {
-                                    doc.getReference().delete();
-                                    continue;
-                                }
-                                uidList.add(user.getUid());
-                            }
-                        } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
-                            executionException.printStackTrace();
-                        }
-                    });
+                    filterMediaList();
                 });
 
         if (registration != null) registration.remove();
@@ -132,39 +112,33 @@ public class ExploreFollowingFragment extends Fragment {
                 Log.w(TAG, "Listen failed.", e);
                 return;
             }
+            fullMediaList.clear();
+            for (QueryDocumentSnapshot queryDocumentSnapshot : value)
+                fullMediaList.add(new Media(queryDocumentSnapshot));
 
-            procES.execute(() -> {
-                mediaList.clear();
-                for (QueryDocumentSnapshot queryDocumentSnapshot : value) {
-                    Media med = new Media(queryDocumentSnapshot);
-                    try {
-                       String uid = Tasks.await(med.getCreatorRef().get()).getId();
-                       if (uidList.contains(uid)){
-                           mediaList.add(med);
-                       }
-                    } catch (ExecutionException executionException) {
-                        executionException.printStackTrace();
-                    } catch (InterruptedException interruptedException) {
-                        interruptedException.printStackTrace();
-                    }
-                    //mediaList.add(med);
-                }
-                // TODO: 3/6/21 change to item based notify (notifyItemRemoved)
-                this.requireActivity().runOnUiThread(() -> {
-
-                    if (b != null) {
-                        if (!mediaList.isEmpty()) {
-                            b.emptyFeedText.setVisibility(View.GONE);
-                        } else {
-                            b.emptyFeedText.setVisibility(View.VISIBLE);
-                            b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
-                        }
-                    }
-                    feedRecyclerAdapter.notifyDataChanged();
-                });
-                Log.d(TAG, "media collection update: " + mediaList);
-            });
+            filterMediaList();
         });
+    }
+
+    private void filterMediaList() {
+        mediaList.clear();
+        for (Media media : fullMediaList) {
+            String uid = media.getCreatorRef().getId();
+            if (uidSet.contains(uid)) {
+                mediaList.add(media);
+            }
+        }
+
+        if (b != null) {
+            if (!mediaList.isEmpty()) {
+                b.emptyFeedText.setVisibility(View.GONE);
+            } else {
+                b.emptyFeedText.setVisibility(View.VISIBLE);
+                b.emptyFeedText.setText("Nothing to show here ¯\\_(ツ)_/¯");
+            }
+        }
+        feedRecyclerAdapter.notifyDataChanged();
+        Log.d(TAG, "media collection update: " + mediaList);
     }
 
     @Override

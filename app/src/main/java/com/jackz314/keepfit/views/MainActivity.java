@@ -188,6 +188,7 @@ class MainActivity extends AppCompatActivity {
         setContentView(rootView);
 
         initializeZoomSdk(this);
+
         if (SchedulingController.getIntentForDailyNotification(this, PendingIntent.FLAG_NO_CREATE) == null) { // alarm manager not scheduled
             long lastDailyNotifScheduledTime = PreferenceManager.getDefaultSharedPreferences(this).getLong(GlobalConstants.DAILY_NOTIF_SCHEDULED_TIME, 0);
             if (lastDailyNotifScheduledTime != 0L) { // has previous daily notif time
