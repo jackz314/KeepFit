@@ -181,12 +181,14 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
                 }
                 UserControllerKt.likeVideo(media.getUid());
                 VideoController.likeVideo(media.getUid());
+                media.setLikes(media.getLikes() + 1); // no listener, so manually update
             }
 
             @Override
             public void unLiked(LikeButton likeButton) {
                 UserControllerKt.unlikeVideo(media.getUid());
                 VideoController.unlikeVideo(media.getUid());
+                media.setLikes(media.getLikes() - 1);
             }
         });
         holder.dislikeButton.setOnLikeListener(new OnLikeListener() {
@@ -197,12 +199,14 @@ public class HistoryRecyclerAdapter extends RecyclerView.Adapter<HistoryRecycler
                 }
                 UserControllerKt.dislikeVideo(media.getUid());
                 VideoController.dislikeVideo(media.getUid());
+                media.setDislikes(media.getDislikes() + 1); // no listener, so manually update
             }
 
             @Override
             public void unLiked(LikeButton likeButton) {
                 UserControllerKt.undislikeVideo(media.getUid());
                 VideoController.undislikeVideo(media.getUid());
+                media.setDislikes(media.getDislikes() - 1); // no listener, so manually update
             }
         });
 
