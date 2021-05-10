@@ -342,9 +342,7 @@ public class UpdateProfileActivity extends AppCompatActivity {
                                         Log.d("Update Profile", "Uploaded " + (int) progress + "%");
                                     }
                                 });
-            } else {
-                Toast.makeText(UpdateProfileActivity.this, "Something went wrong with image upload :(", Toast.LENGTH_LONG).show();
-            }
+            } 
     }
 
 
