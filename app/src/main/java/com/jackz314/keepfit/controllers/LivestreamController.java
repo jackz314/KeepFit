@@ -36,8 +36,6 @@ public class LivestreamController implements MeetingServiceListener {
     private final Context context;
     private final FirebaseFirestore db;
     private Media livestream;
-    private int currParticipants;
-    private int maxParticipants;
 
     public LivestreamController(Context context) {
         this.context = context;
@@ -82,25 +80,35 @@ public class LivestreamController implements MeetingServiceListener {
         }
 
         DocumentReference mediaDoc = db.collection("media").document(Utils.getMD5(livestream.getLink()));
-        mediaDoc.get()
-                .addOnCompleteListener(task -> {
-                    DocumentSnapshot dataResult = task.getResult();
-                    Log.e(TAG, "curr " + dataResult.getLong("view_count").intValue());
-                    Log.e(TAG, "max " + dataResult.getLong("max_participants").intValue());
-                    currParticipants = dataResult.getLong("view_count").intValue();
-                    maxParticipants = dataResult.getLong("max_participants").intValue();
-                });
+        mediaDoc.get().addOnCompleteListener(task -> {
+            DocumentSnapshot dataResult = task.getResult();
+            if (dataResult == null || task.getException() != null) {
+                Log.e(TAG, "joinLivestream: Failed to join meeting, error: ", task.getException());
+                Toast.makeText(context, "Failed to join livestream, try again later", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            Log.d(TAG, "curr " + dataResult.getLong("view_count"));
+            Log.d(TAG, "max " + dataResult.getLong("max_participants"));
 
-        if (currParticipants + 1 > maxParticipants) {
-            Toast.makeText(context, "Max participant limit reached", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        meetingService.addListener(this);
-        int result = meetingService.joinMeetingWithParams(context, params, opts);
-        if (result != ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
-            Log.e(TAG, "joinLivestream: Failed to join meeting, error: " + result);
-            Toast.makeText(context, "Failed to join livestream, try again later", Toast.LENGTH_SHORT).show();
-        }
+            long currParticipants = 0;
+            long maxParticipants = 100;
+            try {
+                currParticipants = Objects.requireNonNull(dataResult.getLong("view_count"));
+                maxParticipants = Objects.requireNonNull(dataResult.getLong("max_participants"));
+            } catch (NullPointerException e) {
+                Log.e(TAG, "joinLivestream: Failed to join meeting, error: " + e);
+            }
+            if (currParticipants + 1 > maxParticipants) {
+                Toast.makeText(context, "Sorry, max participant limit reached, try joining again later.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            meetingService.addListener(this);
+            int result = meetingService.joinMeetingWithParams(context, params, opts);
+            if (result != ZoomApiError.ZOOM_API_ERROR_SUCCESS) {
+                Log.e(TAG, "joinLivestream: Failed to join meeting, error: " + result);
+                Toast.makeText(context, "Failed to join livestream, try again later", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
