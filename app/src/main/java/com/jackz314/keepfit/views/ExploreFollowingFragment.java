@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.Query;
@@ -31,6 +32,8 @@ import com.jackz314.keepfit.controllers.LivestreamController;
 import com.jackz314.keepfit.controllers.UserControllerKt;
 import com.jackz314.keepfit.databinding.FragmentFeedBinding;
 import com.jackz314.keepfit.models.Media;
+import com.jackz314.keepfit.models.SearchResult;
+import com.jackz314.keepfit.models.User;
 import com.jackz314.keepfit.views.other.FeedRecyclerAdapter;
 
 import java.util.ArrayList;
@@ -51,6 +54,7 @@ public class ExploreFollowingFragment extends Fragment {
     private LivestreamController livestreamController;
 
     private final List<Media> mediaList = new ArrayList<>();
+    private final List<String> uidList = new ArrayList<>();
 
     private final Executor procES = Executors.newSingleThreadExecutor();
 
@@ -93,6 +97,35 @@ public class ExploreFollowingFragment extends Fragment {
                 .orderBy("start_time", Query.Direction.DESCENDING);
         if (category != null) feedQuery = feedQuery.whereArrayContains("categories", category);
 
+
+        db.collection("users")
+                .document(ub.getUid())
+                .collection("following")
+                .addSnapshotListener((value, e) -> {
+                    if (e != null || value == null) {
+                        Log.w(TAG, "Listen failed.", e);
+                        return;
+                    }
+
+                    procES.execute(() -> {
+
+                        uidList.clear();
+                        try {
+                            for (QueryDocumentSnapshot doc : value) {
+                                DocumentSnapshot userDoc = Tasks.await(doc.getDocumentReference("ref").get());
+                                User user = new User(userDoc);
+                                if (user.getUid() == null) {
+                                    doc.getReference().delete();
+                                    continue;
+                                }
+                                uidList.add(user.getUid());
+                            }
+                        } catch (ExecutionException | IllegalStateException | InterruptedException executionException) {
+                            executionException.printStackTrace();
+                        }
+                    });
+                });
+
         if (registration != null) registration.remove();
         registration = feedQuery.addSnapshotListener((value, e) -> {
             if (e != null || value == null) {
@@ -106,13 +139,9 @@ public class ExploreFollowingFragment extends Fragment {
                     Media med = new Media(queryDocumentSnapshot);
                     try {
                        String uid = Tasks.await(med.getCreatorRef().get()).getId();
-                        UserControllerKt.getCurrentUserDoc()
-                                .collection("following")
-                                .whereEqualTo("ref", db.collection("users").document(uid))
-                                .addSnapshotListener((val, e1) -> {
-                                    if (val != null && !val.isEmpty()) {
-                                        mediaList.add(med);
-                                    }});
+                       if (uidList.contains(uid)){
+                           mediaList.add(med);
+                       }
                     } catch (ExecutionException executionException) {
                         executionException.printStackTrace();
                     } catch (InterruptedException interruptedException) {

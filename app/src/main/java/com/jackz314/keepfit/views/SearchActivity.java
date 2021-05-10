@@ -58,8 +58,6 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
     private SearchRecyclerAdapter searchRecyclerAdapter;
     private LivestreamController livestreamController;
     private ActivitySearchBinding b;
-    private Chip user_chip;
-    private Chip video_chip;
 
     private final CompositeDisposable compositeDisposable = new CompositeDisposable();
     private com.algolia.search.saas.Index index;
@@ -124,23 +122,22 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         editSearch = findViewById(R.id.search);
 
 
-        user_chip = findViewById(R.id.user_chip);
-        video_chip = findViewById(R.id.video_chip);
+
         //Interface\
         CompoundButton.OnCheckedChangeListener filt = new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) { // this method is for when a search is already processed
                 if (isChecked) { //if checked a chip
-                    if (buttonView == (CompoundButton) user_chip) { // if user chip is checked, need to uncheck videochip
-                        if (video_chip.isChecked()) {
-                            video_chip.setChecked(false);
+                    if (buttonView == (CompoundButton) b.userChip) { // if user chip is checked, need to uncheck videochip
+                        if (b.videoChip.isChecked()) {
+                            b.videoChip.setChecked(false);
                         }
                         if(!mList.isEmpty())
                             filter(1);
                     }
-                    else if(buttonView == (CompoundButton)video_chip){//if video chip is checked, need to uncheck user chip
-                        if(user_chip.isChecked()){
-                            user_chip.setChecked(false);
+                    else if(buttonView == (CompoundButton)b.videoChip){//if video chip is checked, need to uncheck user chip
+                        if(b.userChip.isChecked()){
+                            b.userChip.setChecked(false);
                         }
                         if(!mList.isEmpty())
                             filter(2);
@@ -151,8 +148,8 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
             }
 
         };
-        user_chip.setOnCheckedChangeListener(filt);
-        video_chip.setOnCheckedChangeListener(filt);
+        b.userChip.setOnCheckedChangeListener(filt);
+        b.videoChip.setOnCheckedChangeListener(filt);
 
         editSearch.setOnQueryTextListener(this);
         editSearch.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
@@ -202,6 +199,7 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
         if(mList.isEmpty()){
             b.emptyResultsText.setVisibility(View.VISIBLE);
             b.emptyResultsText.setText("No Filtered Results");
+            b.searchRecycler.setVisibility(View.GONE);
         }
         else{
             b.emptyResultsText.setVisibility(View.GONE);
@@ -294,10 +292,10 @@ public class SearchActivity extends AppCompatActivity implements SearchView.OnQu
                     if (b != null) {
                         if (!mList.isEmpty()){
                             b.emptyResultsText.setVisibility(View.GONE);
-                            if(user_chip.isChecked()){ // checks if a chip is already clicked to filter before displaying full results
+                            if(b.userChip.isChecked()){ // checks if a chip is already clicked to filter before displaying full results
                                 filter(1);
                             }
-                            else if(video_chip.isChecked()){
+                            else if(b.videoChip.isChecked()){
                                 filter(2);
                             }
                         } else {
